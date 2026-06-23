@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>宿曜 対人相性占い｜光晴堂</title>
-<meta name="description" content="宿曜占星術に基づき、二つの生年月日（または法人設立日）から本命宿を算出し、対人・対法人の相性を占います。上司・部下・法人との縁を27宿・11分類で読み解く、光晴堂の相性診断ツールです。">
-<meta property="og:title" content="宿曜 対人相性占い｜光晴堂">
+<title>宿曜 対人相性占い</title>
+<meta name="description" content="宿曜占星術に基づき、二つの生年月日（または法人設立日）から本命宿を算出し、対人・対法人の相性を占います。上司・部下・法人との縁を27宿・11分類で読み解く相性診断ツールです。">
+<meta property="og:title" content="宿曜 対人相性占い">
 <meta property="og:description" content="生年月日から本命宿を算出し、上司・部下・法人との相性を宿曜の観点で読み解きます。">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,19 +16,21 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --deep:    #1a1610;
-  --deep2:   #221e16;
-  --paper:   #f7f3ec;
-  --paper2:  #ede8de;
-  --gold:    #b8953a;
-  --gold-l:  #d4af6a;
-  --gold-dim:rgba(184,149,58,.12);
-  --moon:    #e8e0cc;
-  --ink:     #0e0d0b;
-  --muted:   #7a6e5e;
-  --teal:    #1f6e6e;
-  --accent:  #4a3f8c;
-  --border:  rgba(184,149,58,.22);
+  --deep:    #120c24;
+  --deep2:   #1c1438;
+  --paper:   #f3eff5;
+  --paper2:  #e7e0ed;
+  --gold:    #c9a961;
+  --gold-l:  #e0c785;
+  --gold-dim:rgba(201,169,97,.14);
+  --moon:    #e8e0f5;
+  --ink:     #1a1426;
+  --muted:   #6e6285;
+  --teal:    #6b4ba8;
+  --accent:  #8a6fc4;
+  --violet:  #4a2f7a;
+  --violet-glow: rgba(139,109,212,.35);
+  --border:  rgba(201,169,97,.20);
   --r: 10px;
   --transition: .2s ease;
 }
@@ -54,9 +56,16 @@ body {
   font-size: 17px;
   color: var(--moon);
   letter-spacing: .12em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.site-header .logo span { color: var(--gold); }
-.site-header .sep { color: rgba(232,224,204,.25); font-size: 12px; }
+.logo-moon {
+  color: var(--gold-l);
+  font-size: 16px;
+  text-shadow: 0 0 12px var(--violet-glow);
+}
+.site-header .sep { color: rgba(232,224,245,.25); font-size: 12px; }
 .site-header .page-name {
   font-size: 11px;
   color: var(--gold);
@@ -66,7 +75,16 @@ body {
 
 /* ── Hero ─────────────────────────────────────────────── */
 .hero {
-  background: var(--deep);
+  background:
+    radial-gradient(1px 1px at 12% 22%, rgba(232,224,245,.9), transparent),
+    radial-gradient(1px 1px at 28% 65%, rgba(232,224,245,.7), transparent),
+    radial-gradient(1.5px 1.5px at 45% 15%, rgba(232,224,245,.8), transparent),
+    radial-gradient(1px 1px at 62% 78%, rgba(232,224,245,.6), transparent),
+    radial-gradient(1px 1px at 78% 30%, rgba(232,224,245,.9), transparent),
+    radial-gradient(1.5px 1.5px at 88% 60%, rgba(232,224,245,.7), transparent),
+    radial-gradient(1px 1px at 35% 85%, rgba(232,224,245,.5), transparent),
+    radial-gradient(1px 1px at 95% 12%, rgba(232,224,245,.6), transparent),
+    linear-gradient(180deg, var(--deep) 0%, var(--violet) 130%);
   text-align: center;
   padding: 52px 24px 44px;
   position: relative;
@@ -76,15 +94,16 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(184,149,58,.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 80% at 50% 0%, var(--violet-glow) 0%, transparent 70%);
   pointer-events: none;
 }
 .hero-eyebrow {
   font-family: 'Cinzel', serif;
   font-size: 10px;
   letter-spacing: .4em;
-  color: var(--gold);
+  color: var(--gold-l);
   margin-bottom: 14px;
+  position: relative;
 }
 .hero-title {
   font-family: 'Shippori Mincho', serif;
@@ -92,12 +111,13 @@ body {
   color: var(--moon);
   font-weight: 500;
   letter-spacing: .08em;
+  position: relative;
   line-height: 1.5;
   margin-bottom: 12px;
 }
 .hero-sub {
   font-size: 12px;
-  color: rgba(232,224,204,.5);
+  color: rgba(232,224,245,.5);
   letter-spacing: .08em;
   line-height: 2;
 }
@@ -185,7 +205,7 @@ body {
   margin-top: 3px;
   letter-spacing: .06em;
 }
-.rel-tab.active .rel-desc { color: rgba(232,224,204,.5); }
+.rel-tab.active .rel-desc { color: rgba(232,224,245,.5); }
 
 /* ── Form rows ────────────────────────────────────────── */
 .form-grid {
@@ -244,14 +264,14 @@ body {
   font-family: 'Noto Serif JP', serif;
   vertical-align: middle;
 }
-.badge-a { background: rgba(184,149,58,.15); color: var(--gold); }
+.badge-a { background: rgba(201,169,97,.15); color: var(--gold); }
 .badge-b { background: rgba(74,63,140,.15); color: var(--accent); }
 .badge-corp { background: rgba(31,110,110,.15); color: var(--teal); }
 
 .name-input, .date-input {
   width: 100%;
   padding: 12px 14px;
-  border: 1.5px solid rgba(184,149,58,.25);
+  border: 1.5px solid rgba(201,169,97,.25);
   border-radius: 8px;
   font-family: 'Noto Serif JP', serif;
   font-size: 14px;
@@ -262,7 +282,7 @@ body {
 }
 .name-input:focus, .date-input:focus {
   border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(184,149,58,.12);
+  box-shadow: 0 0 0 3px rgba(201,169,97,.12);
 }
 .input-note {
   font-size: 10px;
@@ -291,7 +311,7 @@ body {
   background: var(--gold);
   color: var(--deep);
   transform: translateY(-2px);
-  box-shadow: 0 6px 24px rgba(184,149,58,.25);
+  box-shadow: 0 6px 24px rgba(201,169,97,.25);
 }
 .btn-submit:disabled { opacity: .5; pointer-events: none; }
 
@@ -311,23 +331,25 @@ body {
 #result.show { display: block; }
 
 .result-header {
-  background: var(--deep);
+  background: linear-gradient(160deg, var(--deep) 0%, var(--violet) 140%);
   border-radius: var(--r) var(--r) 0 0;
   padding: 28px 28px 22px;
   border: 1px solid var(--border);
   border-bottom: none;
+  position: relative;
+  overflow: hidden;
 }
 .result-eyebrow {
   font-family: 'Cinzel', serif;
   font-size: 9px;
   letter-spacing: .4em;
-  color: var(--gold);
+  color: var(--gold-l);
   margin-bottom: 8px;
 }
 .result-rel-label {
   font-family: 'Shippori Mincho', serif;
   font-size: 13px;
-  color: rgba(232,224,204,.6);
+  color: rgba(232,224,245,.6);
   margin-bottom: 4px;
 }
 
@@ -353,7 +375,7 @@ body {
 }
 .shuku-box-name {
   font-size: 11px;
-  color: rgba(232,224,204,.55);
+  color: rgba(232,224,245,.55);
   margin-bottom: 4px;
 }
 .shuku-kanji {
@@ -371,7 +393,7 @@ body {
 }
 .shuku-nature {
   font-size: 9px;
-  color: rgba(232,224,204,.4);
+  color: rgba(232,224,245,.4);
   margin-top: 3px;
 }
 
@@ -461,7 +483,7 @@ body {
 }
 .aspect-item {
   background: var(--paper);
-  border: 1px solid rgba(184,149,58,.15);
+  border: 1px solid rgba(201,169,97,.15);
   border-radius: 8px;
   padding: 14px 16px;
 }
@@ -488,7 +510,7 @@ body {
 
 /* Advice */
 .advice {
-  background: var(--deep);
+  background: linear-gradient(200deg, var(--deep) 0%, var(--violet) 160%);
   border: 1px solid var(--border);
   border-top: none;
   padding: 24px 28px;
@@ -496,15 +518,16 @@ body {
 .advice-title {
   font-family: 'Shippori Mincho', serif;
   font-size: 13px;
-  color: var(--gold);
+  color: var(--gold-l);
   letter-spacing: .1em;
   margin-bottom: 12px;
 }
 .advice-text {
   font-size: 13px;
-  color: rgba(232,224,204,.75);
+  color: rgba(232,224,245,.78);
   line-height: 2.2;
   letter-spacing: .04em;
+  white-space: pre-line;
 }
 
 /* Business note */
@@ -547,7 +570,7 @@ body {
   text-align: center;
   padding: 24px;
   font-size: 10px;
-  color: rgba(232,224,204,.25);
+  color: rgba(232,224,245,.25);
   letter-spacing: .15em;
   border-top: 1px solid var(--border);
 }
@@ -560,7 +583,7 @@ body {
 
 <!-- Header -->
 <header class="site-header">
-  <div class="logo">宿曜占星術 <span>光晴堂</span></div>
+  <div class="logo"><span class="logo-moon">☽</span> 宿曜占星術</div>
   <div class="sep">｜</div>
   <div class="page-name">COMPATIBILITY</div>
 </header>
@@ -722,7 +745,7 @@ body {
 </main>
 
 <footer class="site-footer">
-  © 宿曜占星術 光晴堂 · KOSEI-DO · 竹本光晴
+  © 宿曜占星術 · SUKUYO COMPATIBILITY
 </footer>
 
 <script>
