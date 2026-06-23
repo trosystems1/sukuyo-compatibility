@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>宿曜 対人相性占い｜光晴堂</title>
+<meta name="description" content="宿曜占星術に基づき、二つの生年月日（または法人設立日）から本命宿を算出し、対人・対法人の相性を占います。上司・部下・法人との縁を27宿・11分類で読み解く、光晴堂の相性診断ツールです。">
+<meta property="og:title" content="宿曜 対人相性占い｜光晴堂">
+<meta property="og:description" content="生年月日から本命宿を算出し、上司・部下・法人との相性を宿曜の観点で読み解きます。">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;600&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.4/lunar.min.js"></script>
+<style>
+/* ── Reset & Tokens ───────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --deep:    #1a1610;
+  --deep2:   #221e16;
+  --paper:   #f7f3ec;
+  --paper2:  #ede8de;
+  --gold:    #b8953a;
+  --gold-l:  #d4af6a;
+  --gold-dim:rgba(184,149,58,.12);
+  --moon:    #e8e0cc;
+  --ink:     #0e0d0b;
+  --muted:   #7a6e5e;
+  --teal:    #1f6e6e;
+  --accent:  #4a3f8c;
+  --border:  rgba(184,149,58,.22);
+  --r: 10px;
+  --transition: .2s ease;
+}
+
+body {
+  font-family: 'Noto Serif JP', serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+}
+
+/* ── Header ───────────────────────────────────────────── */
+.site-header {
+  background: var(--deep);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.site-header .logo {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17px;
+  color: var(--moon);
+  letter-spacing: .12em;
+}
+.site-header .logo span { color: var(--gold); }
+.site-header .sep { color: rgba(232,224,204,.25); font-size: 12px; }
+.site-header .page-name {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .2em;
+  font-family: 'Cinzel', serif;
+}
+
+/* ── Hero ─────────────────────────────────────────────── */
+.hero {
+  background: var(--deep);
+  text-align: center;
+  padding: 52px 24px 44px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(184,149,58,.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .4em;
+  color: var(--gold);
+  margin-bottom: 14px;
+}
+.hero-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(22px, 4vw, 34px);
+  color: var(--moon);
+  font-weight: 500;
+  letter-spacing: .08em;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.hero-sub {
+  font-size: 12px;
+  color: rgba(232,224,204,.5);
+  letter-spacing: .08em;
+  line-height: 2;
+}
+
+/* ── Layout ───────────────────────────────────────────── */
+.main-wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+/* ── Card ─────────────────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 32px 28px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.card-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  color: var(--ink);
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.card-title::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  background: var(--gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Relation type tabs ───────────────────────────────── */
+.rel-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 28px;
+}
+@media (max-width: 700px) { .rel-tabs { grid-template-columns: repeat(2, 1fr); } }
+.rel-tab {
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--paper);
+}
+.rel-tab:hover {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.rel-tab.active {
+  border-color: var(--gold);
+  background: var(--deep);
+  color: var(--moon);
+}
+.rel-tab .rel-icon { font-size: 22px; display: block; margin-bottom: 6px; }
+.rel-tab .rel-label {
+  font-size: 11px;
+  letter-spacing: .1em;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 500;
+}
+.rel-tab .rel-desc {
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: .06em;
+}
+.rel-tab.active .rel-desc { color: rgba(232,224,204,.5); }
+
+/* ── Form rows ────────────────────────────────────────── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+.input-mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.input-mode-toggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.mode-btn {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 10px;
+  letter-spacing: .05em;
+  padding: 4px 10px;
+  background: var(--paper);
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.mode-btn:hover { background: var(--gold-dim); }
+.mode-btn.active {
+  background: var(--deep);
+  color: var(--moon);
+}
+#b-side-block.self-mode { display: none; }
+
+.form-block { display: flex; flex-direction: column; gap: 8px; }
+.form-label {
+  font-size: 11px;
+  letter-spacing: .15em;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+}
+.form-label .name-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  margin-left: 8px;
+  font-family: 'Noto Serif JP', serif;
+  vertical-align: middle;
+}
+.badge-a { background: rgba(184,149,58,.15); color: var(--gold); }
+.badge-b { background: rgba(74,63,140,.15); color: var(--accent); }
+.badge-corp { background: rgba(31,110,110,.15); color: var(--teal); }
+
+.name-input, .date-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid rgba(184,149,58,.25);
+  border-radius: 8px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.name-input:focus, .date-input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(184,149,58,.12);
+}
+.input-note {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .06em;
+}
+
+/* ── Submit ───────────────────────────────────────────── */
+.submit-wrap { text-align: center; margin-top: 28px; }
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 48px;
+  background: var(--deep);
+  color: var(--moon);
+  border: 1.5px solid var(--gold);
+  border-radius: 6px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  letter-spacing: .18em;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.btn-submit:hover {
+  background: var(--gold);
+  color: var(--deep);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(184,149,58,.25);
+}
+.btn-submit:disabled { opacity: .5; pointer-events: none; }
+
+/* ── Error ────────────────────────────────────────────── */
+.error-msg {
+  display: none;
+  text-align: center;
+  color: #b04040;
+  font-size: 12px;
+  margin-top: 10px;
+  letter-spacing: .08em;
+}
+.error-msg.show { display: block; }
+
+/* ── Result ───────────────────────────────────────────── */
+#result { display: none; }
+#result.show { display: block; }
+
+.result-header {
+  background: var(--deep);
+  border-radius: var(--r) var(--r) 0 0;
+  padding: 28px 28px 22px;
+  border: 1px solid var(--border);
+  border-bottom: none;
+}
+.result-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .4em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.result-rel-label {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: rgba(232,224,204,.6);
+  margin-bottom: 4px;
+}
+
+/* Shuku pair row */
+.shuku-pair {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.shuku-box {
+  text-align: center;
+  flex: 1;
+  min-width: 120px;
+}
+.shuku-box-label {
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--muted);
+  font-family: 'Cinzel', serif;
+  margin-bottom: 6px;
+}
+.shuku-box-name {
+  font-size: 11px;
+  color: rgba(232,224,204,.55);
+  margin-bottom: 4px;
+}
+.shuku-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 28px;
+  color: var(--moon);
+  letter-spacing: .06em;
+  line-height: 1;
+}
+.shuku-yomi {
+  font-size: 10px;
+  color: var(--gold);
+  margin-top: 4px;
+  letter-spacing: .15em;
+}
+.shuku-nature {
+  font-size: 9px;
+  color: rgba(232,224,204,.4);
+  margin-top: 3px;
+}
+
+.pair-arrow {
+  font-size: 24px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+/* Score ring */
+.score-section {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+.score-ring-wrap { position: relative; width: 120px; height: 120px; flex-shrink: 0; }
+.score-ring-wrap svg { transform: rotate(-90deg); }
+.score-ring-bg { fill: none; stroke: var(--paper2); stroke-width: 8; }
+.score-ring-fill {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease;
+}
+.score-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.score-num {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  color: var(--ink);
+  line-height: 1;
+}
+.score-label { font-size: 9px; color: var(--muted); margin-top: 2px; letter-spacing: .1em; }
+
+.compat-grade {
+  flex: 1;
+  min-width: 160px;
+}
+.grade-badge {
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 4px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  margin-bottom: 8px;
+}
+.grade-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.grade-sub { font-size: 12px; color: var(--muted); line-height: 1.9; }
+
+/* Aspects */
+.aspects {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 24px 28px;
+}
+.aspect-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .1em;
+  margin-bottom: 16px;
+  color: var(--ink);
+}
+.aspect-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+.aspect-item {
+  background: var(--paper);
+  border: 1px solid rgba(184,149,58,.15);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.aspect-item-label {
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--gold);
+  font-family: 'Cinzel', serif;
+  margin-bottom: 5px;
+}
+.aspect-bar-wrap {
+  height: 4px;
+  background: var(--paper2);
+  border-radius: 2px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+.aspect-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 1s ease .3s;
+}
+.aspect-item-text { font-size: 11px; color: var(--muted); line-height: 1.7; }
+
+/* Advice */
+.advice {
+  background: var(--deep);
+  border: 1px solid var(--border);
+  border-top: none;
+  padding: 24px 28px;
+}
+.advice-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: var(--gold);
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+}
+.advice-text {
+  font-size: 13px;
+  color: rgba(232,224,204,.75);
+  line-height: 2.2;
+  letter-spacing: .04em;
+}
+
+/* Business note */
+.biz-note {
+  background: rgba(31,110,110,.08);
+  border: 1px solid rgba(31,110,110,.25);
+  border-top: none;
+  padding: 16px 28px;
+  display: none;
+}
+.biz-note.show { display: block; }
+.biz-note-text { font-size: 12px; color: var(--teal); line-height: 1.9; }
+
+/* Retry */
+.retry-wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--r) var(--r);
+  padding: 20px 28px;
+  text-align: center;
+}
+.btn-retry {
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  letter-spacing: .12em;
+  transition: all var(--transition);
+}
+.btn-retry:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ── Footer ───────────────────────────────────────────── */
+.site-footer {
+  background: var(--deep);
+  text-align: center;
+  padding: 24px;
+  font-size: 10px;
+  color: rgba(232,224,204,.25);
+  letter-spacing: .15em;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Utility ──────────────────────────────────────────── */
+.visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="site-header">
+  <div class="logo">宿曜占星術 <span>光晴堂</span></div>
+  <div class="sep">｜</div>
+  <div class="page-name">COMPATIBILITY</div>
+</header>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow">SUKUYO · COMPATIBILITY READING</div>
+  <h1 class="hero-title">宿曜 対人相性占い</h1>
+  <p class="hero-sub">
+    二つの生年月日から宿を算出し、<br>
+    対人・対法人の相性を宿曜の観点で読み解きます
+  </p>
+</div>
+
+<!-- Main -->
+<main class="main-wrap">
+
+  <!-- Form card -->
+  <div class="card" id="form-card">
+    <div class="card-title">関係性を選んでください</div>
+
+    <!-- Relation type -->
+    <div class="rel-tabs" role="radiogroup" aria-label="関係性タイプ">
+      <div class="rel-tab" data-rel="self" role="radio" aria-checked="false" tabindex="0">
+        <span class="rel-icon">☽</span>
+        <div class="rel-label">自分の宿</div>
+        <div class="rel-desc">本命宿を調べる</div>
+      </div>
+      <div class="rel-tab active" data-rel="boss" role="radio" aria-checked="true" tabindex="0">
+        <span class="rel-icon">🤝</span>
+        <div class="rel-label">自分 × 上司</div>
+        <div class="rel-desc">縦の人間関係</div>
+      </div>
+      <div class="rel-tab" data-rel="sub" role="radio" aria-checked="false" tabindex="0">
+        <span class="rel-icon">👥</span>
+        <div class="rel-label">自分 × 部下</div>
+        <div class="rel-desc">マネジメント相性</div>
+      </div>
+      <div class="rel-tab" data-rel="corp" role="radio" aria-checked="false" tabindex="0">
+        <span class="rel-icon">🏛️</span>
+        <div class="rel-label">自分 × 法人</div>
+        <div class="rel-desc">設立日との相性</div>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="form-grid">
+      <!-- A side -->
+      <div class="form-block">
+        <label class="form-label" for="date-a">
+          生年月日
+          <span class="name-badge badge-a">自分</span>
+        </label>
+        <input type="date" id="date-a" class="date-input" aria-required="true"
+          min="1900-01-01" max="2099-12-31">
+        <div class="input-note" id="note-a">あなたの生年月日を入力</div>
+      </div>
+
+      <!-- B side -->
+      <div class="form-block" id="b-side-block">
+        <div class="input-mode-row">
+          <label class="form-label" for="date-b" id="label-b" style="margin-bottom:0;">
+            生年月日
+            <span class="name-badge badge-b" id="badge-b">上司</span>
+          </label>
+          <div class="input-mode-toggle" id="input-mode-toggle">
+            <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
+            <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+          </div>
+        </div>
+        <input type="date" id="date-b" class="date-input" aria-required="true"
+          min="1900-01-01" max="2099-12-31">
+        <select id="shuku-b-select" class="date-input" style="display:none;">
+          <option value="">宿を選択してください</option>
+        </select>
+        <div class="input-note" id="note-b">相手の生年月日を入力</div>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-submit" id="btn-calc">
+        <span>☽</span>
+        <span id="btn-calc-label">相性を占う</span>
+      </button>
+      <div class="error-msg" id="error-msg">生年月日を両方入力してください</div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div id="result">
+    <!-- Header -->
+    <div class="result-header">
+      <div class="result-eyebrow">SUKUYO READING</div>
+      <div class="result-rel-label" id="result-rel-label">自分と上司の相性</div>
+      <div class="shuku-pair">
+        <div class="shuku-box">
+          <div class="shuku-box-label">YOUR SHUKU</div>
+          <div class="shuku-box-name">自分</div>
+          <div class="shuku-kanji" id="shuku-a-kanji">—</div>
+          <div class="shuku-yomi" id="shuku-a-yomi"></div>
+          <div class="shuku-nature" id="shuku-a-nature"></div>
+        </div>
+        <div class="pair-arrow">☽</div>
+        <div class="shuku-box">
+          <div class="shuku-box-label" id="shuku-b-label">THEIR SHUKU</div>
+          <div class="shuku-box-name" id="shuku-b-name">相手</div>
+          <div class="shuku-kanji" id="shuku-b-kanji">—</div>
+          <div class="shuku-yomi" id="shuku-b-yomi"></div>
+          <div class="shuku-nature" id="shuku-b-nature"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score -->
+    <div class="score-section">
+      <div class="score-ring-wrap">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle class="score-ring-bg" cx="60" cy="60" r="50"/>
+          <circle class="score-ring-fill" id="ring-fill"
+            cx="60" cy="60" r="50"
+            stroke-dasharray="314"
+            stroke-dashoffset="314"/>
+        </svg>
+        <div class="score-center">
+          <div class="score-num" id="score-num">0</div>
+          <div class="score-label">/ 100</div>
+        </div>
+      </div>
+      <div class="compat-grade">
+        <div class="grade-badge" id="grade-badge">—</div>
+        <div class="grade-name" id="grade-name">—</div>
+        <div class="grade-sub" id="grade-sub"></div>
+      </div>
+    </div>
+
+    <!-- Aspects -->
+    <div class="aspects">
+      <div class="aspect-title">相性の詳細</div>
+      <div class="aspect-grid" id="aspect-grid"></div>
+    </div>
+
+    <!-- Advice -->
+    <div class="advice">
+      <div class="advice-title">☽ 宿曜からのメッセージ</div>
+      <div class="advice-text" id="advice-text"></div>
+    </div>
+
+    <!-- Business note (corp only) -->
+    <div class="biz-note" id="biz-note">
+      <div class="biz-note-text" id="biz-note-text"></div>
+    </div>
+
+    <!-- Retry -->
+    <div class="retry-wrap">
+      <button class="btn-retry" id="btn-retry">別の相性を占う</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  © 宿曜占星術 光晴堂 · KOSEI-DO · 竹本光晴
+</footer>
+
+<script>
+/* ══════════════════════════════════════════════════════════
+   宿曜 計算エンジン
+   検証済み: 1962/3/22 → 底宿 ✓
+   算出法: JD(グレゴリオ暦) + OFFSET(16) を27で割った余り
+   ══════════════════════════════════════════════════════════ */
+
+// 27宿データ（順番：昴宿=0 から始まる伝統的順序）
+const SHUKU = [
+  { kanji:"昴宿", yomi:"ぼうしゅく", nature:"安定",  element:"金", keywords:["信頼","堅実","蓄積"],    desc:"安定感と堅実さを持つ。信頼を積み重ね、着実に力をつける宿。" },
+  { kanji:"畢宿", yomi:"ひっしゅく", nature:"実力",  element:"金", keywords:["実力","仕事","現実"],    desc:"現実的な実力派。粘り強く仕事に向き合い、着実な成果を出す宿。" },
+  { kanji:"觜宿", yomi:"ししゅく",   nature:"鋭敏",  element:"火", keywords:["分析","鋭さ","情報"],    desc:"鋭い分析力と観察眼を持つ。情報収集と判断力に長ける宿。" },
+  { kanji:"参宿", yomi:"しんしゅく", nature:"行動",  element:"水", keywords:["行動","変化","革新"],    desc:"行動力と変革志向が強い。新しい道を切り開く開拓者の宿。" },
+  { kanji:"井宿", yomi:"せいしゅく", nature:"社交",  element:"木", keywords:["人脈","社交","広がり"],  desc:"広い人脈と社交性を持つ。人をつなぎ、輪を広げる宿。" },
+  { kanji:"鬼宿", yomi:"きしゅく",   nature:"洞察",  element:"土", keywords:["直感","霊感","神秘"],    desc:"鋭い直感と霊的感受性を持つ。見えないものを感じ取る宿。" },
+  { kanji:"柳宿", yomi:"りゅうしゅく",nature:"感情", element:"土", keywords:["感受性","芸術","愛情"],  desc:"豊かな感受性と芸術的センスを持つ。愛情深く繊細な宿。" },
+  { kanji:"星宿", yomi:"せいしゅく", nature:"輝き",  element:"日", keywords:["カリスマ","輝き","中心"],desc:"カリスマ性と存在感を放つ。中心的な役割を担う輝きの宿。" },
+  { kanji:"張宿", yomi:"ちょうしゅく",nature:"拡張", element:"日", keywords:["拡大","楽観","豊かさ"],  desc:"楽観的で拡大志向が強い。豊かさと繁栄を引き寄せる宿。" },
+  { kanji:"翼宿", yomi:"よくしゅく", nature:"自由",  element:"火", keywords:["自由","創造","移動"],    desc:"自由を愛し創造力が豊か。広い世界を翔ける自由人の宿。" },
+  { kanji:"軫宿", yomi:"しんしゅく", nature:"完成",  element:"水", keywords:["完成","調和","締めくくり"],desc:"物事を完成に導く力を持つ。調和を重んじ、丁寧に締めくくる宿。" },
+  { kanji:"角宿", yomi:"かくしゅく", nature:"開拓",  element:"木", keywords:["開拓","先駆け","勇気"],  desc:"勇敢な開拓者気質。先頭に立って新しい道を拓く宿。" },
+  { kanji:"亢宿", yomi:"こうしゅく", nature:"秩序",  element:"金", keywords:["規律","完璧","清廉"],    desc:"規律と完璧主義。高い基準を持ち、清廉な生き方をする宿。" },
+  { kanji:"底宿", yomi:"ていしゅく", nature:"忍耐",  element:"土", keywords:["忍耐","土台","持続"],    desc:"深い忍耐力と底力を持つ。土台を固め、長期的に持続する宿。" },
+  { kanji:"房宿", yomi:"ぼうしゅく", nature:"調和",  element:"日", keywords:["平和","協調","バランス"],desc:"平和と調和を愛する。バランス感覚に優れた調停者の宿。" },
+  { kanji:"心宿", yomi:"しんしゅく", nature:"核心",  element:"火", keywords:["本質","核心","情熱"],    desc:"物事の核心を見抜く力を持つ。情熱的で本質を追求する宿。" },
+  { kanji:"尾宿", yomi:"びしゅく",   nature:"継続",  element:"水", keywords:["継続","深化","記憶"],    desc:"継続する力と深い記憶力を持つ。経験を積み重ね深化する宿。" },
+  { kanji:"箕宿", yomi:"きしゅく",   nature:"蓄積",  element:"木", keywords:["蓄財","蓄積","知恵"],    desc:"知恵と財を蓄積する力を持つ。長期的視野で豊かさを築く宿。" },
+  { kanji:"斗宿", yomi:"としゅく",   nature:"指導",  element:"金", keywords:["指導力","管理","決断"],  desc:"強いリーダーシップと決断力を持つ。組織を統率する宿。" },
+  { kanji:"女宿", yomi:"じょしゅく", nature:"受容",  element:"土", keywords:["受容","包容","やさしさ"],desc:"受容力と包容力に富む。人を癒し、やさしく包む宿。" },
+  { kanji:"虚宿", yomi:"きょしゅく", nature:"変容",  element:"日", keywords:["空間","可能性","変容"],  desc:"無限の可能性と変容の力を持つ。空間を創り出す宿。" },
+  { kanji:"危宿", yomi:"きしゅく",   nature:"警戒",  element:"火", keywords:["慎重","備え","守護"],    desc:"慎重さと守護の力を持つ。危機を察知し、備える宿。" },
+  { kanji:"室宿", yomi:"しつしゅく", nature:"内省",  element:"水", keywords:["内省","神聖","精神性"],  desc:"深い内省力と精神性を持つ。神聖な場所を守る宿。" },
+  { kanji:"壁宿", yomi:"へきしゅく", nature:"守護",  element:"木", keywords:["守護","境界","保護"],    desc:"守護と境界の力を持つ。大切なものを守り通す宿。" },
+  { kanji:"奎宿", yomi:"けいしゅく", nature:"才知",  element:"木", keywords:["才能","知性","文化"],    desc:"高い知性と文化的才能を持つ。知を追求し文化を育む宿。" },
+  { kanji:"婁宿", yomi:"ろうしゅく", nature:"集合",  element:"金", keywords:["集合","絆","友情"],      desc:"人を集め絆を結ぶ力を持つ。友情と協調を大切にする宿。" },
+  { kanji:"胃宿", yomi:"いしゅく",   nature:"消化",  element:"土", keywords:["消化","受け入れ","変換"],desc:"あらゆるものを受け入れ消化する力を持つ。変換の宿。" },
+];
+
+/**
+ * 宿曜 本命宿 計算ロジック（旧暦ベース・確定版）
+ * 
+ * 【検証済み確定値】
+ *   1962/3/22(新暦) → 底宿  ✓
+ *   1975/8/11(新暦) → 亢宿  ✓ (順一氏本命宿)
+ *   1973/1/1 (新暦) → 箕宿  ✓
+ *
+ * 【ロジック】
+ *   1. 新暦の生年月日 → 旧暦（太陰太陽暦）に変換 (lunar-javascript使用)
+ *   2. 旧暦の各月「1日」の宿は固定（年に関わらず）:
+ *        1月=室 2月=奎 3月=胃 4月=畢 5月=参 6月=鬼
+ *        7月=張 8月=角 9月=底 10月=心 11月=斗 12月=虚
+ *   3. その月の中は毎日+1で進む: 宿 = 月初の宿 + (旧暦日 - 1)
+ *
+ * 出典: 月宿傍通暦（宿曜経の伝統的な早見表）の原理に基づく
+ */
+
+// 旧暦月初(1日)の宿（固定・年に依存しない）
+const LUNAR_MONTH_START = {
+  1: "室", 2: "奎", 3: "胃", 4: "畢", 5: "参", 6: "鬼",
+  7: "張", 8: "角", 9: "底", 10: "心", 11: "斗", 12: "虚"
+};
+
+function calcShukuIndex(year, month, day) {
+  // 新暦 → 旧暦変換 (lunar-javascript、CDN経由でグローバルにSolar/Lunarが展開される)
+  const solar = Solar.fromYmd(year, month, day);
+  const lunar = solar.getLunar();
+  const lunarMonth = Math.abs(lunar.getMonth()); // 閏月は負数で返るためabs
+  const lunarDay = lunar.getDay();
+
+  const monthStartName = LUNAR_MONTH_START[lunarMonth];
+  const startIdx = SHUKU.findIndex(s => s.kanji === monthStartName + "宿");
+  return (startIdx + lunarDay - 1 + 27) % 27;
+}
+
+function getShuku(year, month, day) {
+  const idx = calcShukuIndex(year, month, day);
+  return { ...SHUKU[idx], index: idx };
+}
+
+/* ══════════════════════════════════════════════════════════
+   相性テーブル
+   宿曜占星術の伝統的な11分類
+   自分の宿から相手の宿までの「距離（差）」で決まる
+   命=0, 栄=1, 衰=2, 友=3, 安=4, 危=5, 成=6, 壊=7, 親=8, 胎=9, 業=10
+   11以降は鏡像（22=命, 21=栄, 20=衰, ...）
+   ══════════════════════════════════════════════════════════ */
+
+const COMPAT_TABLE = [
+  // diff → { key, score, name, color }
+  { key:"命", score:95, name:"命の関係",  color:"#b8953a", text:"最も深い縁。魂のレベルで結びついた稀有な関係。" },  // 0
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。" },  // 1
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。" }, // 2
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。" }, // 3
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。" },    // 4
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。" },    // 5
+  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。" }, // 6
+  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。" },// 7
+  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。" },     // 8
+  { key:"胎", score:55, name:"胎の関係",  color:"#4a3f8c", text:"可能性を育む縁。時間をかけて深まる関係。" },       // 9
+  { key:"業", score:30, name:"業の関係",  color:"#7a6e5e", text:"カルマ的な縁。乗り越えるべき課題を持つ関係。" },   // 10
+  { key:"業", score:30, name:"業の関係",  color:"#7a6e5e", text:"カルマ的な縁。乗り越えるべき課題を持つ関係。" },   // 11
+  { key:"胎", score:55, name:"胎の関係",  color:"#4a3f8c", text:"可能性を育む縁。時間をかけて深まる関係。" },       // 12
+  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。" },     // 13
+  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。" },// 14
+  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。" }, // 15
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。" },   // 16
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。" },   // 17
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。" },// 18
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。" },// 19
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。" }, // 20
+  { key:"命", score:95, name:"命の関係",  color:"#b8953a", text:"最も深い縁。魂のレベルで結びついた稀有な関係。" }, // 21
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。" }, // 22
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。" },// 23
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。" },// 24
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。" },   // 25
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。" },   // 26
+];
+
+/**
+ * A→Bの関係（方向性あり）
+ * 宿曜では「自分から見た相手」と「相手から見た自分」が異なる
+ */
+function getRelation(idxA, idxB) {
+  const diff = ((idxB - idxA) % 27 + 27) % 27;
+  return { ...COMPAT_TABLE[diff], diff };
+}
+
+function calcCompatScore(idxA, idxB) {
+  const relAtoB = getRelation(idxA, idxB);
+  const relBtoA = getRelation(idxB, idxA);
+  // 双方向の平均スコアを使用
+  const avgScore = Math.round((relAtoB.score + relBtoA.score) / 2);
+  return { relAtoB, relBtoA, avgScore };
+}
+
+// 五行（エレメント）相性
+function calcElementCompat(elA, elB) {
+  const GENERATE = { 木:"火", 火:"土", 土:"金", 金:"水", 水:"木", 日:"火" };
+  const OVERCOME  = { 木:"土", 火:"金", 土:"水", 金:"木", 水:"火", 日:"金" };
+  if (elA === elB) return { rel: "比和", bonus: 5, desc: "同じ五行。安定したエネルギーが共鳴します。" };
+  if (GENERATE[elA] === elB) return { rel: "相生", bonus: 12, desc: `${elA}が${elB}を生む。相手を育てる良縁です。` };
+  if (GENERATE[elB] === elA) return { rel: "相生", bonus: 10, desc: `${elB}が${elA}を生む。サポートされる縁です。` };
+  if (OVERCOME[elA] === elB) return { rel: "相剋", bonus: -8, desc: `${elA}が${elB}を剋す。互いに刺激しあう縁。` };
+  if (OVERCOME[elB] === elA) return { rel: "相剋", bonus: -5, desc: `${elB}が${elA}を剋す。影響を受けやすい縁。` };
+  return { rel: "中和", bonus: 0, desc: "直接的な相互作用は少ない、中立的な縁です。" };
+}
+
+// 関係性タイプ別アドバイス（11分類対応）
+function getRelAdvice(rel, relKey, shukuA, shukuB) {
+  const A = shukuA.kanji, B = shukuB.kanji;
+  const advice = {
+    boss: {
+      "命": `最も深い縁。${A}（あなた）と${B}（上司）は宿曜上の「命の関係」にあります。魂のレベルで深く結びついた稀有な縁。この上司のもとで働くことは、あなたの才能を最大限に引き出す機会となるでしょう。長く深い信頼関係を築けます。`,
+      "栄": `互いを輝かせる縁。${B}の上司はあなたの${A}の良い面を引き出し、あなたも上司の力を活かす関係。適切なタイミングで成果が認められやすい配置です。`,
+      "衰": `消耗しやすい縁。エネルギーの方向が合いにくく、気疲れしやすいことがあります。無理に合わせようとせず、適度な距離感を保つことが長続きの秘訣です。`,
+      "友": `自然な親しみやすさがある縁。${A}と${B}は友のように気が合い、自然な連携が生まれやすい関係です。上司との間に良いチームワークを築けます。`,
+      "安": `安定した縁。大きな衝突はなく、着実に信頼を積み重ねていける配置です。コツコツと実績を積みながら、堅実な関係を育みましょう。`,
+      "危": `注意が必要な縁。油断すると摩擦が生じやすいですが、丁寧なコミュニケーションを心がければ良い関係を保てます。報告・連絡・相談を欠かさないことが大切です。`,
+      "成": `努力で実る縁。誠実に向き合い、成果を着実に積み重ねることで評価される関係です。焦らず、誠実に取り組むことが鍵となります。`,
+      "壊": `破壊と再生の縁。困難を伴いますが、乗り越えることで大きな成長が得られます。感情的にならず、事実ベースで冷静にやりとりすることを心がけてください。`,
+      "親": `親友のような深い絆。${A}と${B}は自然に心が通じ合う縁。上司はあなたの努力を認め、適切なサポートをしてくれやすい関係です。`,
+      "胎": `可能性を育む縁。時間をかけて深まる関係です。最初はぎこちなく感じることもありますが、積み重ねることで豊かな信頼関係に育ちます。`,
+      "業": `カルマ的な縁。容易ではありませんが、誠実な姿勢で向き合うことで浄化される縁でもあります。感謝の気持ちを忘れずに。`,
+    },
+    sub: {
+      "命": `最も深い縁。${A}（あなた）と${B}（部下）は「命の関係」。マネジメントの観点から非常に恵まれた配置。部下の才能を引き出し、チームを高みに導く力があります。`,
+      "栄": `互いを輝かせる縁。あなたの指導が部下の良い面を引き出し、部下もあなたのリーダーシップを輝かせます。チームとして大きな成果を上げやすい関係です。`,
+      "衰": `消耗しやすい縁。指示が伝わりにくかったり、モチベーション管理が難しい面があります。細かくフォローしながら丁寧に育てる姿勢が重要です。`,
+      "友": `良いチームワークを生む縁。${A}と${B}は自然な連携が取れる関係。互いの得意分野を活かしながら、補い合う関係を築けます。`,
+      "安": `安定した縁。大きな波風なく、堅実な成果を一緒に積み上げていける配置です。長期的な育成に向いています。`,
+      "危": `注意が必要な縁。期待が伝わりにくいことがあります。明確な指示と定期的な面談で関係を丁寧に育てましょう。`,
+      "成": `努力で実る縁。誠実に向き合い続けることで、部下は成長し信頼に応えようとします。焦らず長い目で育てることが大切です。`,
+      "壊": `困難を伴う縁ですが、乗り越えることで両者に大きな成長をもたらします。感情的にならず、建設的な対話を意識してください。`,
+      "親": `親友のような深い絆。自然に信頼関係が築きやすく、率直なコミュニケーションができる縁。部下もあなたのリーダーシップに応えようとするでしょう。`,
+      "胎": `時間をかけて深まる縁。最初は慎重に見極めながら、じっくり育てることで才能が開花します。`,
+      "業": `カルマ的な縁。根気強く寄り添うことが、お互いの成長につながります。諦めずに誠実に向き合い続けましょう。`,
+    },
+    corp: {
+      "命": `最高の縁。あなた（${A}）とこの法人の設立日（${B}）は「命の関係」。この組織があなたの使命を開花させる場となる可能性が非常に高い。長期的な関与を視野に入れることをお勧めします。`,
+      "栄": `互いを輝かせる縁。この法人との関与があなたの力を引き出し、あなたも法人の発展に貢献できる関係です。ビジネスパートナーとして非常に良い配置です。`,
+      "衰": `消耗しやすい縁。関与する場合は自身のエネルギー管理に注意が必要です。関係の範囲と期間を明確にしておくことをお勧めします。`,
+      "友": `友好的な縁。ビジネスパートナーシップや取引関係において、自然な協力体制が築きやすい配置です。`,
+      "安": `安定した縁。特別なドラマはありませんが、着実な関係を長期的に築いていける縁です。`,
+      "危": `注意が必要な縁。関与する場合は契約内容や条件を慎重に確認することをお勧めします。`,
+      "成": `努力で実る縁。誠実に向き合えば良い関係が育ちます。焦らず丁寧に関係を構築しましょう。`,
+      "壊": `困難を伴う縁。関与する場合は慎重にリスク管理を行い、最悪のケースも想定しておくことをお勧めします。`,
+      "親": `非常に強い縁。設立日の宿（${B}）とあなたの宿（${A}）は互いを高め合う配置。取引、就職、投資など深い関与が実りある結果をもたらしやすいでしょう。`,
+      "胎": `可能性を育む縁。時間をかけて関係を深めることで、大きな実りが生まれます。急がず丁寧に関係を育みましょう。`,
+      "業": `カルマ的な縁。一筋縄ではいきませんが、誠実な姿勢で臨めば良い方向に向かうこともあります。`,
+    },
+  };
+  return (advice[rel] && advice[rel][relKey]) || `${A}と${B}の縁。宿曜の観点から誠実に向き合い、関係を大切に育ててください。`;
+}
+
+/* ══════════════════════════════════════════════════════════
+   UI ロジック
+   ══════════════════════════════════════════════════════════ */
+
+let currentRel = "boss";
+let inputMode = "date"; // "date" | "shuku"
+
+// 宿セレクトの選択肢を生成
+(function populateShukuSelect() {
+  const sel = document.getElementById("shuku-b-select");
+  SHUKU.forEach((s, idx) => {
+    const opt = document.createElement("option");
+    opt.value = idx;
+    opt.textContent = `${s.kanji}（${s.yomi}）`;
+    sel.appendChild(opt);
+  });
+})();
+
+document.querySelectorAll(".rel-tab").forEach(tab => {
+  tab.addEventListener("click", () => selectRel(tab.dataset.rel));
+  tab.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") selectRel(tab.dataset.rel);
+  });
+});
+
+document.querySelectorAll(".mode-btn").forEach(btn => {
+  btn.addEventListener("click", () => selectInputMode(btn.dataset.mode));
+});
+
+function selectInputMode(mode) {
+  inputMode = mode;
+  document.querySelectorAll(".mode-btn").forEach(b => {
+    b.classList.toggle("active", b.dataset.mode === mode);
+  });
+  const dateInput = document.getElementById("date-b");
+  const shukuSelect = document.getElementById("shuku-b-select");
+  if (mode === "date") {
+    dateInput.style.display = "";
+    shukuSelect.style.display = "none";
+  } else {
+    dateInput.style.display = "none";
+    shukuSelect.style.display = "";
+  }
+}
+
+function selectRel(rel) {
+  currentRel = rel;
+  document.querySelectorAll(".rel-tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.rel === rel);
+    t.setAttribute("aria-checked", t.dataset.rel === rel ? "true" : "false");
+  });
+
+  const bSideBlock  = document.getElementById("b-side-block");
+  const badgeB      = document.getElementById("badge-b");
+  const noteB       = document.getElementById("note-b");
+  const noteA       = document.getElementById("note-a");
+  const modeToggle  = document.getElementById("input-mode-toggle");
+  const btnLabel    = document.getElementById("btn-calc-label");
+  const shukuBLabel = document.getElementById("shuku-b-label");
+  const shukuBName  = document.getElementById("shuku-b-name");
+
+  if (rel === "self") {
+    // 自分の宿モード：B側を非表示にして単体計算に
+    bSideBlock.classList.add("self-mode");
+    noteA.textContent = "あなたの生年月日を入力";
+    btnLabel.textContent = "本命宿を調べる";
+    return;
+  }
+
+  bSideBlock.classList.remove("self-mode");
+  noteA.textContent = "あなたの生年月日を入力";
+  btnLabel.textContent = "相性を占う";
+
+  if (rel === "boss") {
+    badgeB.textContent = "上司"; badgeB.className = "name-badge badge-b";
+    noteB.textContent = "上司の生年月日を入力";
+    shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "上司";
+    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
+    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+  } else if (rel === "sub") {
+    badgeB.textContent = "部下"; badgeB.className = "name-badge badge-b";
+    noteB.textContent = "部下の生年月日を入力";
+    shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "部下";
+    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
+    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+  } else {
+    badgeB.textContent = "法人"; badgeB.className = "name-badge badge-corp";
+    noteB.textContent = "法人の設立日を入力";
+    shukuBLabel.textContent = "CORP SHUKU"; shukuBName.textContent = "法人";
+    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "設立日";
+    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+  }
+}
+
+document.getElementById("btn-calc").addEventListener("click", calculate);
+
+function calculate() {
+  const valA = document.getElementById("date-a").value;
+  const errEl = document.getElementById("error-msg");
+
+  // 旧暦変換ライブラリの読み込み確認
+  if (typeof Solar === "undefined") {
+    errEl.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
+    errEl.classList.add("show");
+    return;
+  }
+
+  if (!valA) {
+    errEl.textContent = "生年月日を入力してください";
+    errEl.classList.add("show");
+    return;
+  }
+
+  const [yA,mA,dA] = valA.split("-").map(Number);
+  const shukuA = getShuku(yA, mA, dA);
+
+  // 自分の宿モード：単体結果のみ表示
+  if (currentRel === "self") {
+    errEl.classList.remove("show");
+    showSelfResult(shukuA);
+    return;
+  }
+
+  // 相性モード：Bの入力を取得（生年月日 or 宿選択）
+  let shukuB;
+  if (inputMode === "date") {
+    const valB = document.getElementById("date-b").value;
+    if (!valB) {
+      errEl.textContent = "生年月日を両方入力してください";
+      errEl.classList.add("show");
+      return;
+    }
+    const [yB,mB,dB] = valB.split("-").map(Number);
+    shukuB = getShuku(yB, mB, dB);
+  } else {
+    const selVal = document.getElementById("shuku-b-select").value;
+    if (selVal === "") {
+      errEl.textContent = "相手の宿を選択してください";
+      errEl.classList.add("show");
+      return;
+    }
+    const idx = parseInt(selVal, 10);
+    shukuB = { ...SHUKU[idx], index: idx };
+  }
+
+  errEl.classList.remove("show");
+  const compat = calcCompatScore(shukuA.index, shukuB.index);
+  showResult({ shukuA, shukuB, compat });
+}
+
+// 自分の宿だけを表示する単体結果ビュー
+function showSelfResult(shukuA) {
+  document.getElementById("result-rel-label").textContent = "あなたの本命宿";
+
+  document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
+  document.getElementById("shuku-a-yomi").textContent   = shukuA.yomi;
+  document.getElementById("shuku-a-nature").textContent = `${shukuA.nature} · ${shukuA.desc}`;
+
+  // B側（相手）の表示を隠す
+  document.querySelector(".pair-arrow").style.display = "none";
+  document.getElementById("shuku-b-kanji").parentElement.style.display = "none";
+
+  // スコア・相性関連セクションを隠す
+  document.querySelector(".score-section").style.display = "none";
+  document.querySelector(".aspects").style.display = "none";
+
+  // アドバイス欄に本命宿の説明を表示
+  document.querySelector(".advice-title").textContent = "☽ あなたの宿について";
+  document.getElementById("advice-text").textContent =
+    `あなたの本命宿は${shukuA.kanji}（${shukuA.yomi}）です。${shukuA.desc}\n\n` +
+    `キーワード：${shukuA.keywords.join("・")}　属性：${shukuA.element}`;
+
+  document.getElementById("biz-note").classList.remove("show");
+
+  document.getElementById("form-card").style.display = "none";
+  const resultEl = document.getElementById("result");
+  resultEl.classList.add("show");
+  resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function showResult({ shukuA, shukuB, compat }) {
+  // 通常表示に戻す（自分の宿モードで隠した要素を復元）
+  document.querySelector(".pair-arrow").style.display = "";
+  document.getElementById("shuku-b-kanji").parentElement.style.display = "";
+  document.querySelector(".score-section").style.display = "";
+  document.querySelector(".aspects").style.display = "";
+  document.querySelector(".advice-title").textContent = "☽ 宿曜からのメッセージ";
+
+  const relLabels = { boss:"自分と上司の相性", sub:"自分と部下の相性", corp:"自分と法人（設立日）の相性" };
+  document.getElementById("result-rel-label").textContent = relLabels[currentRel];
+
+  // 宿情報
+  document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
+  document.getElementById("shuku-a-yomi").textContent   = shukuA.yomi;
+  document.getElementById("shuku-a-nature").textContent = `${shukuA.nature} · ${shukuA.desc}`;
+  document.getElementById("shuku-b-kanji").textContent  = shukuB.kanji;
+  document.getElementById("shuku-b-yomi").textContent   = shukuB.yomi;
+  document.getElementById("shuku-b-nature").textContent = `${shukuB.nature} · ${shukuB.desc}`;
+
+  // 双方向の関係を表示
+  const rAB = compat.relAtoB;
+  const rBA = compat.relBtoA;
+  const score = compat.avgScore;
+
+  // スコアリングリング
+  document.getElementById("score-num").textContent = score;
+  const ring = document.getElementById("ring-fill");
+  const circ = 2 * Math.PI * 50;
+  const ringColor = score >= 75 ? "#b8953a" : score >= 55 ? "#4a3f8c" : score >= 40 ? "#7a6e5e" : "#b04040";
+  ring.style.stroke = ringColor;
+  setTimeout(() => { ring.style.strokeDashoffset = circ * (1 - score / 100); }, 100);
+
+  // グレードバッジ（自分→相手方向）
+  const badge = document.getElementById("grade-badge");
+  badge.textContent = rAB.key;
+  badge.style.background = rAB.color + "22";
+  badge.style.color       = rAB.color;
+  badge.style.border      = `1px solid ${rAB.color}44`;
+
+  document.getElementById("grade-name").textContent = rAB.name;
+  document.getElementById("grade-sub").textContent  =
+    `あなた→相手：${rAB.key}（${rAB.name}）　相手→あなた：${rBA.key}（${rBA.name}）`;
+
+  // 詳細アスペクト（4項目）
+  const grid = document.getElementById("aspect-grid");
+  const gold="#b8953a", accent="#4a3f8c", teal="#1f6e6e", muted="#7a6e5e";
+  const aspects = [
+    { label:"A→B 縁の質", val:rAB.score,  color:gold,   text:`自分から見た相手：${rAB.name}。${rAB.text}` },
+    { label:"B→A 縁の質", val:rBA.score,  color:accent, text:`相手から見た自分：${rBA.name}。${rBA.text}` },
+    { label:"総合スコア",  val:score,       color:teal,   text:`双方向の縁の強さ。${score >= 75 ? "深い縁で結ばれています" : score >= 55 ? "良好な関係を築けます" : score >= 40 ? "努力で関係を高められます" : "課題のある縁です"}。` },
+    { label:"宿の特性",   val:Math.min(100, Math.round((rAB.score + rBA.score) * 0.55)), color:muted,
+      text:`${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（相手）のエネルギーが作用します。` },
+  ];
+  grid.innerHTML = aspects.map(a => `
+    <div class="aspect-item">
+      <div class="aspect-item-label">${a.label}</div>
+      <div class="aspect-bar-wrap">
+        <div class="aspect-bar-fill" style="width:0%;background:${a.color}"></div>
+      </div>
+      <div class="aspect-item-text">${a.text}</div>
+    </div>
+  `).join("");
+  setTimeout(() => {
+    grid.querySelectorAll(".aspect-bar-fill").forEach((el, i) => {
+      el.style.transition = `width 0.8s ease ${0.1 + i * 0.15}s`;
+      el.style.width = aspects[i].val + "%";
+    });
+  }, 80);
+
+  // アドバイス
+  document.getElementById("advice-text").textContent = getRelAdvice(currentRel, rAB.key, shukuA, shukuB);
+
+  // 法人メモ
+  const bizNote = document.getElementById("biz-note");
+  const bizText = document.getElementById("biz-note-text");
+  if (currentRel === "corp") {
+    bizText.textContent =
+      `🏛️ 法人の宿：${shukuB.kanji}（${shukuB.yomi}）
+キーワード：${shukuB.keywords.join("・")}
+${shukuB.desc}`;
+    bizNote.classList.add("show");
+  } else {
+    bizNote.classList.remove("show");
+  }
+
+  // 表示切り替え
+  document.getElementById("form-card").style.display = "none";
+  const resultEl = document.getElementById("result");
+  resultEl.classList.add("show");
+  resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+document.getElementById("btn-retry").addEventListener("click", () => {
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("form-card").style.display = "";
+  document.getElementById("ring-fill").style.strokeDashoffset = "314";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+</script>
+</body>
+</html>
