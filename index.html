@@ -1774,11 +1774,12 @@ function moonPhaseSVG(phaseIdx, size = 56) {
    宿曜占星術の伝統的な11分類
    自分の宿から相手の宿までの「距離（差）」で決まる
 
-   【2026/6 修正】以下2つの独立した情報源を相互検証して並び順を確定：
-     ①Web上の実例データ（八雲院）から逆算した対応表
-     ②Takemoto-sensei講義音源の「宿番号1桁化＋引き算」秘伝ロジック
-       （宿番号(1-27)を数字根に変換し、2人の差(0-8)を運勢ワードに対応させる方法）
-   両者の計算結果が完全に一致したため、以下を正しい対応表として採用。
+   【2026/6 確定】Takemoto-sensei公式サイト kosei-do.co.jp の占星盤解説ページ
+   （https://kosei-do.co.jp/details/senseiban.html）に掲載されている実例
+   （昴宿を基準=命としたときの業・胎・栄親・友衰・安壊・成危の各宿、近中遠の距離含む）
+   27件すべてと完全照合し、対応表とgetRelationのdiff計算方向を確定。
+   ※第三者サイト（八雲院等）の情報は参考に留め、本サイトの実装はkosei-do.co.jp
+     公式の占星盤データのみを正式な参照元として採用する。
 
    diff=0:命, 1:親, 2:友, 3:壊, 4:成, 5:危, 6:安, 7:衰, 8:栄,
    diff=9:胎（命=胎=業の9グループ・命業胎ソウルメイトグループと同一構造）,
@@ -1822,7 +1823,10 @@ const COMPAT_TABLE = [
  * 宿曜では「自分から見た相手」と「相手から見た自分」が異なる
  */
 function getRelation(idxA, idxB) {
-  const diff = ((idxB - idxA) % 27 + 27) % 27;
+  // 【2026/6 再修正】kosei-do.co.jp(Takemoto-sensei公式サイト)の占星盤解説ページ
+  // (https://kosei-do.co.jp/details/senseiban.html) の実例データと27件全件照合した結果、
+  // diffの方向は (idxA - idxB) が正しいことが判明（従来は (idxB - idxA) で逆方向だった）
+  const diff = ((idxA - idxB) % 27 + 27) % 27;
   return { ...COMPAT_TABLE[diff], diff };
 }
 
