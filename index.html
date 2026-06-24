@@ -59,7 +59,11 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity var(--transition);
 }
+.site-header .logo:hover { opacity: .8; }
 .logo-moon {
   color: var(--gold-l);
   font-size: 16px;
@@ -364,6 +368,38 @@ body {
   font-size: 10px;
   color: var(--muted);
   letter-spacing: .06em;
+}
+
+/* ── 年月日プルダウン ─────────────────────────────────── */
+.date-select-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.date-select {
+  padding: 12px 8px;
+  border: 1.5px solid rgba(201,169,97,.25);
+  border-radius: 8px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 14px;
+  background: var(--paper);
+  color: var(--ink);
+  outline: none;
+  cursor: pointer;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.date-select:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,169,97,.12);
+}
+#self-date-year, #a-date-year, #b-date-year { flex: 1.3; min-width: 90px; }
+#self-date-month, #a-date-month, #b-date-month { flex: 1; min-width: 64px; }
+#self-date-day, #a-date-day, #b-date-day { flex: 1; min-width: 64px; }
+.date-select-unit {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: .04em;
 }
 
 /* ── Submit ───────────────────────────────────────────── */
@@ -1003,7 +1039,7 @@ body {
 
 <!-- Header -->
 <header class="site-header">
-  <div class="logo"><span class="logo-moon">☽</span> 宿曜占星術</div>
+  <a href="#" id="logo-home-link" class="logo"><span class="logo-moon">☽</span> 宿曜占星術</a>
   <div class="sep">｜</div>
   <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav">
@@ -1047,12 +1083,27 @@ body {
     <div class="card-title">あなたの生年月日</div>
 
     <div class="form-block">
-      <label class="form-label" for="self-date">
-        生年月日
-        <span class="name-badge badge-a">自分</span>
-      </label>
-      <input type="date" id="self-date" class="date-input" aria-required="true"
-        min="1900-01-01" max="2099-12-31">
+      <div class="input-mode-row">
+        <label class="form-label" for="self-date-year" style="margin-bottom:0;">
+          生年月日
+          <span class="name-badge badge-a">自分</span>
+        </label>
+        <div class="input-mode-toggle" id="input-mode-toggle-self">
+          <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
+          <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+        </div>
+      </div>
+      <div class="date-select-row" id="date-select-self">
+        <select class="date-select" id="self-date-year" aria-label="年"></select>
+        <span class="date-select-unit">年</span>
+        <select class="date-select" id="self-date-month" aria-label="月"></select>
+        <span class="date-select-unit">月</span>
+        <select class="date-select" id="self-date-day" aria-label="日"></select>
+        <span class="date-select-unit">日</span>
+      </div>
+      <select id="shuku-self-select" class="date-input" style="display:none;">
+        <option value="">宿を選択してください</option>
+      </select>
       <div class="input-note">あなたの生年月日を入力してください</div>
     </div>
 
@@ -1094,7 +1145,7 @@ body {
       <!-- A side -->
       <div class="form-block">
         <div class="input-mode-row">
-          <label class="form-label" for="date-a" style="margin-bottom:0;">
+          <label class="form-label" for="a-date-year" style="margin-bottom:0;">
             生年月日
             <span class="name-badge badge-a">自分</span>
           </label>
@@ -1103,8 +1154,14 @@ body {
             <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
           </div>
         </div>
-        <input type="date" id="date-a" class="date-input" aria-required="true"
-          min="1900-01-01" max="2099-12-31">
+        <div class="date-select-row" id="date-select-a">
+          <select class="date-select" id="a-date-year" aria-label="年"></select>
+          <span class="date-select-unit">年</span>
+          <select class="date-select" id="a-date-month" aria-label="月"></select>
+          <span class="date-select-unit">月</span>
+          <select class="date-select" id="a-date-day" aria-label="日"></select>
+          <span class="date-select-unit">日</span>
+        </div>
         <select id="shuku-a-select" class="date-input" style="display:none;">
           <option value="">宿を選択してください</option>
         </select>
@@ -1114,7 +1171,7 @@ body {
       <!-- B side -->
       <div class="form-block" id="b-side-block">
         <div class="input-mode-row">
-          <label class="form-label" for="date-b" id="label-b" style="margin-bottom:0;">
+          <label class="form-label" for="b-date-year" id="label-b" style="margin-bottom:0;">
             生年月日
             <span class="name-badge badge-b" id="badge-b">上司</span>
           </label>
@@ -1123,8 +1180,14 @@ body {
             <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
           </div>
         </div>
-        <input type="date" id="date-b" class="date-input" aria-required="true"
-          min="1900-01-01" max="2099-12-31">
+        <div class="date-select-row" id="date-select-b">
+          <select class="date-select" id="b-date-year" aria-label="年"></select>
+          <span class="date-select-unit">年</span>
+          <select class="date-select" id="b-date-month" aria-label="月"></select>
+          <span class="date-select-unit">月</span>
+          <select class="date-select" id="b-date-day" aria-label="日"></select>
+          <span class="date-select-unit">日</span>
+        </div>
         <select id="shuku-b-select" class="date-input" style="display:none;">
           <option value="">宿を選択してください</option>
         </select>
@@ -1603,12 +1666,72 @@ function getRelAdvice(rel, relKey, shukuA, shukuB) {
    ══════════════════════════════════════════════════════════ */
 
 let currentRel = "boss";
-let inputMode = { a: "date", b: "date" }; // "date" | "shuku"
+let inputMode = { self: "date", a: "date", b: "date" }; // "date" | "shuku"
 
-// 宿セレクトの選択肢を生成（A・B共通）
+const DATE_SELECT_PREFIXES = ["self", "a", "b"];
+const YEAR_MIN = 1900, YEAR_MAX = 2099, YEAR_DEFAULT = 1980;
+
+function daysInMonth(year, month) {
+  return new Date(year, month, 0).getDate();
+}
+
+// 年・月・日プルダウンの選択肢を生成（self / a / b 共通）
+(function populateDateSelects() {
+  DATE_SELECT_PREFIXES.forEach(prefix => {
+    const yearSel  = document.getElementById(`${prefix}-date-year`);
+    const monthSel = document.getElementById(`${prefix}-date-month`);
+    const daySel   = document.getElementById(`${prefix}-date-day`);
+    if (!yearSel || !monthSel || !daySel) return;
+
+    for (let y = YEAR_MIN; y <= YEAR_MAX; y++) {
+      const opt = document.createElement("option");
+      opt.value = y;
+      opt.textContent = `${y}`;
+      if (y === YEAR_DEFAULT) opt.selected = true;
+      yearSel.appendChild(opt);
+    }
+    for (let m = 1; m <= 12; m++) {
+      const opt = document.createElement("option");
+      opt.value = m;
+      opt.textContent = `${m}`;
+      monthSel.appendChild(opt);
+    }
+
+    function rebuildDayOptions() {
+      const y = parseInt(yearSel.value, 10);
+      const m = parseInt(monthSel.value, 10);
+      const prevDay = parseInt(daySel.value, 10) || 1;
+      const maxDay = daysInMonth(y, m);
+      daySel.innerHTML = "";
+      for (let d = 1; d <= maxDay; d++) {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = `${d}`;
+        daySel.appendChild(opt);
+      }
+      daySel.value = Math.min(prevDay, maxDay);
+    }
+
+    rebuildDayOptions();
+    yearSel.addEventListener("change", rebuildDayOptions);
+    monthSel.addEventListener("change", rebuildDayOptions);
+  });
+})();
+
+// 指定prefix（self/a/b）の年月日プルダウンから "YYYY-MM-DD" 文字列を取得
+function getDateSelectValue(prefix) {
+  const y = document.getElementById(`${prefix}-date-year`).value;
+  const m = document.getElementById(`${prefix}-date-month`).value;
+  const d = document.getElementById(`${prefix}-date-day`).value;
+  if (!y || !m || !d) return "";
+  return `${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+}
+
+// 宿セレクトの選択肢を生成（self・A・B共通）
 (function populateShukuSelect() {
-  ["shuku-a-select", "shuku-b-select"].forEach(id => {
+  ["shuku-self-select", "shuku-a-select", "shuku-b-select"].forEach(id => {
     const sel = document.getElementById(id);
+    if (!sel) return;
     SHUKU.forEach((s, idx) => {
       const opt = document.createElement("option");
       opt.value = idx;
@@ -1647,7 +1770,8 @@ document.querySelectorAll(".rel-tab").forEach(tab => {
 
 document.querySelectorAll(".mode-btn").forEach(btn => {
   btn.addEventListener("click", () => {
-    const side = btn.closest("#input-mode-toggle-a") ? "a" : "b";
+    const toggle = btn.closest('[id^="input-mode-toggle-"]');
+    const side = toggle.id.replace("input-mode-toggle-", "");
     selectInputMode(side, btn.dataset.mode);
   });
 });
@@ -1658,13 +1782,13 @@ function selectInputMode(side, mode) {
   toggle.querySelectorAll(".mode-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.mode === mode);
   });
-  const dateInput   = document.getElementById(`date-${side}`);
+  const dateRow     = document.getElementById(`date-select-${side}`);
   const shukuSelect = document.getElementById(`shuku-${side}-select`);
   if (mode === "date") {
-    dateInput.style.display = "";
+    dateRow.style.display = "";
     shukuSelect.style.display = "none";
   } else {
-    dateInput.style.display = "none";
+    dateRow.style.display = "none";
     shukuSelect.style.display = "";
   }
 }
@@ -1713,21 +1837,35 @@ document.getElementById("btn-self-calc").addEventListener("click", calculateSelf
 
 function calculateSelf() {
   const errEl = document.getElementById("self-error-msg");
-  const valA = document.getElementById("self-date").value;
 
   if (typeof Solar === "undefined") {
     errEl.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
     errEl.classList.add("show");
     return;
   }
-  if (!valA) {
-    errEl.textContent = "生年月日を入力してください";
-    errEl.classList.add("show");
-    return;
+
+  let shukuA, yA, mA, dA;
+
+  if (inputMode.self === "date") {
+    const valA = getDateSelectValue("self");
+    if (!valA) {
+      errEl.textContent = "生年月日を入力してください";
+      errEl.classList.add("show");
+      return;
+    }
+    [yA, mA, dA] = valA.split("-").map(Number);
+    shukuA = getShuku(yA, mA, dA);
+  } else {
+    const selVal = document.getElementById("shuku-self-select").value;
+    if (selVal === "") {
+      errEl.textContent = "あなたの宿を選択してください";
+      errEl.classList.add("show");
+      return;
+    }
+    const idx = parseInt(selVal, 10);
+    shukuA = { ...SHUKU[idx], index: idx };
   }
 
-  const [yA, mA, dA] = valA.split("-").map(Number);
-  const shukuA = getShuku(yA, mA, dA);
   errEl.classList.remove("show");
   showSelfResult(shukuA, yA, mA, dA);
 }
@@ -1748,7 +1886,7 @@ function calculate() {
   // A側（自分）の入力を取得（生年月日 or 宿選択）
   let shukuA;
   if (inputMode.a === "date") {
-    const valA = document.getElementById("date-a").value;
+    const valA = getDateSelectValue("a");
     if (!valA) {
       errEl.textContent = "生年月日を入力してください";
       errEl.classList.add("show");
@@ -1770,7 +1908,7 @@ function calculate() {
   // B側（相手）の入力を取得（生年月日 or 宿選択）
   let shukuB;
   if (inputMode.b === "date") {
-    const valB = document.getElementById("date-b").value;
+    const valB = getDateSelectValue("b");
     if (!valB) {
       errEl.textContent = "生年月日を両方入力してください";
       errEl.classList.add("show");
@@ -2093,6 +2231,29 @@ document.getElementById("nav-sukuyo-about").addEventListener("click", (e) => {
 
 document.getElementById("btn-back-from-sukuyo-about").addEventListener("click", () => {
   hideSukuyoAboutPage();
+});
+
+/* ── ロゴクリック：ホーム（自分を占うモード）に戻る ───────── */
+function goHome() {
+  // 月のルネーション／宿曜とはページが開いていれば閉じる
+  document.getElementById("moon-rune-page").classList.remove("show");
+  document.getElementById("sukuyo-about-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-moon-rune").classList.remove("active");
+  document.getElementById("nav-sukuyo-about").classList.remove("active");
+
+  // 結果表示・フォームを初期状態（自分を占うモード）に戻す
+  document.getElementById("result").classList.remove("show");
+  document.getElementById("form-card").classList.remove("show");
+  document.getElementById("self-card").classList.remove("hide");
+  selectTopMode("self");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("logo-home-link").addEventListener("click", (e) => {
+  e.preventDefault();
+  goHome();
 });
 </script>
 </body>
