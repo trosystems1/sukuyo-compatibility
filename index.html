@@ -864,6 +864,137 @@ body {
   .header-nav .nav-link { font-size: 12px; }
 }
 
+/* ── Sukuyo About Page: 27宿/11分類グリッド ─────────────── */
+.shuku-list-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+@media (max-width: 700px) { .shuku-list-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px) { .shuku-list-grid { grid-template-columns: 1fr; } }
+
+.shuku-mini-card {
+  background: var(--paper2);
+  border-radius: 8px;
+  padding: 14px;
+  border: 1px solid var(--border);
+}
+.shuku-mini-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.shuku-mini-yomi {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: .06em;
+  margin-bottom: 8px;
+}
+.shuku-mini-keywords {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .04em;
+  margin-bottom: 6px;
+}
+.shuku-mini-desc {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+.relation-list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+@media (max-width: 600px) { .relation-list-grid { grid-template-columns: 1fr; } }
+.relation-mini-card {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+.relation-mini-key {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  font-weight: 500;
+}
+.relation-mini-body { flex: 1; min-width: 0; }
+.relation-mini-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.relation-mini-text {
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* ── Soulmate Group (命業胎の9グループ) ──────────────────── */
+.soulmate-group-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 700px) { .soulmate-group-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 460px) { .soulmate-group-grid { grid-template-columns: 1fr; } }
+
+.soulmate-group-card {
+  background: var(--deep);
+  border-radius: var(--r);
+  padding: 18px 16px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+.soulmate-group-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.soulmate-group-no {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  color: var(--gold);
+  letter-spacing: .15em;
+  margin-bottom: 10px;
+}
+.soulmate-group-shuku-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.soulmate-group-shuku-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.soulmate-group-shuku-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  color: var(--moon);
+}
+.soulmate-group-shuku-yomi {
+  font-size: 9.5px;
+  color: rgba(232,224,245,.45);
+  letter-spacing: .04em;
+}
+
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 </style>
@@ -876,6 +1007,7 @@ body {
   <div class="sep">｜</div>
   <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav">
+    <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
   </nav>
 </header>
@@ -1139,6 +1271,61 @@ body {
 
     <div class="retry-wrap">
       <button class="btn-retry" id="btn-back-from-moon">相性占いに戻る</button>
+    </div>
+  </main>
+</div>
+
+<!-- Sukuyo About Explainer Page -->
+<div class="moon-rune-page" id="sukuyo-about-page">
+  <div class="hero moon-rune-hero">
+    <div class="hero-eyebrow">SUKUYO ASTROLOGY · 27 MANSIONS</div>
+    <h1 class="hero-title">宿曜とは</h1>
+    <p class="hero-sub">
+      生まれた瞬間の月の位置から、27の「宿」のいずれかを導き出す。<br>
+      インドの占星術を起源とし、中国・日本へと伝わった東洋の星の知恵です。
+    </p>
+  </div>
+
+  <main class="main-wrap">
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">宿曜占星術の基本</div>
+      <p class="moon-rune-intro-text">
+        宿曜占星術は、月が天球を一周する約27.3日の動きに基づき、天を27のエリア（宿）に分けた占星術です。生まれた日に月がどの宿に位置していたかによって、その人の「本命宿」が決まります。本命宿は太陽星座のように固定的な性格区分ではなく、その人が持つ本質的な気質・才能・人生のテーマを示すものとされています。
+      </p>
+      <p class="moon-rune-intro-text">
+        二人の本命宿の位置関係（何宿分離れているか）によって、命・栄・衰・友・安・危・成・壊・親・胎・業という11種類の縁の質が決まります。これが宿曜における相性占いの基礎で、上司・部下・パートナー・取引先など、あらゆる対人関係に応用されます。
+      </p>
+    </div>
+
+    <!-- 27宿一覧 -->
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">27の宿</div>
+      <p class="moon-rune-intro-text">
+        天球を27分割した「宿」それぞれに、固有の気質と象徴が割り当てられています。
+      </p>
+      <div class="shuku-list-grid" id="sukuyo-shuku-grid"></div>
+    </div>
+
+    <!-- 11分類一覧 -->
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">11種類の縁（相性の分類）</div>
+      <p class="moon-rune-intro-text">
+        自分の宿から相手の宿までの距離によって、以下の11種類のいずれかの関係性が決まります。
+      </p>
+      <div class="relation-list-grid" id="sukuyo-relation-grid"></div>
+    </div>
+
+    <!-- 命業胎（ソウルメイトグループ）一覧 -->
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">命・業・胎のグループ（ソウルメイト）</div>
+      <p class="moon-rune-intro-text">
+        27の宿は、9つのグループ・3宿ずつに分けることができます。同じグループに属する3つの宿は、互いに「命（同じ運命）」「業（前世からの縁）」「胎（来世への縁）」という、宿曜の中でも特に深い結びつきを持つ関係にあります。誰を基準にするかによって自分から見た相手が命・業・胎のいずれになるかは変わりますが、同じグループの3宿はソウルメイト的な強い縁で結ばれていると考えられています。
+      </p>
+      <div class="soulmate-group-grid" id="sukuyo-soulmate-grid"></div>
+    </div>
+
+    <div class="retry-wrap">
+      <button class="btn-retry" id="btn-back-from-sukuyo-about">占いに戻る</button>
     </div>
   </main>
 </div>
@@ -1631,9 +1818,9 @@ function showSelfResult(shukuA, year, month, day) {
 
   document.getElementById("biz-note").classList.remove("show");
 
-  // 月のルネーションを表示
-  const moon = calcMoonPhase(year, month, day);
-  showMoonPhase(moon);
+  // 月のルネーション表示は将来のマイページ（Googleログイン）機能で
+  // 生年月日を保存した際に連動表示する想定のため、現状の単発結果には表示しない
+  document.getElementById("moon-section").classList.remove("show");
 
   document.getElementById("self-card").classList.add("hide");
   document.getElementById("btn-retry-label").textContent = "もう一度調べる";
@@ -1817,6 +2004,95 @@ document.getElementById("nav-moon-rune").addEventListener("click", (e) => {
 
 document.getElementById("btn-back-from-moon").addEventListener("click", () => {
   hideMoonRunePage();
+});
+
+/* ── Sukuyo About Explainer Page ─────────────────────────── */
+function renderSukuyoShukuGrid() {
+  const grid = document.getElementById("sukuyo-shuku-grid");
+  if (!grid || grid.dataset.rendered) return;
+  grid.innerHTML = SHUKU.map(s => `
+    <div class="shuku-mini-card">
+      <div class="shuku-mini-kanji">${s.kanji}</div>
+      <div class="shuku-mini-yomi">${s.yomi}</div>
+      <div class="shuku-mini-keywords">${s.keywords.join("・")}</div>
+      <div class="shuku-mini-desc">${s.desc}</div>
+    </div>
+  `).join("");
+  grid.dataset.rendered = "true";
+}
+
+function renderSukuyoRelationGrid() {
+  const grid = document.getElementById("sukuyo-relation-grid");
+  if (!grid || grid.dataset.rendered) return;
+  // 11種類（命業胎は1つずつ、他は重複を除いて1つずつ）を順序立てて抽出
+  const seen = new Set();
+  const uniqueRelations = [];
+  COMPAT_TABLE.forEach(r => {
+    if (!seen.has(r.key)) {
+      seen.add(r.key);
+      uniqueRelations.push(r);
+    }
+  });
+  grid.innerHTML = uniqueRelations.map(r => `
+    <div class="relation-mini-card">
+      <div class="relation-mini-key" style="background:${r.color}22; color:${r.color};">${r.key}</div>
+      <div class="relation-mini-body">
+        <div class="relation-mini-name">${r.name}</div>
+        <div class="relation-mini-text">${r.text}</div>
+      </div>
+    </div>
+  `).join("");
+  grid.dataset.rendered = "true";
+}
+
+function renderSukuyoSoulmateGrid() {
+  const grid = document.getElementById("sukuyo-soulmate-grid");
+  if (!grid || grid.dataset.rendered) return;
+  // 27宿を9グループ・3宿ずつに分割（インデックスi, i+9, i+18が同じグループ）
+  const groups = [];
+  for (let i = 0; i < 9; i++) {
+    groups.push([SHUKU[i], SHUKU[i + 9], SHUKU[i + 18]]);
+  }
+  grid.innerHTML = groups.map((g, gi) => `
+    <div class="soulmate-group-card">
+      <div class="soulmate-group-no">GROUP ${gi + 1} / 9</div>
+      <div class="soulmate-group-shuku-row">
+        ${g.map(s => `
+          <div class="soulmate-group-shuku-item">
+            <span class="soulmate-group-shuku-kanji">${s.kanji}</span>
+            <span class="soulmate-group-shuku-yomi">${s.yomi}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+  grid.dataset.rendered = "true";
+}
+
+function showSukuyoAboutPage() {
+  renderSukuyoShukuGrid();
+  renderSukuyoRelationGrid();
+  renderSukuyoSoulmateGrid();
+  document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("sukuyo-about-page").classList.add("show");
+  document.getElementById("nav-sukuyo-about").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function hideSukuyoAboutPage() {
+  document.getElementById("sukuyo-about-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-sukuyo-about").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("nav-sukuyo-about").addEventListener("click", (e) => {
+  e.preventDefault();
+  showSukuyoAboutPage();
+});
+
+document.getElementById("btn-back-from-sukuyo-about").addEventListener("click", () => {
+  hideSukuyoAboutPage();
 });
 </script>
 </body>
