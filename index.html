@@ -257,15 +257,16 @@ body {
 .loading-wheel-wrap.show { display: flex; }
 .loading-wheel-svg-holder svg {
   display: block;
-  width: 260px;
-  height: 260px;
+  width: 400px;
+  max-width: min(400px, 88vw);
+  height: auto;
 }
 .loading-wheel-outer-ring {
-  animation: loadingWheelSpinCW 18s linear infinite;
+  animation: loadingWheelSpinCW 9s linear infinite;
   transform-origin: 200px 200px;
 }
 .loading-wheel-inner-ring {
-  animation: loadingWheelSpinCCW 12s linear infinite;
+  animation: loadingWheelSpinCCW 6s linear infinite;
   transform-origin: 200px 200px;
 }
 @keyframes loadingWheelSpinCW {
@@ -1905,7 +1906,7 @@ function hideLoadingWheel() {
  * フォームを隠してローディングホイールを表示し、一定時間後にcallbackを実行して結果を表示する。
  * cardId: ローディング中に隠すフォームカードのid
  */
-function runWithLoadingWheel(cardId, message, callback, delayMs = 1300) {
+function runWithLoadingWheel(cardId, message, callback, delayMs = 2500) {
   if (cardId) {
     const card = document.getElementById(cardId);
     if (card) card.classList.add("hide");
