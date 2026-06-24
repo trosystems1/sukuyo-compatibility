@@ -72,6 +72,27 @@ body {
   letter-spacing: .2em;
   font-family: 'Cinzel', serif;
 }
+.header-nav {
+  margin-left: auto;
+  display: flex;
+  gap: 24px;
+}
+.header-nav .nav-link {
+  font-size: 13px;
+  color: var(--moon);
+  text-decoration: none;
+  letter-spacing: .04em;
+  opacity: .8;
+  transition: opacity var(--transition), color var(--transition);
+  padding: 4px 0;
+  border-bottom: 1px solid transparent;
+}
+.header-nav .nav-link:hover,
+.header-nav .nav-link.active {
+  opacity: 1;
+  color: var(--gold-l);
+  border-bottom-color: var(--gold);
+}
 
 /* ── Hero ─────────────────────────────────────────────── */
 .hero {
@@ -668,6 +689,126 @@ body {
   border-top: 1px solid var(--border);
 }
 
+/* ── Moon Rune Explainer Page ────────────────────────────── */
+.moon-rune-page { display: none; }
+.moon-rune-page.show { display: block; }
+#compat-app.hide { display: none; }
+
+.moon-rune-hero .hero-title { font-size: 30px; }
+
+.moon-rune-intro-card { text-align: left; }
+.moon-rune-intro-text {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+.stage-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.stage-legend-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--paper2);
+  border-radius: var(--r);
+  padding: 16px;
+}
+.stage-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.stage-dot-asc { background: var(--gold); }
+.stage-dot-desc { background: var(--violet); }
+.stage-legend-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.stage-legend-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.moon-rune-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.moon-phase-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  display: flex;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.moon-phase-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.moon-phase-icon-wrap {
+  flex-shrink: 0;
+}
+.moon-phase-body { flex: 1; min-width: 0; }
+.moon-phase-no {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .15em;
+  margin-bottom: 4px;
+}
+.moon-phase-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17px;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+.moon-phase-en {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+.moon-phase-stage-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: .06em;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--gold-dim);
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.moon-phase-stage-badge.descending {
+  background: rgba(74,47,122,.12);
+  color: var(--violet);
+}
+.moon-phase-desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .stage-legend, .moon-rune-grid { grid-template-columns: 1fr; }
+  .header-nav { gap: 14px; }
+  .header-nav .nav-link { font-size: 12px; }
+}
+
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 </style>
@@ -679,7 +820,13 @@ body {
   <div class="logo"><span class="logo-moon">☽</span> 宿曜占星術</div>
   <div class="sep">｜</div>
   <div class="page-name">COMPATIBILITY</div>
+  <nav class="header-nav">
+    <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
+  </nav>
 </header>
+
+<!-- Compatibility App (default view) -->
+<div id="compat-app">
 
 <!-- Hero -->
 <div class="hero">
@@ -852,6 +999,52 @@ body {
   </div>
 
 </main>
+
+</div>
+<!-- /Compatibility App -->
+
+<!-- Moon Rune Explainer Page -->
+<div class="moon-rune-page" id="moon-rune-page">
+  <div class="hero moon-rune-hero">
+    <div class="hero-eyebrow">LUNATION · 8 PHASES</div>
+    <h1 class="hero-title">月のルネーション</h1>
+    <p class="hero-sub">
+      新月から次の新月までの約29.5日間。<br>
+      月はその満ち欠けの中で、8つの異なる性質をめぐっていきます。
+    </p>
+  </div>
+
+  <main class="main-wrap">
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">月のルネーションとは</div>
+      <p class="moon-rune-intro-text">
+        ルネーション（lunation）とは、新月から次の新月までの一周期を指します。宿曜占星術では、生まれた瞬間の月相が、その人の内面のリズムや行動パターンに影響を与えると考えられています。8つのフェーズは大きく「上昇期」と「下降期」の2つに分かれ、それぞれ異なる性質を持っています。
+      </p>
+      <div class="stage-legend">
+        <div class="stage-legend-item">
+          <span class="stage-dot stage-dot-asc"></span>
+          <div>
+            <div class="stage-legend-title">上昇期（1〜4番目）</div>
+            <div class="stage-legend-desc">アグレッシブ・能動的。新しいことを始め、形にしていく力。</div>
+          </div>
+        </div>
+        <div class="stage-legend-item">
+          <span class="stage-dot stage-dot-desc"></span>
+          <div>
+            <div class="stage-legend-title">下降期（5〜8番目）</div>
+            <div class="stage-legend-desc">慎重・内省的。得たものを分かち合い、見直し、次への準備をする力。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="moon-rune-grid" id="moon-rune-grid"></div>
+
+    <div class="retry-wrap">
+      <button class="btn-retry" id="btn-back-from-moon">相性占いに戻る</button>
+    </div>
+  </main>
+</div>
 
 <footer class="site-footer">
   © 宿曜占星術 · SUKUYO COMPATIBILITY
@@ -1428,6 +1621,51 @@ document.getElementById("btn-retry").addEventListener("click", () => {
   document.getElementById("form-card").style.display = "";
   document.getElementById("ring-fill").style.strokeDashoffset = "314";
   window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+/* ── Moon Rune Explainer Page ────────────────────────────── */
+function renderMoonRuneGrid() {
+  const grid = document.getElementById("moon-rune-grid");
+  if (!grid || grid.dataset.rendered) return;
+  grid.innerHTML = MOON_PHASES.map((p, i) => `
+    <div class="moon-phase-card">
+      <div class="moon-phase-icon-wrap">${moonPhaseSVG(i, 56)}</div>
+      <div class="moon-phase-body">
+        <div class="moon-phase-no">PHASE ${p.no} / 8</div>
+        <div class="moon-phase-name">${p.name}</div>
+        <div class="moon-phase-en">${p.en}</div>
+        <span class="moon-phase-stage-badge ${p.stage === "下降" ? "descending" : ""}">
+          ${p.stage === "上昇" ? "上昇期（アグレッシブ）" : "下降期（慎重）"}
+        </span>
+        <div class="moon-phase-desc">${p.desc}</div>
+      </div>
+    </div>
+  `).join("");
+  grid.dataset.rendered = "true";
+}
+
+function showMoonRunePage() {
+  renderMoonRuneGrid();
+  document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("moon-rune-page").classList.add("show");
+  document.getElementById("nav-moon-rune").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function hideMoonRunePage() {
+  document.getElementById("moon-rune-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-moon-rune").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("nav-moon-rune").addEventListener("click", (e) => {
+  e.preventDefault();
+  showMoonRunePage();
+});
+
+document.getElementById("btn-back-from-moon").addEventListener("click", () => {
+  hideMoonRunePage();
 });
 </script>
 </body>
