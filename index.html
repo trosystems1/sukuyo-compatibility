@@ -246,6 +246,44 @@ body {
 #form-card { display: none; }
 #form-card.show { display: block; }
 
+/* ── Loading Wheel（占い計算中のローディング表示） ───────── */
+.loading-wheel-wrap {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 48px 0;
+}
+.loading-wheel-wrap.show { display: flex; }
+.loading-wheel-svg-holder svg {
+  display: block;
+  width: 260px;
+  height: 260px;
+}
+.loading-wheel-outer-ring {
+  animation: loadingWheelSpinCW 18s linear infinite;
+  transform-origin: 200px 200px;
+}
+.loading-wheel-inner-ring {
+  animation: loadingWheelSpinCCW 12s linear infinite;
+  transform-origin: 200px 200px;
+}
+@keyframes loadingWheelSpinCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes loadingWheelSpinCCW {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+.loading-wheel-text {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 14px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  text-align: center;
+}
+
 /* ── Relation type tabs ───────────────────────────────── */
 .rel-tabs {
   display: grid;
@@ -1122,6 +1160,12 @@ body {
     </div>
   </div>
 
+  <!-- Loading Wheel (占い計算中のローディング表示) -->
+  <div class="loading-wheel-wrap" id="loading-wheel-wrap">
+    <div class="loading-wheel-svg-holder" id="loading-wheel-svg-holder"></div>
+    <div class="loading-wheel-text" id="loading-wheel-text">宿曜の星を巡らせています…</div>
+  </div>
+
   <!-- Self-reading card -->
   <div class="card" id="self-card">
     <div class="card-title">あなたの生年月日</div>
@@ -1789,6 +1833,90 @@ function calcCompatScore(idxA, idxB) {
   return { relAtoB, relBtoA, avgScore };
 }
 
+/* ══════════════════════════════════════════════════════════
+   ローディングホイール（占い計算中のアニメーション）
+   外側リング：27宿（固定方向に回転）　内側リング：11分類の運勢ワード（逆方向に回転）
+   伝統的な宿曜盤（相性図）の構造をそのまま再現し、SHUKU・COMPAT_TABLEのデータを再利用する
+   ══════════════════════════════════════════════════════════ */
+function buildLoadingWheelSVG() {
+  const cx = 200, cy = 200;
+  const outerR = 175, innerR = 110;
+  const N = 27;
+
+  // 運勢ワードリング（diff0=命をSHUKU[0]=昴の位置に合わせる）
+  const relationRing = COMPAT_TABLE.map(r => r.key);
+
+  function ringText(items, radius, fontSize, extraClass) {
+    return items.map((label, i) => {
+      const angle = (i / N) * 360 - 90; // 12時方向を0番目に
+      const rad = angle * Math.PI / 180;
+      const x = cx + radius * Math.cos(rad);
+      const y = cy + radius * Math.sin(rad);
+      // 各文字を中心点に向けて読みやすい向きに回転（外周側が上を向くように）
+      const rot = angle + 90;
+      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" class="${extraClass}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})">${label}</text>`;
+    }).join("");
+  }
+
+  const outerNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+
+  return `
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="loadingWheelBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1c1438"/>
+      <stop offset="100%" stop-color="#120c24"/>
+    </radialGradient>
+  </defs>
+  <circle cx="200" cy="200" r="195" fill="url(#loadingWheelBg)" stroke="#c9a961" stroke-width="1" opacity="0.95"/>
+
+  <g class="loading-wheel-outer-ring">
+    <circle cx="200" cy="200" r="${outerR}" fill="none" stroke="rgba(201,169,97,.35)" stroke-width="1"/>
+    <circle cx="200" cy="200" r="${outerR - 32}" fill="none" stroke="rgba(201,169,97,.2)" stroke-width="1"/>
+    <g fill="#e8e0f5">${ringText(outerNames, outerR - 16, 13, "loading-wheel-outer-text")}</g>
+  </g>
+
+  <g class="loading-wheel-inner-ring">
+    <circle cx="200" cy="200" r="${innerR}" fill="none" stroke="rgba(201,169,97,.3)" stroke-width="1"/>
+    <circle cx="200" cy="200" r="${innerR - 28}" fill="none" stroke="rgba(201,169,97,.2)" stroke-width="1"/>
+    <g fill="#c9a961">${ringText(relationRing, innerR - 15, 14, "loading-wheel-inner-text")}</g>
+  </g>
+
+  <circle cx="200" cy="200" r="${innerR - 30}" fill="rgba(18,12,36,.6)"/>
+  <text x="200" y="200" text-anchor="middle" dominant-baseline="middle" font-size="34" fill="#e0c785">☽</text>
+</svg>`;
+}
+
+function showLoadingWheel(message) {
+  const holder = document.getElementById("loading-wheel-svg-holder");
+  if (!holder.dataset.rendered) {
+    holder.innerHTML = buildLoadingWheelSVG();
+    holder.dataset.rendered = "true";
+  }
+  document.getElementById("loading-wheel-text").textContent = message || "宿曜の星を巡らせています…";
+  document.getElementById("loading-wheel-wrap").classList.add("show");
+}
+
+function hideLoadingWheel() {
+  document.getElementById("loading-wheel-wrap").classList.remove("show");
+}
+
+/**
+ * フォームを隠してローディングホイールを表示し、一定時間後にcallbackを実行して結果を表示する。
+ * cardId: ローディング中に隠すフォームカードのid
+ */
+function runWithLoadingWheel(cardId, message, callback, delayMs = 1300) {
+  if (cardId) {
+    const card = document.getElementById(cardId);
+    if (card) card.classList.add("hide");
+  }
+  showLoadingWheel(message);
+  setTimeout(() => {
+    hideLoadingWheel();
+    callback();
+  }, delayMs);
+}
+
 // 五行（エレメント）相性
 function calcElementCompat(elA, elB) {
   const GENERATE = { 木:"火", 火:"土", 土:"金", 金:"水", 水:"木", 日:"火" };
@@ -2054,7 +2182,9 @@ function calculateSelf() {
   }
 
   errEl.classList.remove("show");
-  showSelfResult(shukuA, yA, mA, dA);
+  runWithLoadingWheel("self-card", "本命宿を読み解いています…", () => {
+    showSelfResult(shukuA, yA, mA, dA);
+  });
 }
 
 /* ── 相性を占う（form-card） ───────────────────────────── */
@@ -2116,7 +2246,10 @@ function calculate() {
 
   errEl.classList.remove("show");
   const compat = calcCompatScore(shukuA.index, shukuB.index);
-  showResult({ shukuA, shukuB, compat });
+  document.getElementById("form-card").classList.remove("show");
+  runWithLoadingWheel(null, "相性を読み解いています…", () => {
+    showResult({ shukuA, shukuB, compat });
+  });
 }
 
 // 自分の宿だけを表示する単体結果ビュー
