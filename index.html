@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>宿曜 対人相性占い</title>
-<meta name="description" content="宿曜占星術に基づき、二つの生年月日（または法人設立日）から本命宿を算出し、対人・対法人の相性を占います。上司・部下・法人との縁を27宿・11分類で読み解く相性診断ツールです。">
-<meta property="og:title" content="宿曜 対人相性占い">
-<meta property="og:description" content="生年月日から本命宿を算出し、上司・部下・法人との相性を宿曜の観点で読み解きます。">
+<title>宿曜占い - 本命宿・月のルネーション・対人相性</title>
+<meta name="description" content="宿曜占星術に基づき、生年月日から本命宿を算出します。自分自身の本命宿と月のルネーションを調べることも、上司・部下・法人との相性を27宿・11分類で読み解くこともできる宿曜占いツールです。">
+<meta property="og:title" content="宿曜占い - 本命宿・月のルネーション・対人相性">
+<meta property="og:description" content="生年月日から本命宿を算出し、自分自身の鑑定も、上司・部下・法人との相性も占える宿曜占いツールです。">
 <meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Shippori+Mincho:wght@400;500;600&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
@@ -186,6 +186,61 @@ body {
   border-radius: 2px;
   flex-shrink: 0;
 }
+
+/* ── Top mode tabs (自分を占う / 相性を占う) ─────────────── */
+.top-mode-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+@media (max-width: 600px) { .top-mode-tabs { grid-template-columns: 1fr; } }
+.top-mode-tab {
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px 18px;
+  text-align: center;
+  cursor: pointer;
+  background: #fff;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+.top-mode-tab::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+.top-mode-tab:hover { border-color: var(--gold); }
+.top-mode-tab.active {
+  border-color: var(--gold);
+  background: var(--deep);
+  color: var(--moon);
+}
+.top-mode-tab.active::before { opacity: 1; }
+.top-mode-icon { font-size: 28px; display: block; margin-bottom: 10px; }
+.top-mode-label {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+.top-mode-desc {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: .04em;
+}
+.top-mode-tab.active .top-mode-desc { color: rgba(232,224,245,.55); }
+
+#self-card { display: block; }
+#self-card.hide { display: none; }
+#form-card { display: none; }
+#form-card.show { display: block; }
 
 /* ── Relation type tabs ───────────────────────────────── */
 .rel-tabs {
@@ -819,7 +874,7 @@ body {
 <header class="site-header">
   <div class="logo"><span class="logo-moon">☽</span> 宿曜占星術</div>
   <div class="sep">｜</div>
-  <div class="page-name">COMPATIBILITY</div>
+  <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav">
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
   </nav>
@@ -830,28 +885,61 @@ body {
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-eyebrow">SUKUYO · COMPATIBILITY READING</div>
-  <h1 class="hero-title">宿曜 対人相性占い</h1>
+  <div class="hero-eyebrow">SUKUYO · BIRTH STAR READING</div>
+  <h1 class="hero-title">宿曜占い</h1>
   <p class="hero-sub">
-    二つの生年月日から宿を算出し、<br>
-    対人・対法人の相性を宿曜の観点で読み解きます
+    生年月日から本命宿を導き、自分自身を、あるいは<br>
+    人と人・人と法人との縁を、宿曜の観点で読み解きます
   </p>
 </div>
 
 <!-- Main -->
 <main class="main-wrap">
 
-  <!-- Form card -->
+  <!-- Top mode selector -->
+  <div class="top-mode-tabs" role="radiogroup" aria-label="占いの種類" id="top-mode-tabs">
+    <div class="top-mode-tab active" data-mode="self" role="radio" aria-checked="true" tabindex="0">
+      <span class="top-mode-icon">☽</span>
+      <div class="top-mode-label">自分を占う</div>
+      <div class="top-mode-desc">本命宿と月のルネーションを調べる</div>
+    </div>
+    <div class="top-mode-tab" data-mode="compat" role="radio" aria-checked="false" tabindex="0">
+      <span class="top-mode-icon">🤝</span>
+      <div class="top-mode-label">相性を占う</div>
+      <div class="top-mode-desc">上司・部下・法人との縁を読み解く</div>
+    </div>
+  </div>
+
+  <!-- Self-reading card -->
+  <div class="card" id="self-card">
+    <div class="card-title">あなたの生年月日</div>
+
+    <div class="form-block">
+      <label class="form-label" for="self-date">
+        生年月日
+        <span class="name-badge badge-a">自分</span>
+      </label>
+      <input type="date" id="self-date" class="date-input" aria-required="true"
+        min="1900-01-01" max="2099-12-31">
+      <div class="input-note">あなたの生年月日を入力してください</div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-submit" id="btn-self-calc">
+        <span>☽</span>
+        <span>本命宿を調べる</span>
+      </button>
+    </div>
+
+    <div class="error-msg" id="self-error-msg"></div>
+  </div>
+
+  <!-- Form card (compatibility) -->
   <div class="card" id="form-card">
     <div class="card-title">関係性を選んでください</div>
 
     <!-- Relation type -->
     <div class="rel-tabs" role="radiogroup" aria-label="関係性タイプ">
-      <div class="rel-tab" data-rel="self" role="radio" aria-checked="false" tabindex="0">
-        <span class="rel-icon">☽</span>
-        <div class="rel-label">自分の宿</div>
-        <div class="rel-desc">本命宿を調べる</div>
-      </div>
       <div class="rel-tab active" data-rel="boss" role="radio" aria-checked="true" tabindex="0">
         <span class="rel-icon">🤝</span>
         <div class="rel-label">自分 × 上司</div>
@@ -873,12 +961,21 @@ body {
     <div class="form-grid">
       <!-- A side -->
       <div class="form-block">
-        <label class="form-label" for="date-a">
-          生年月日
-          <span class="name-badge badge-a">自分</span>
-        </label>
+        <div class="input-mode-row">
+          <label class="form-label" for="date-a" style="margin-bottom:0;">
+            生年月日
+            <span class="name-badge badge-a">自分</span>
+          </label>
+          <div class="input-mode-toggle" id="input-mode-toggle-a">
+            <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
+            <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+          </div>
+        </div>
         <input type="date" id="date-a" class="date-input" aria-required="true"
           min="1900-01-01" max="2099-12-31">
+        <select id="shuku-a-select" class="date-input" style="display:none;">
+          <option value="">宿を選択してください</option>
+        </select>
         <div class="input-note" id="note-a">あなたの生年月日を入力</div>
       </div>
 
@@ -889,7 +986,7 @@ body {
             生年月日
             <span class="name-badge badge-b" id="badge-b">上司</span>
           </label>
-          <div class="input-mode-toggle" id="input-mode-toggle">
+          <div class="input-mode-toggle" id="input-mode-toggle-b">
             <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
             <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
           </div>
@@ -994,7 +1091,7 @@ body {
 
     <!-- Retry -->
     <div class="retry-wrap">
-      <button class="btn-retry" id="btn-retry">別の相性を占う</button>
+      <button class="btn-retry" id="btn-retry"><span id="btn-retry-label">別の相性を占う</span></button>
     </div>
   </div>
 
@@ -1319,19 +1416,41 @@ function getRelAdvice(rel, relKey, shukuA, shukuB) {
    ══════════════════════════════════════════════════════════ */
 
 let currentRel = "boss";
-let inputMode = "date"; // "date" | "shuku"
+let inputMode = { a: "date", b: "date" }; // "date" | "shuku"
 
-// 宿セレクトの選択肢を生成
+// 宿セレクトの選択肢を生成（A・B共通）
 (function populateShukuSelect() {
-  const sel = document.getElementById("shuku-b-select");
-  SHUKU.forEach((s, idx) => {
-    const opt = document.createElement("option");
-    opt.value = idx;
-    opt.textContent = `${s.kanji}（${s.yomi}）`;
-    sel.appendChild(opt);
+  ["shuku-a-select", "shuku-b-select"].forEach(id => {
+    const sel = document.getElementById(id);
+    SHUKU.forEach((s, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = `${s.kanji}（${s.yomi}）`;
+      sel.appendChild(opt);
+    });
   });
 })();
 
+/* ── トップモード切り替え（自分を占う / 相性を占う） ───────── */
+document.querySelectorAll("#top-mode-tabs .top-mode-tab").forEach(tab => {
+  tab.addEventListener("click", () => selectTopMode(tab.dataset.mode));
+  tab.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") selectTopMode(tab.dataset.mode);
+  });
+});
+
+function selectTopMode(mode) {
+  document.querySelectorAll("#top-mode-tabs .top-mode-tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.mode === mode);
+    t.setAttribute("aria-checked", t.dataset.mode === mode ? "true" : "false");
+  });
+  document.getElementById("self-card").classList.toggle("hide", mode !== "self");
+  document.getElementById("form-card").classList.toggle("show", mode === "compat");
+  document.getElementById("result").classList.remove("show");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ── 相性モード：関係性タブ（上司/部下/法人） ─────────────── */
 document.querySelectorAll(".rel-tab").forEach(tab => {
   tab.addEventListener("click", () => selectRel(tab.dataset.rel));
   tab.addEventListener("keydown", e => {
@@ -1340,16 +1459,20 @@ document.querySelectorAll(".rel-tab").forEach(tab => {
 });
 
 document.querySelectorAll(".mode-btn").forEach(btn => {
-  btn.addEventListener("click", () => selectInputMode(btn.dataset.mode));
+  btn.addEventListener("click", () => {
+    const side = btn.closest("#input-mode-toggle-a") ? "a" : "b";
+    selectInputMode(side, btn.dataset.mode);
+  });
 });
 
-function selectInputMode(mode) {
-  inputMode = mode;
-  document.querySelectorAll(".mode-btn").forEach(b => {
+function selectInputMode(side, mode) {
+  inputMode[side] = mode;
+  const toggle = document.getElementById(`input-mode-toggle-${side}`);
+  toggle.querySelectorAll(".mode-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.mode === mode);
   });
-  const dateInput = document.getElementById("date-b");
-  const shukuSelect = document.getElementById("shuku-b-select");
+  const dateInput   = document.getElementById(`date-${side}`);
+  const shukuSelect = document.getElementById(`shuku-${side}-select`);
   if (mode === "date") {
     dateInput.style.display = "";
     shukuSelect.style.display = "none";
@@ -1366,24 +1489,14 @@ function selectRel(rel) {
     t.setAttribute("aria-checked", t.dataset.rel === rel ? "true" : "false");
   });
 
-  const bSideBlock  = document.getElementById("b-side-block");
   const badgeB      = document.getElementById("badge-b");
   const noteB       = document.getElementById("note-b");
   const noteA       = document.getElementById("note-a");
-  const modeToggle  = document.getElementById("input-mode-toggle");
+  const modeToggleB = document.getElementById("input-mode-toggle-b");
   const btnLabel    = document.getElementById("btn-calc-label");
   const shukuBLabel = document.getElementById("shuku-b-label");
   const shukuBName  = document.getElementById("shuku-b-name");
 
-  if (rel === "self") {
-    // 自分の宿モード：B側を非表示にして単体計算に
-    bSideBlock.classList.add("self-mode");
-    noteA.textContent = "あなたの生年月日を入力";
-    btnLabel.textContent = "本命宿を調べる";
-    return;
-  }
-
-  bSideBlock.classList.remove("self-mode");
   noteA.textContent = "あなたの生年月日を入力";
   btnLabel.textContent = "相性を占う";
 
@@ -1391,27 +1504,51 @@ function selectRel(rel) {
     badgeB.textContent = "上司"; badgeB.className = "name-badge badge-b";
     noteB.textContent = "上司の生年月日を入力";
     shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "上司";
-    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
-    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
+    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
   } else if (rel === "sub") {
     badgeB.textContent = "部下"; badgeB.className = "name-badge badge-b";
     noteB.textContent = "部下の生年月日を入力";
     shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "部下";
-    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
-    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
+    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
   } else {
     badgeB.textContent = "法人"; badgeB.className = "name-badge badge-corp";
     noteB.textContent = "法人の設立日を入力";
     shukuBLabel.textContent = "CORP SHUKU"; shukuBName.textContent = "法人";
-    modeToggle.querySelectorAll(".mode-btn")[0].textContent = "設立日";
-    modeToggle.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
+    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "設立日";
+    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
   }
 }
 
+/* ── 自分を占う（self-card） ───────────────────────────── */
+document.getElementById("btn-self-calc").addEventListener("click", calculateSelf);
+
+function calculateSelf() {
+  const errEl = document.getElementById("self-error-msg");
+  const valA = document.getElementById("self-date").value;
+
+  if (typeof Solar === "undefined") {
+    errEl.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
+    errEl.classList.add("show");
+    return;
+  }
+  if (!valA) {
+    errEl.textContent = "生年月日を入力してください";
+    errEl.classList.add("show");
+    return;
+  }
+
+  const [yA, mA, dA] = valA.split("-").map(Number);
+  const shukuA = getShuku(yA, mA, dA);
+  errEl.classList.remove("show");
+  showSelfResult(shukuA, yA, mA, dA);
+}
+
+/* ── 相性を占う（form-card） ───────────────────────────── */
 document.getElementById("btn-calc").addEventListener("click", calculate);
 
 function calculate() {
-  const valA = document.getElementById("date-a").value;
   const errEl = document.getElementById("error-msg");
 
   // 旧暦変換ライブラリの読み込み確認
@@ -1421,25 +1558,31 @@ function calculate() {
     return;
   }
 
-  if (!valA) {
-    errEl.textContent = "生年月日を入力してください";
-    errEl.classList.add("show");
-    return;
+  // A側（自分）の入力を取得（生年月日 or 宿選択）
+  let shukuA;
+  if (inputMode.a === "date") {
+    const valA = document.getElementById("date-a").value;
+    if (!valA) {
+      errEl.textContent = "生年月日を入力してください";
+      errEl.classList.add("show");
+      return;
+    }
+    const [yA, mA, dA] = valA.split("-").map(Number);
+    shukuA = getShuku(yA, mA, dA);
+  } else {
+    const selVal = document.getElementById("shuku-a-select").value;
+    if (selVal === "") {
+      errEl.textContent = "あなたの宿を選択してください";
+      errEl.classList.add("show");
+      return;
+    }
+    const idx = parseInt(selVal, 10);
+    shukuA = { ...SHUKU[idx], index: idx };
   }
 
-  const [yA,mA,dA] = valA.split("-").map(Number);
-  const shukuA = getShuku(yA, mA, dA);
-
-  // 自分の宿モード：単体結果のみ表示
-  if (currentRel === "self") {
-    errEl.classList.remove("show");
-    showSelfResult(shukuA, yA, mA, dA);
-    return;
-  }
-
-  // 相性モード：Bの入力を取得（生年月日 or 宿選択）
+  // B側（相手）の入力を取得（生年月日 or 宿選択）
   let shukuB;
-  if (inputMode === "date") {
+  if (inputMode.b === "date") {
     const valB = document.getElementById("date-b").value;
     if (!valB) {
       errEl.textContent = "生年月日を両方入力してください";
@@ -1492,7 +1635,8 @@ function showSelfResult(shukuA, year, month, day) {
   const moon = calcMoonPhase(year, month, day);
   showMoonPhase(moon);
 
-  document.getElementById("form-card").style.display = "none";
+  document.getElementById("self-card").classList.add("hide");
+  document.getElementById("btn-retry-label").textContent = "もう一度調べる";
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1610,7 +1754,8 @@ ${shukuB.desc}`;
   }
 
   // 表示切り替え
-  document.getElementById("form-card").style.display = "none";
+  document.getElementById("form-card").classList.remove("show");
+  document.getElementById("btn-retry-label").textContent = "別の相性を占う";
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1618,8 +1763,14 @@ ${shukuB.desc}`;
 
 document.getElementById("btn-retry").addEventListener("click", () => {
   document.getElementById("result").classList.remove("show");
-  document.getElementById("form-card").style.display = "";
   document.getElementById("ring-fill").style.strokeDashoffset = "314";
+  // 元のモードに応じてフォームを再表示
+  const compatActive = document.querySelector('#top-mode-tabs .top-mode-tab[data-mode="compat"]').classList.contains("active");
+  if (compatActive) {
+    document.getElementById("form-card").classList.add("show");
+  } else {
+    document.getElementById("self-card").classList.remove("hide");
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
