@@ -830,17 +830,20 @@ body {
 
 .moon-rune-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
   margin-bottom: 20px;
 }
 .moon-phase-card {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 24px;
+  padding: 20px 16px;
   display: flex;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
   position: relative;
   overflow: hidden;
 }
@@ -854,7 +857,7 @@ body {
 .moon-phase-icon-wrap {
   flex-shrink: 0;
 }
-.moon-phase-body { flex: 1; min-width: 0; }
+.moon-phase-body { width: 100%; }
 .moon-phase-no {
   font-family: 'Cinzel', serif;
   font-size: 11px;
@@ -864,20 +867,20 @@ body {
 }
 .moon-phase-name {
   font-family: 'Shippori Mincho', serif;
-  font-size: 17px;
+  font-size: 16px;
   color: var(--ink);
   margin-bottom: 2px;
 }
 .moon-phase-en {
-  font-size: 11px;
+  font-size: 10.5px;
   color: var(--muted);
-  letter-spacing: .08em;
+  letter-spacing: .06em;
   margin-bottom: 10px;
 }
 .moon-phase-stage-badge {
   display: inline-block;
-  font-size: 11px;
-  letter-spacing: .06em;
+  font-size: 10.5px;
+  letter-spacing: .04em;
   padding: 3px 10px;
   border-radius: 100px;
   background: var(--gold-dim);
@@ -889,13 +892,18 @@ body {
   color: var(--violet);
 }
 .moon-phase-desc {
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 12px;
+  line-height: 1.7;
   color: var(--muted);
+  text-align: left;
 }
 
+@media (max-width: 900px) {
+  .moon-rune-grid { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 640px) {
-  .stage-legend, .moon-rune-grid { grid-template-columns: 1fr; }
+  .stage-legend { grid-template-columns: 1fr; }
+  .moon-rune-grid { grid-template-columns: 1fr; }
   .header-nav { gap: 14px; }
   .header-nav .nav-link { font-size: 12px; }
 }
