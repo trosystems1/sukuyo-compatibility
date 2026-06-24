@@ -1114,6 +1114,90 @@ body {
   letter-spacing: .04em;
 }
 
+/* ── Senseiban (占星盤) Interactive Page ───────────────── */
+.senseiban-wheel-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px 0 24px;
+}
+.senseiban-wheel-holder {
+  position: relative;
+  width: 420px;
+  max-width: min(420px, 92vw);
+  touch-action: none;
+  user-select: none;
+}
+.senseiban-wheel-holder svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.senseiban-inner-ring-group {
+  cursor: grab;
+}
+.senseiban-inner-ring-group.dragging {
+  cursor: grabbing;
+}
+.senseiban-base-label {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: .04em;
+}
+.senseiban-base-label span {
+  color: var(--gold);
+  font-weight: 500;
+}
+.senseiban-relation-table-wrap {
+  margin-top: 8px;
+}
+.senseiban-relation-table {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+@media (max-width: 700px) {
+  .senseiban-relation-table { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 460px) {
+  .senseiban-relation-table { grid-template-columns: 1fr; }
+}
+.senseiban-relation-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.senseiban-relation-cell.is-base {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.senseiban-relation-badge {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 500;
+}
+.senseiban-relation-name {
+  font-size: 13px;
+  color: var(--ink);
+}
+.senseiban-relation-rel {
+  font-size: 11px;
+  color: var(--muted);
+}
+
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 </style>
@@ -1128,6 +1212,7 @@ body {
   <nav class="header-nav">
     <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
+    <a href="#" id="nav-senseiban" class="nav-link">占星盤</a>
   </nav>
 </header>
 
@@ -1612,6 +1697,42 @@ body {
 
     <div class="retry-wrap">
       <button class="btn-retry" id="btn-back-from-sukuyo-about">占いに戻る</button>
+    </div>
+  </main>
+</div>
+
+<!-- Senseiban (占星盤) Interactive Page -->
+<div class="moon-rune-page senseiban-page" id="senseiban-page">
+  <div class="hero moon-rune-hero">
+    <div class="hero-eyebrow">SENSEIBAN · INTERACTIVE WHEEL</div>
+    <h1 class="hero-title">占星盤</h1>
+    <p class="hero-sub">
+      内側のリングを指でドラッグして回し、<br>
+      好きな宿を「命」の位置に合わせて、27宿それぞれとの縁を確かめてみましょう。
+    </p>
+  </div>
+
+  <main class="main-wrap">
+    <div class="card moon-rune-intro-card">
+      <div class="card-title">使い方</div>
+      <p class="moon-rune-intro-text">
+        内側の運勢ワードのリングをドラッグすると回転します。リング中央上部（12時の位置）に重なった外側の宿が「基準（命）」になります。基準を変えると、下に表示される27宿それぞれとの関係が自動的に切り替わります。
+      </p>
+    </div>
+
+    <div class="senseiban-wheel-card">
+      <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
+      <div class="senseiban-base-label">
+        基準（命）：<span id="senseiban-base-shuku">昴宿</span>
+      </div>
+    </div>
+
+    <div class="senseiban-relation-table-wrap">
+      <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
+    </div>
+
+    <div class="retry-wrap">
+      <button class="btn-retry" id="btn-back-from-senseiban">占いに戻る</button>
     </div>
   </main>
 </div>
@@ -2558,14 +2679,206 @@ document.getElementById("btn-back-from-sukuyo-about").addEventListener("click", 
   hideSukuyoAboutPage();
 });
 
+/* ══════════════════════════════════════════════════════════
+   占星盤（インタラクティブ宿曜盤）
+   外側リング：27宿（固定）　内側リング：11分類の運勢ワード（ドラッグで回転）
+   内側リングの12時位置に重なった外側の宿が「基準（命）」になる
+   ══════════════════════════════════════════════════════════ */
+let senseibanRotation = 0; // 現在の内側リング回転角度（度）
+let senseibanBaseIdx = 0;  // 現在の基準宿のSHUKUインデックス
+
+function buildSenseibanSVG() {
+  const cx = 210, cy = 210;
+  const outerR = 185, innerR = 118;
+  const N = 27;
+
+  const relationRing = COMPAT_TABLE.map(r => r.key);
+  const outerNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+
+  function ringText(items, radius, fontSize, extraClass, extraAttrs) {
+    return items.map((label, i) => {
+      const angle = (i / N) * 360 - 90;
+      const rad = angle * Math.PI / 180;
+      const x = cx + radius * Math.cos(rad);
+      const y = cy + radius * Math.sin(rad);
+      const rot = angle + 90;
+      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" class="${extraClass}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})" ${extraAttrs||""}>${label}</text>`;
+    }).join("");
+  }
+
+  return `
+<svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="senseibanBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#fdfaf4"/>
+      <stop offset="100%" stop-color="#f3ecdd"/>
+    </radialGradient>
+  </defs>
+  <circle cx="${cx}" cy="${cy}" r="205" fill="url(#senseibanBg)" stroke="#c9a961" stroke-width="1.5"/>
+
+  <!-- 外側リング：27宿（固定） -->
+  <g>
+    <circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="rgba(74,47,122,.25)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="${outerR - 38}" fill="none" stroke="rgba(74,47,122,.18)" stroke-width="1"/>
+    <g fill="#241b3e">${ringText(outerNames, outerR - 19, 14, "senseiban-outer-text")}</g>
+  </g>
+
+  <!-- 内側リング：11分類の運勢ワード（ドラッグで回転） -->
+  <g class="senseiban-inner-ring-group" id="senseiban-inner-ring-group" transform="rotate(0 ${cx} ${cy})">
+    <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="#fff" stroke="rgba(201,169,97,.5)" stroke-width="1"/>
+    <circle cx="${cx}" cy="${cy}" r="${innerR - 36}" fill="none" stroke="rgba(201,169,97,.3)" stroke-width="1"/>
+    <g fill="#b8953a">${ringText(relationRing, innerR - 18, 15, "senseiban-inner-text")}</g>
+  </g>
+
+  <!-- 基準点マーカー（12時位置） -->
+  <polygon points="${cx-8},${cy-outerR-2} ${cx+8},${cy-outerR-2} ${cx},${cy-outerR+14}" fill="#c9a961"/>
+
+  <circle cx="${cx}" cy="${cy}" r="${innerR - 38}" fill="rgba(253,250,244,.9)" stroke="rgba(201,169,97,.4)" stroke-width="1"/>
+  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="28" fill="#4a3f8c">☽</text>
+</svg>`;
+}
+
+function renderSenseibanRelationTable() {
+  const table = document.getElementById("senseiban-relation-table");
+  const baseIdx = senseibanBaseIdx;
+  const cells = SHUKU.map((s, idx) => {
+    const rel = getRelation(baseIdx, idx);
+    const isBase = idx === baseIdx;
+    return `
+      <div class="senseiban-relation-cell ${isBase ? "is-base" : ""}">
+        <div class="senseiban-relation-badge" style="background:${rel.color}22; color:${rel.color};">${rel.key}</div>
+        <div>
+          <div class="senseiban-relation-name">${s.kanji}（${s.yomi}）</div>
+          <div class="senseiban-relation-rel">${isBase ? "基準（命）" : rel.name}</div>
+        </div>
+      </div>`;
+  }).join("");
+  table.innerHTML = cells;
+}
+
+function updateSenseibanBase() {
+  // 内側リングの回転角度から、12時位置に来ている外側の宿（基準）を逆算する
+  // 内側リングが時計回りに回転すると、相対的に基準点は反時計回りに動く
+  const N = 27;
+  const anglePerSlot = 360 / N;
+  // senseibanRotationは「内側リングが何度回転したか」。0番目の宿（昴）が基準のとき回転0度。
+  const rawIdx = Math.round((-senseibanRotation / anglePerSlot)) % N;
+  const idx = ((rawIdx % N) + N) % N;
+  senseibanBaseIdx = idx;
+  document.getElementById("senseiban-base-shuku").textContent = SHUKU[idx].kanji;
+  renderSenseibanRelationTable();
+}
+
+function initSenseibanDrag() {
+  const holder = document.getElementById("senseiban-wheel-holder");
+  const group = document.getElementById("senseiban-inner-ring-group");
+  if (!holder || !group || holder.dataset.dragInit) return;
+  holder.dataset.dragInit = "true";
+
+  const svg = holder.querySelector("svg");
+  const cx = 210, cy = 210;
+  let dragging = false;
+  let startAngle = 0;
+  let startRotation = 0;
+
+  function getSvgPoint(clientX, clientY) {
+    const rect = svg.getBoundingClientRect();
+    const scale = 420 / rect.width; // viewBoxは0 0 420 420
+    const x = (clientX - rect.left) * scale;
+    const y = (clientY - rect.top) * scale;
+    return { x, y };
+  }
+
+  function angleAt(clientX, clientY) {
+    const p = getSvgPoint(clientX, clientY);
+    return Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI;
+  }
+
+  function onPointerDown(e) {
+    dragging = true;
+    group.classList.add("dragging");
+    const point = e.touches ? e.touches[0] : e;
+    startAngle = angleAt(point.clientX, point.clientY);
+    startRotation = senseibanRotation;
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const point = e.touches ? e.touches[0] : e;
+    const currentAngle = angleAt(point.clientX, point.clientY);
+    const delta = currentAngle - startAngle;
+    senseibanRotation = startRotation + delta;
+    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
+    e.preventDefault();
+  }
+
+  function onPointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    group.classList.remove("dragging");
+    // 27分割の最も近い角度にスナップ
+    const anglePerSlot = 360 / 27;
+    const snapped = Math.round(senseibanRotation / anglePerSlot) * anglePerSlot;
+    senseibanRotation = snapped;
+    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
+    updateSenseibanBase();
+  }
+
+  holder.addEventListener("mousedown", onPointerDown);
+  window.addEventListener("mousemove", onPointerMove);
+  window.addEventListener("mouseup", onPointerUp);
+  holder.addEventListener("touchstart", onPointerDown, { passive: false });
+  window.addEventListener("touchmove", onPointerMove, { passive: false });
+  window.addEventListener("touchend", onPointerUp);
+}
+
+function showSenseibanPage() {
+  const holder = document.getElementById("senseiban-wheel-holder");
+  if (!holder.dataset.rendered) {
+    holder.innerHTML = buildSenseibanSVG();
+    holder.dataset.rendered = "true";
+    initSenseibanDrag();
+  }
+  senseibanRotation = 0;
+  senseibanBaseIdx = 0;
+  const group = document.getElementById("senseiban-inner-ring-group");
+  if (group) group.setAttribute("transform", "rotate(0 210 210)");
+  document.getElementById("senseiban-base-shuku").textContent = SHUKU[0].kanji;
+  renderSenseibanRelationTable();
+
+  document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("senseiban-page").classList.add("show");
+  document.getElementById("nav-senseiban").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function hideSenseibanPage() {
+  document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-senseiban").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("nav-senseiban").addEventListener("click", (e) => {
+  e.preventDefault();
+  showSenseibanPage();
+});
+
+document.getElementById("btn-back-from-senseiban").addEventListener("click", () => {
+  hideSenseibanPage();
+});
+
 /* ── ロゴクリック：ホーム（自分を占うモード）に戻る ───────── */
 function goHome() {
-  // 月のルネーション／宿曜とはページが開いていれば閉じる
+  // 月のルネーション／宿曜とは／占星盤ページが開いていれば閉じる
   document.getElementById("moon-rune-page").classList.remove("show");
   document.getElementById("sukuyo-about-page").classList.remove("show");
+  document.getElementById("senseiban-page").classList.remove("show");
   document.getElementById("compat-app").classList.remove("hide");
   document.getElementById("nav-moon-rune").classList.remove("active");
   document.getElementById("nav-sukuyo-about").classList.remove("active");
+  document.getElementById("nav-senseiban").classList.remove("active");
 
   // 結果表示・フォームを初期状態（自分を占うモード）に戻す
   document.getElementById("result").classList.remove("show");
