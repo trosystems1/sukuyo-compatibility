@@ -190,6 +190,13 @@ body {
   border-radius: 2px;
   flex-shrink: 0;
 }
+.card-subtitle {
+  font-size: 12.5px;
+  color: var(--muted);
+  letter-spacing: .03em;
+  margin: -14px 0 22px;
+  line-height: 1.6;
+}
 
 /* ── Top mode tabs (自分を占う / 相性を占う) ─────────────── */
 .top-mode-tabs {
@@ -285,47 +292,6 @@ body {
   text-align: center;
 }
 
-/* ── Relation type tabs ───────────────────────────────── */
-.rel-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin-bottom: 28px;
-}
-@media (max-width: 700px) { .rel-tabs { grid-template-columns: repeat(2, 1fr); } }
-.rel-tab {
-  border: 1.5px solid var(--border);
-  border-radius: 8px;
-  padding: 14px 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition);
-  background: var(--paper);
-}
-.rel-tab:hover {
-  border-color: var(--gold);
-  background: var(--gold-dim);
-}
-.rel-tab.active {
-  border-color: var(--gold);
-  background: var(--deep);
-  color: var(--moon);
-}
-.rel-tab .rel-icon { font-size: 22px; display: block; margin-bottom: 6px; }
-.rel-tab .rel-label {
-  font-size: 13px;
-  letter-spacing: .1em;
-  font-family: 'Shippori Mincho', serif;
-  font-weight: 500;
-}
-.rel-tab .rel-desc {
-  font-size: 11px;
-  color: var(--muted);
-  margin-top: 3px;
-  letter-spacing: .06em;
-}
-.rel-tab.active .rel-desc { color: rgba(232,224,245,.5); }
-
 /* ── Result view tabs（結果ページ内：見方を切り替える） ──── */
 .result-view-tabs {
   display: flex;
@@ -338,25 +304,28 @@ body {
 .result-view-tab {
   flex: 1 1 auto;
   min-width: 110px;
-  border: 1.5px solid rgba(232,224,245,.18);
+  border: 1.5px solid rgba(232,224,245,.35);
   border-radius: 999px;
   padding: 9px 16px;
   font-size: 12.5px;
   letter-spacing: .04em;
   font-family: 'Shippori Mincho', serif;
-  background: transparent;
-  color: rgba(232,224,245,.65);
+  font-weight: 500;
+  background: rgba(232,224,245,.08);
+  color: rgba(232,224,245,.92);
   cursor: pointer;
   transition: all var(--transition);
 }
 .result-view-tab:hover {
   border-color: var(--gold);
+  background: rgba(232,224,245,.16);
   color: var(--moon);
 }
 .result-view-tab.active {
   border-color: var(--gold);
-  background: var(--gold-dim);
-  color: var(--gold);
+  background: var(--gold);
+  color: #2a1f0a;
+  font-weight: 600;
 }
 @media (max-width: 600px) {
   .result-view-tab { min-width: 0; font-size: 11.5px; padding: 8px 10px; }
@@ -1329,31 +1298,8 @@ body {
 
   <!-- Form card (compatibility) -->
   <div class="card" id="form-card">
-    <div class="card-title">関係性を選んでください</div>
-
-    <!-- Relation type -->
-    <div class="rel-tabs" role="radiogroup" aria-label="関係性タイプ">
-      <div class="rel-tab active" data-rel="boss" role="radio" aria-checked="true" tabindex="0">
-        <span class="rel-icon">🤝</span>
-        <div class="rel-label">自分 × 上司</div>
-        <div class="rel-desc">縦の人間関係</div>
-      </div>
-      <div class="rel-tab" data-rel="sub" role="radio" aria-checked="false" tabindex="0">
-        <span class="rel-icon">👥</span>
-        <div class="rel-label">自分 × 部下</div>
-        <div class="rel-desc">マネジメント相性</div>
-      </div>
-      <div class="rel-tab" data-rel="partner" role="radio" aria-checked="false" tabindex="0">
-        <span class="rel-icon">💞</span>
-        <div class="rel-label">自分 × パートナー</div>
-        <div class="rel-desc">恋愛・結婚の相性</div>
-      </div>
-      <div class="rel-tab" data-rel="corp" role="radio" aria-checked="false" tabindex="0">
-        <span class="rel-icon">🏛️</span>
-        <div class="rel-label">自分 × 法人</div>
-        <div class="rel-desc">設立日との相性</div>
-      </div>
-    </div>
+    <div class="card-title">あなたと相手の生年月日を入力してください</div>
+    <div class="card-subtitle">結果ページで「上司として／部下として／恋愛として／法人として」を後から切り替えられます</div>
 
     <!-- Inputs -->
     <div class="form-grid">
@@ -1388,7 +1334,7 @@ body {
         <div class="input-mode-row">
           <label class="form-label" for="b-date-year" id="label-b" style="margin-bottom:0;">
             生年月日
-            <span class="name-badge badge-b" id="badge-b">上司</span>
+            <span class="name-badge badge-b" id="badge-b">相手</span>
           </label>
           <div class="input-mode-toggle" id="input-mode-toggle-b">
             <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
@@ -2268,14 +2214,6 @@ function selectTopMode(mode) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* ── 相性モード：関係性タブ（上司/部下/法人） ─────────────── */
-document.querySelectorAll(".rel-tab").forEach(tab => {
-  tab.addEventListener("click", () => selectRel(tab.dataset.rel));
-  tab.addEventListener("keydown", e => {
-    if (e.key === "Enter" || e.key === " ") selectRel(tab.dataset.rel);
-  });
-});
-
 document.querySelectorAll(".mode-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     const toggle = btn.closest('[id^="input-mode-toggle-"]');
@@ -2298,51 +2236,6 @@ function selectInputMode(side, mode) {
   } else {
     dateRow.style.display = "none";
     shukuSelect.style.display = "";
-  }
-}
-
-function selectRel(rel) {
-  currentRel = rel;
-  document.querySelectorAll(".rel-tab").forEach(t => {
-    t.classList.toggle("active", t.dataset.rel === rel);
-    t.setAttribute("aria-checked", t.dataset.rel === rel ? "true" : "false");
-  });
-
-  const badgeB      = document.getElementById("badge-b");
-  const noteB       = document.getElementById("note-b");
-  const noteA       = document.getElementById("note-a");
-  const modeToggleB = document.getElementById("input-mode-toggle-b");
-  const btnLabel    = document.getElementById("btn-calc-label");
-  const shukuBLabel = document.getElementById("shuku-b-label");
-  const shukuBName  = document.getElementById("shuku-b-name");
-
-  noteA.textContent = "あなたの生年月日を入力";
-  btnLabel.textContent = "相性を占う";
-
-  if (rel === "boss") {
-    badgeB.textContent = "上司"; badgeB.className = "name-badge badge-b";
-    noteB.textContent = "上司の生年月日を入力";
-    shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "上司";
-    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
-    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
-  } else if (rel === "sub") {
-    badgeB.textContent = "部下"; badgeB.className = "name-badge badge-b";
-    noteB.textContent = "部下の生年月日を入力";
-    shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "部下";
-    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
-    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
-  } else if (rel === "partner") {
-    badgeB.textContent = "パートナー"; badgeB.className = "name-badge badge-b";
-    noteB.textContent = "パートナーの生年月日を入力";
-    shukuBLabel.textContent = "THEIR SHUKU"; shukuBName.textContent = "パートナー";
-    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "生年月日";
-    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
-  } else {
-    badgeB.textContent = "法人"; badgeB.className = "name-badge badge-corp";
-    noteB.textContent = "法人の設立日を入力";
-    shukuBLabel.textContent = "CORP SHUKU"; shukuBName.textContent = "法人";
-    modeToggleB.querySelectorAll(".mode-btn")[0].textContent = "設立日";
-    modeToggleB.querySelectorAll(".mode-btn")[1].textContent = "宿で選ぶ";
   }
 }
 
@@ -2603,15 +2496,28 @@ function renderResultForView(view) {
       ? "あなたと相手は同じ宿（命の関係）です"
       : `あなたは「${rAB.key}」／相手は「${rBA.key}」の立場です`;
 
-  // 詳細アスペクト（4項目）
+  // 詳細アスペクト（4項目）：視点（上司/部下/パートナー/法人）ごとに言い回しを変える
   const grid = document.getElementById("aspect-grid");
   const gold="#b8953a", accent="#4a3f8c", teal="#1f6e6e", muted="#7a6e5e";
+  const bLabel = bLabels[view]; // 上司／部下／パートナー／法人
+  const totalScoreText = {
+    boss:    `この上司との縁の強さ。${score >= 75 ? "信頼関係を築きやすい配置です" : score >= 55 ? "良好な協力関係を築けます" : score >= 40 ? "努力次第で関係を高められます" : "丁寧なコミュニケーションが必要な配置です"}。`,
+    sub:     `この部下との縁の強さ。${score >= 75 ? "才能を引き出しやすい配置です" : score >= 55 ? "良好な育成関係を築けます" : score >= 40 ? "丁寧なフォローで力を発揮します" : "細やかな配慮が必要な配置です"}。`,
+    partner: `恋愛・結婚における縁の強さ。${score >= 75 ? "深い縁で結ばれた相性です" : score >= 55 ? "良好な関係を築けます" : score >= 40 ? "お互いの努力で関係を深められます" : "刺激や試練の多い相性です"}。`,
+    corp:    `この法人との縁の強さ。${score >= 75 ? "深く関与する価値がある配置です" : score >= 55 ? "良好な取引関係を築けます" : score >= 40 ? "条件を見極めながら関与する配置です" : "慎重なリスク管理が必要な配置です"}。`,
+  };
+  const traitText = {
+    boss:    `${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（上司）のエネルギーが、仕事の進め方や評価のされ方に影響します。`,
+    sub:     `${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（部下）のエネルギーが、指導の仕方や育ち方に影響します。`,
+    partner: `${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（パートナー）のエネルギーが、恋愛・結婚生活の距離感に影響します。`,
+    corp:    `${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（法人）のエネルギーが、関与の仕方や取引の結果に影響します。`,
+  };
   const aspects = [
-    { label:"A→B 縁の質", val:rAB.score,  color:gold,   text:`自分から見た相手：${rAB.name}。${rAB.text}` },
-    { label:"B→A 縁の質", val:rBA.score,  color:accent, text:`相手から見た自分：${rBA.name}。${rBA.text}` },
-    { label:"総合スコア",  val:score,       color:teal,   text:`双方向の縁の強さ。${score >= 75 ? "深い縁で結ばれています" : score >= 55 ? "良好な関係を築けます" : score >= 40 ? "努力で関係を高められます" : "課題のある縁です"}。` },
+    { label:"A→B 縁の質", val:rAB.score,  color:gold,   text:`自分から見た${bLabel}：${rAB.name}。${rAB.text}` },
+    { label:"B→A 縁の質", val:rBA.score,  color:accent, text:`${bLabel}から見た自分：${rBA.name}。${rBA.text}` },
+    { label:"総合スコア",  val:score,       color:teal,   text: totalScoreText[view] },
     { label:"宿の特性",   val:Math.min(100, Math.round((rAB.score + rBA.score) * 0.55)), color:muted,
-      text:`${shukuA.keywords[0]}（自分）×${shukuB.keywords[0]}（相手）のエネルギーが作用します。` },
+      text: traitText[view] },
   ];
   grid.innerHTML = aspects.map(a => `
     <div class="aspect-item">
