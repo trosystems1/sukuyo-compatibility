@@ -326,43 +326,40 @@ body {
 }
 .rel-tab.active .rel-desc { color: rgba(232,224,245,.5); }
 
-/* ── Result view tabs（結果ページ内の視点切り替え） ───── */
+/* ── Result view tabs（結果ページ内：見方を切り替える） ──── */
 .result-view-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 14px 20px;
-  background: var(--paper);
-  border: 1px solid var(--border);
-  border-top: none;
+  justify-content: center;
+  margin: 20px auto 0;
+  max-width: 560px;
 }
-.result-view-tabs.hide { display: none; }
 .result-view-tab {
-  flex: 1;
-  min-width: 120px;
-  padding: 10px 12px;
-  border: 1.5px solid var(--border);
+  flex: 1 1 auto;
+  min-width: 110px;
+  border: 1.5px solid rgba(232,224,245,.18);
   border-radius: 999px;
-  background: var(--paper);
-  font-family: 'Shippori Mincho', serif;
+  padding: 9px 16px;
   font-size: 12.5px;
-  letter-spacing: .06em;
-  color: var(--ink);
+  letter-spacing: .04em;
+  font-family: 'Shippori Mincho', serif;
+  background: transparent;
+  color: rgba(232,224,245,.65);
   cursor: pointer;
   transition: all var(--transition);
-  text-align: center;
 }
 .result-view-tab:hover {
   border-color: var(--gold);
-  background: var(--gold-dim);
+  color: var(--moon);
 }
 .result-view-tab.active {
   border-color: var(--gold);
-  background: var(--deep);
-  color: var(--moon);
+  background: var(--gold-dim);
+  color: var(--gold);
 }
-@media (max-width: 700px) {
-  .result-view-tab { min-width: calc(50% - 4px); flex: 1 1 calc(50% - 4px); }
+@media (max-width: 600px) {
+  .result-view-tab { min-width: 0; font-size: 11.5px; padding: 8px 10px; }
 }
 
 /* ── Form rows ────────────────────────────────────────── */
@@ -1349,7 +1346,7 @@ body {
       <div class="rel-tab" data-rel="partner" role="radio" aria-checked="false" tabindex="0">
         <span class="rel-icon">💞</span>
         <div class="rel-label">自分 × パートナー</div>
-        <div class="rel-desc">恋愛・結婚相性</div>
+        <div class="rel-desc">恋愛・結婚の相性</div>
       </div>
       <div class="rel-tab" data-rel="corp" role="radio" aria-checked="false" tabindex="0">
         <span class="rel-icon">🏛️</span>
@@ -1447,8 +1444,9 @@ body {
       </div>
     </div>
 
-    <div class="result-view-tabs hide" id="result-view-tabs" role="radiogroup" aria-label="見方を切り替える">
-      <button type="button" class="result-view-tab active" data-view="boss" role="radio" aria-checked="true">🤝 上司として</button>
+    <!-- 視点切り替えタブ（同じ宿ペアのまま見方だけ変える） -->
+    <div class="result-view-tabs" id="result-view-tabs" role="radiogroup" aria-label="見方を切り替える">
+      <button type="button" class="result-view-tab" data-view="boss" role="radio" aria-checked="true">🤝 上司として</button>
       <button type="button" class="result-view-tab" data-view="sub" role="radio" aria-checked="false">👥 部下として</button>
       <button type="button" class="result-view-tab" data-view="partner" role="radio" aria-checked="false">💞 恋愛として</button>
       <button type="button" class="result-view-tab" data-view="corp" role="radio" aria-checked="false">🏛️ 法人として</button>
@@ -1964,33 +1962,34 @@ function moonPhaseSVG(phaseIdx, size = 56) {
    安・壊（あんかい）／危・成（きせい）
    pairName: バッジに表示するペア名（命のみ単独）　pairYomi: ペアの読み仮名 */
 const COMPAT_TABLE = [
+  // diff → { key, score, name, color, pairName, pairYomi }
   { key:"命", score:95, name:"命の関係",  color:"#b8953a", text:"最も深い縁。魂のレベルで結びついた稀有な関係。", pairName:"命",     pairYomi:"めい"     },  // 0
   { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。",     pairName:"栄・親", pairYomi:"えいしん" },  // 1
-  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 2
-  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },  // 3
-  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。", pairName:"危・成", pairYomi:"きせい"   },  // 4
-  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",    pairName:"危・成", pairYomi:"きせい"   },  // 5
-  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",    pairName:"安・壊", pairYomi:"あんかい" },  // 6
-  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 7
-  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",  pairName:"栄・親", pairYomi:"えいしん" },  // 8
-  { key:"胎", score:55, name:"胎の関係",  color:"#4a3f8c", text:"可能性を育む縁。時間をかけて深まる関係。",       pairName:"業・胎", pairYomi:"ぎょうたい" },  // 9
-  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。",     pairName:"栄・親", pairYomi:"えいしん" },  // 10
-  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 11
-  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },  // 12
-  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。", pairName:"危・成", pairYomi:"きせい"   },  // 13
-  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",    pairName:"危・成", pairYomi:"きせい"   },  // 14
-  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",    pairName:"安・壊", pairYomi:"あんかい" },  // 15
-  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 16
-  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",  pairName:"栄・親", pairYomi:"えいしん" },  // 17
-  { key:"業", score:30, name:"業の関係",  color:"#7a6e5e", text:"カルマ的な縁。乗り越えるべき課題を持つ関係。",   pairName:"業・胎", pairYomi:"ぎょうたい" },  // 18
-  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。",     pairName:"栄・親", pairYomi:"えいしん" },  // 19
-  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 20
-  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },  // 21
-  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。", pairName:"危・成", pairYomi:"きせい"   },  // 22
-  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",    pairName:"危・成", pairYomi:"きせい"   },  // 23
-  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",    pairName:"安・壊", pairYomi:"あんかい" },  // 24
-  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" },  // 25
-  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",  pairName:"栄・親", pairYomi:"えいしん" },  // 26
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 2
+  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },// 3
+  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。",   pairName:"危・成", pairYomi:"きせい"   }, // 4
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",     pairName:"危・成", pairYomi:"きせい"   },    // 5
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",     pairName:"安・壊", pairYomi:"あんかい" },    // 6
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 7
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",   pairName:"栄・親", pairYomi:"えいしん" },  // 8
+  { key:"胎", score:55, name:"胎の関係",  color:"#4a3f8c", text:"可能性を育む縁。時間をかけて深まる関係。",       pairName:"業・胎", pairYomi:"ぎょうたい" },       // 9
+  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。",     pairName:"栄・親", pairYomi:"えいしん" },     // 10
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 11
+  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },// 12
+  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。",   pairName:"危・成", pairYomi:"きせい"   }, // 13
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",     pairName:"危・成", pairYomi:"きせい"   },    // 14
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",     pairName:"安・壊", pairYomi:"あんかい" },    // 15
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 16
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",   pairName:"栄・親", pairYomi:"えいしん" },  // 17
+  { key:"業", score:30, name:"業の関係",  color:"#7a6e5e", text:"カルマ的な縁。乗り越えるべき課題を持つ関係。",     pairName:"業・胎", pairYomi:"ぎょうたい" },   // 18
+  { key:"親", score:88, name:"親の関係",  color:"#b8953a", text:"親友のような深い絆。自然に心が通じ合う縁。",     pairName:"栄・親", pairYomi:"えいしん" },     // 19
+  { key:"友", score:80, name:"友の関係",  color:"#b8953a", text:"自然な親しみやすさがある縁。長く続く友情的な絆。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 20
+  { key:"壊", score:35, name:"壊の関係",  color:"#b04040", text:"破壊と再生の縁。深い変容をもたらすが困難を伴う。", pairName:"安・壊", pairYomi:"あんかい" },// 21
+  { key:"成", score:60, name:"成の関係",  color:"#4a3f8c", text:"努力で実る縁。誠実に向き合えば成果が生まれる。",   pairName:"危・成", pairYomi:"きせい"   }, // 22
+  { key:"危", score:42, name:"危の関係",  color:"#b04040", text:"注意が必要な縁。油断すると摩擦が生じやすい。",     pairName:"危・成", pairYomi:"きせい"   },    // 23
+  { key:"安", score:65, name:"安の関係",  color:"#2e7d32", text:"安定した縁。大きな波風なく穏やかに続く関係。",     pairName:"安・壊", pairYomi:"あんかい" },    // 24
+  { key:"衰", score:38, name:"衰の関係",  color:"#b04040", text:"消耗しやすい縁。エネルギーの方向性が合いにくい。", pairName:"友・衰", pairYomi:"ゆうすい" }, // 25
+  { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",   pairName:"栄・親", pairYomi:"えいしん" },  // 26
 ];
 
 /**
@@ -2153,17 +2152,17 @@ function getRelAdvice(rel, relKey, shukuA, shukuB) {
       "業": `カルマ的な縁。一筋縄ではいきませんが、誠実な姿勢で臨めば良い方向に向かうこともあります。`,
     },
     partner: {
-      "命": `${A}と${B}は「命の関係」——魂の鏡のようなパートナーです。価値観や感性が似ており、言葉にしなくても通じ合いやすい反面、自分の弱点も映し出される関係。お互いの素直さを大切にすれば、深い愛情と安心感を育てられるでしょう。`,
-      "栄": `互いを輝かせる「栄・親」の縁。${A}と${B}は安定した愛情を築きやすく、結婚・同棲にも向いた関係です。ただし刺激不足になりやすいので、意識的に新しい体験や会話の機会を作ることが長続きの鍵です。`,
-      "親": `親友のような深い絆「栄・親」。${A}と${B}は自然体でいられる関係で、結婚生活においても精神的な支え合いが期待できます。感謝の気持ちを言葉にすることが、愛をより深めます。`,
-      "友": `友達感覚で長続きしやすい「友・衰」の縁。気さくで居心地の良さがあり、恋愛が長く続きやすい配置です。恋人らしい特別感を意識的に演出すると、より充実した関係になります。`,
-      "衰": `エネルギーの消耗を感じやすい「友・衰」の縁。親しみやすさはあるものの、一方がもう一方に尽くしやすい傾向があります。対等な関係を意識し、一人の時間も大切にしましょう。`,
-      "安": `安定した愛情「安・壊」の縁。あなたにとって相手は安らぎの存在で、穏やかな関係を築きやすいです。ただし相手から見たあなたは「壊」の側——無意識に傷つけてしまうこともあるので、相手の気持ちに丁寧に耳を傾けてください。`,
-      "壊": `強い引力と衝突を伴う「安・壊」の縁。${A}と${B}は惹かれ合う一方で、価値観の違いから激しい喧嘩も起きやすい関係です。率直さを大切にしつつ、冷静な対話の場を作ることが二人の絆を深めます。`,
-      "成": `刺激的で成長を促す「危・成」の縁。お互いに影響し合い、恋愛関係を通じて大きく変化する可能性があります。価値観の違いを否定せず、違いから学ぶ姿勢が大切です。`,
-      "危": `スリルと不安定さを伴う「危・成」の縁。情熱的で刺激的ですが、価値観のズレや嫉妬のような摩擦も起きやすい配置。お互いの境界線を尊重することが安定への第一歩です。`,
-      "胎": `前世的な強い縁「業・胎」。${A}と${B}は初めから特別なつながりを感じやすく、結婚を見据えた深い関係に育ちやすいです。焦らず時間をかけて信頼を育てることが鍵となります。`,
-      "業": `カルマ的で避けられない縁「業・胎」。出会った瞬間から運命的な引力を感じることもありますが、乗り越えるべき課題も多い関係。誠実さと忍耐が二人の未来を切り開きます。`,
+      "命": `最も深い縁。${A}（あなた）と${B}（パートナー）は同じ宿の「命の関係」。価値観や感性が驚くほど似ており、お互いを映す鏡のような存在です。安心感は大きい一方、似ているからこそ短所も共有しやすく、刺激の少なさを意識的に補う工夫が長続きの鍵になります。`,
+      "栄": `「栄・親」の関係。お互いにプラスを与え合い、尊重し合える理想的な組み合わせです。安定感のある恋愛・結婚相性として知られますが、刺激が少なく友達止まりになりやすい面もあるので、関係の初期は意識的に距離を詰める工夫を。`,
+      "親": `「栄・親」の関係。親愛を表す宿で、自然に心が通じ合います。穏やかで安心できるパートナーシップを築きやすい配置です。マンネリ防止に、たまには新しい体験を一緒にしてみましょう。`,
+      "友": `「友・衰」の関係。友人から恋人へと自然に発展しやすい、似た価値観を持つ組み合わせです。ラブラブというより、長く続く穏やかな関係になりやすいでしょう。`,
+      "衰": `「友・衰」の関係。協力的で安定したパートナーシップですが、エネルギーの方向性が合いにくいと感じる場面もあります。お互いのペースを尊重することが長続きの秘訣です。`,
+      "安": `「安・壊」の関係。あなたが「安」の立場なら、相手にとって安心できる安定剤的な存在。強い引力がありますが、相手任せにすると関係に油断が生まれやすいので、感謝を言葉にする習慣を持ちましょう。`,
+      "壊": `「安・壊」の関係。強い引力と、破壊・再生をもたらす縁。出会った瞬間に強く惹かれ合うことが多い一方、感情的な衝突も起きやすい組み合わせです。大胆な行動や決めつけは避け、対話を大切にしてください。`,
+      "成": `「危・成」の関係。目標達成やパートナーシップとして相性は良いものの、性格は正反対。お互いに無いものを見出して惹かれ合いますが、価値観の違いが恋愛・結婚生活では表面化しやすいでしょう。`,
+      "危": `「危・成」の関係。刺激的で異性としての吸引力は強いタイプですが、ドライな一面もあります。少し熱意を持って向き合うことで、かけがえのない関係に育てられます。`,
+      "胎": `「業・胎」の関係。前世からの深い繋がりを感じさせる、骨身にしみるような強い縁です。出会った瞬間に運命的なものを感じやすい一方、結婚となると思わぬ障害が現れることも。困難を乗り越えた先に、特別な信頼関係が育ちます。`,
+      "業": `「業・胎」の関係。カルマ的な強い引力を持つ縁。たとえ別れても相手を愛したことを後悔しない、深い学びをもたらす関係とされています。困難を伴いますが、それを乗り越えることが二人の成長につながります。`,
     },
   };
   return (advice[rel] && advice[rel][relKey]) || `${A}と${B}の縁。宿曜の観点から誠実に向き合い、関係を大切に育ててください。`;
@@ -2174,7 +2173,7 @@ function getRelAdvice(rel, relKey, shukuA, shukuB) {
    ══════════════════════════════════════════════════════════ */
 
 let currentRel = "boss";
-let lastCompatResult = null;
+let lastCompatResult = null; // 直前の相性結果（A/B/compat）。視点タブ切り替え時の再描画に使用
 let inputMode = { self: "date", a: "date", b: "date" }; // "date" | "shuku"
 
 const DATE_SELECT_PREFIXES = ["self", "a", "b"];
@@ -2269,18 +2268,11 @@ function selectTopMode(mode) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-/* ── 相性モード：関係性タブ（上司/部下/パートナー/法人） ─── */
+/* ── 相性モード：関係性タブ（上司/部下/法人） ─────────────── */
 document.querySelectorAll(".rel-tab").forEach(tab => {
   tab.addEventListener("click", () => selectRel(tab.dataset.rel));
   tab.addEventListener("keydown", e => {
     if (e.key === "Enter" || e.key === " ") selectRel(tab.dataset.rel);
-  });
-});
-
-document.querySelectorAll(".result-view-tab").forEach(tab => {
-  tab.addEventListener("click", () => renderResultForView(tab.dataset.view));
-  tab.addEventListener("keydown", e => {
-    if (e.key === "Enter" || e.key === " ") renderResultForView(tab.dataset.view);
   });
 });
 
@@ -2462,8 +2454,6 @@ function calculate() {
 // 自分の宿だけを表示する単体結果ビュー
 function showSelfResult(shukuA, year, month, day) {
   lastCompatResult = null;
-  document.getElementById("result-view-tabs").classList.add("hide");
-
   document.getElementById("result-rel-label").textContent = "あなたの本命宿";
 
   document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
@@ -2474,7 +2464,8 @@ function showSelfResult(shukuA, year, month, day) {
   document.querySelector(".pair-arrow").style.display = "none";
   document.getElementById("shuku-b-kanji").parentElement.style.display = "none";
 
-  // スコア・相性関連セクションを隠す
+  // 視点切り替えタブ・スコア・相性関連セクションを隠す（自分の宿のみの単体結果のため）
+  document.getElementById("result-view-tabs").style.display = "none";
   document.querySelector(".score-section").style.display = "none";
   document.querySelector(".aspects").style.display = "none";
 
@@ -2522,7 +2513,12 @@ function showMoonPhase(moon) {
   `).join("");
 }
 
+// 直前に表示した相性結果（A/B/compat）を保持。
+// 視点タブ（上司/部下/パートナー/法人）の切り替え時に、入力に戻らず再描画するために使う。
+
 function showResult({ shukuA, shukuB, compat }) {
+  lastCompatResult = { shukuA, shukuB, compat };
+
   // 通常表示に戻す（自分の宿モードで隠した要素を復元）
   document.querySelector(".pair-arrow").style.display = "";
   document.getElementById("shuku-b-kanji").parentElement.style.display = "";
@@ -2530,19 +2526,13 @@ function showResult({ shukuA, shukuB, compat }) {
   document.querySelector(".aspects").style.display = "";
   document.querySelector(".advice-title").textContent = "☽ 宿曜からのメッセージ";
   document.getElementById("moon-section").classList.remove("show");
+  document.getElementById("result-view-tabs").style.display = "flex";
 
-  lastCompatResult = { shukuA, shukuB, compat };
-  document.getElementById("result-view-tabs").classList.remove("hide");
+  // 視点タブをcurrentRelに同期（パートナー/法人以外で入力した場合はbossを初期表示）
+  const initialView = ["boss", "sub", "partner", "corp"].includes(currentRel) ? currentRel : "boss";
+  syncResultViewTabs(initialView);
 
-  // 宿情報
-  document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
-  document.getElementById("shuku-a-yomi").textContent   = shukuA.yomi;
-  document.getElementById("shuku-a-nature").textContent = `${shukuA.nature} · ${shukuA.desc}`;
-  document.getElementById("shuku-b-kanji").textContent  = shukuB.kanji;
-  document.getElementById("shuku-b-yomi").textContent   = shukuB.yomi;
-  document.getElementById("shuku-b-nature").textContent = `${shukuB.nature} · ${shukuB.desc}`;
-
-  renderResultForView(currentRel);
+  renderResultForView(initialView);
 
   // 表示切り替え
   document.getElementById("form-card").classList.remove("show");
@@ -2552,50 +2542,68 @@ function showResult({ shukuA, shukuB, compat }) {
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+// 結果ページ内の視点タブの見た目（active状態）を切り替える
+function syncResultViewTabs(view) {
+  document.querySelectorAll(".result-view-tab").forEach(t => {
+    t.classList.toggle("active", t.dataset.view === view);
+    t.setAttribute("aria-checked", t.dataset.view === view ? "true" : "false");
+  });
+}
+
+// 同じ宿ペア（shukuA/shukuB）のまま、見方（上司/部下/パートナー/法人）だけ変えて再描画する
 function renderResultForView(view) {
   if (!lastCompatResult) return;
   const { shukuA, shukuB, compat } = lastCompatResult;
 
-  document.querySelectorAll(".result-view-tab").forEach(t => {
-    const active = t.dataset.view === view;
-    t.classList.toggle("active", active);
-    t.setAttribute("aria-checked", active ? "true" : "false");
-  });
-
   const relLabels = {
-    boss: "自分と上司の相性",
-    sub: "自分と部下の相性",
+    boss:    "自分と上司の相性",
+    sub:     "自分と部下の相性",
     partner: "自分とパートナーの相性",
-    corp: "自分と法人（設立日）の相性",
+    corp:    "自分と法人（設立日）の相性",
   };
-  document.getElementById("result-rel-label").textContent = relLabels[view] || relLabels.boss;
+  document.getElementById("result-rel-label").textContent = relLabels[view];
 
+  const bLabels = { boss:"上司", sub:"部下", partner:"パートナー", corp:"法人" };
+  document.getElementById("shuku-b-label").textContent = view === "corp" ? "CORP SHUKU" : "THEIR SHUKU";
+  document.getElementById("shuku-b-name").textContent  = bLabels[view];
+
+  // 宿情報
+  document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
+  document.getElementById("shuku-a-yomi").textContent   = shukuA.yomi;
+  document.getElementById("shuku-a-nature").textContent = `${shukuA.nature} · ${shukuA.desc}`;
+  document.getElementById("shuku-b-kanji").textContent  = shukuB.kanji;
+  document.getElementById("shuku-b-yomi").textContent   = shukuB.yomi;
+  document.getElementById("shuku-b-nature").textContent = `${shukuB.nature} · ${shukuB.desc}`;
+
+  // 双方向の関係
   const rAB = compat.relAtoB;
   const rBA = compat.relBtoA;
   const score = compat.avgScore;
 
+  // スコアリングリング
   document.getElementById("score-num").textContent = score;
   const ring = document.getElementById("ring-fill");
   const circ = 2 * Math.PI * 50;
   const ringColor = score >= 75 ? "#b8953a" : score >= 55 ? "#4a3f8c" : score >= 40 ? "#7a6e5e" : "#b04040";
   ring.style.stroke = ringColor;
+  ring.style.strokeDashoffset = "314";
   setTimeout(() => { ring.style.strokeDashoffset = circ * (1 - score / 100); }, 100);
 
+  // グレードバッジ：ペア名（命以外は「安・壊」のような2文字組み合わせ）で表示
   const badge = document.getElementById("grade-badge");
   badge.textContent = rAB.pairName;
   badge.style.background = rAB.color + "22";
   badge.style.color       = rAB.color;
   badge.style.border      = `1px solid ${rAB.color}44`;
 
-  if (rAB.key === "命") {
-    document.getElementById("grade-name").textContent = `命の関係（${rAB.pairYomi}）`;
-    document.getElementById("grade-sub").textContent  = "あなたと相手は同じ宿（命の関係）です";
-  } else {
-    document.getElementById("grade-name").textContent = `${rAB.pairName}の関係（${rAB.pairYomi}）`;
-    document.getElementById("grade-sub").textContent  =
-      `あなたは「${rAB.key}」／相手は「${rBA.key}」の立場です`;
-  }
+  document.getElementById("grade-name").textContent =
+    rAB.key === "命" ? "命の関係（めい）" : `${rAB.pairName}の関係（${rAB.pairYomi}）`;
+  document.getElementById("grade-sub").textContent  =
+    rAB.key === "命"
+      ? "あなたと相手は同じ宿（命の関係）です"
+      : `あなたは「${rAB.key}」／相手は「${rBA.key}」の立場です`;
 
+  // 詳細アスペクト（4項目）
   const grid = document.getElementById("aspect-grid");
   const gold="#b8953a", accent="#4a3f8c", teal="#1f6e6e", muted="#7a6e5e";
   const aspects = [
@@ -2621,8 +2629,10 @@ function renderResultForView(view) {
     });
   }, 80);
 
+  // アドバイス（視点ごとに切り替え）
   document.getElementById("advice-text").textContent = getRelAdvice(view, rAB.key, shukuA, shukuB);
 
+  // 法人メモ
   const bizNote = document.getElementById("biz-note");
   const bizText = document.getElementById("biz-note-text");
   if (view === "corp") {
@@ -2635,6 +2645,16 @@ ${shukuB.desc}`;
     bizNote.classList.remove("show");
   }
 }
+
+// 結果ページ内タブのクリックで見方を切り替える（入力に戻らず再描画）
+document.querySelectorAll(".result-view-tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    const view = tab.dataset.view;
+    currentRel = view;
+    syncResultViewTabs(view);
+    renderResultForView(view);
+  });
+});
 
 document.getElementById("btn-retry").addEventListener("click", () => {
   document.getElementById("result").classList.remove("show");
