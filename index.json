@@ -1,0 +1,60 @@
+{
+  "project": "sukuyo-compatibility",
+  "description": "竹本光晴堂（kosei-do.co.jp）向け、宿曜占星術の本命宿計算・月のルネーション・対人/対法人相性診断ツール",
+  "lastUpdated": "2026-06-28",
+  "files": {
+    "index.html": {
+      "role": "ツール本体。HTML/CSS/JSをすべて含む単一ファイル（約2900行）",
+      "sections": [
+        { "lines": "1-20", "what": "head, meta, OGタグ, lunar-javascript CDN読み込み" },
+        { "lines": "~940-1209", "what": "CSS（宿曜×月のルネーションUI、27宿/11分類グリッドなど）" },
+        { "lines": "1209-1744", "what": "HTML本体（ナビ、モード切替タブ、入力フォーム各種）" },
+        { "lines": "1744-2897", "what": "<script>本体。計算ロジック・UI制御" }
+      ],
+      "keyFunctions": {
+        "calcShukuIndex(year, month, day)": "新暦→旧暦変換後、旧暦月初の宿テーブル(SHUKU)を起点に該当日の宿インデックスを算出。line 1806",
+        "getShuku(year, month, day)": "calcShukuIndexのラッパー。宿オブジェクトを返す。line 1818",
+        "calcMoonPhase(year, month, day)": "月のルネーション（旧暦日からのフェーズ）算出。line 1844",
+        "moonPhaseSVG(phaseIdx, size)": "月相アイコンSVG生成。line 1862",
+        "getRelation(idxA, idxB)": "27宿同士の関係性（11分類）を判定。line 1946",
+        "calcCompatScore(idxA, idxB)": "相性スコア算出。line 1954",
+        "calcElementCompat(elA, elB)": "五行ベースの相性補正。line 2047",
+        "getRelAdvice(rel, relKey, shukuA, shukuB)": "関係性×宿の組み合わせに応じたアドバイス文生成。line 2059",
+        "calculateSelf()": "「本命宿を調べる」モードのエントリポイント。line 2279",
+        "calculate()": "「相性を調べる」モードのエントリポイント（対人/対法人共通）。line 2319",
+        "showSelfResult(...)": "本命宿モードの結果表示。line 2382",
+        "showResult({shukuA, shukuB, compat})": "相性診断モードの結果表示・スコアアニメーション。line 2441",
+        "runWithLoadingWheel(cardId, message, callback, delayMs)": "占い結果表示前のローディングアニメーション制御。line 2034",
+        "selectTopMode(mode) / selectInputMode(side, mode) / selectRel(rel)": "UIタブ・入力モード切り替え系"
+      },
+      "dataStructures": {
+        "SHUKU": "27宿の名称・属性を保持する配列。月初の宿が固定で割り当てられている前提（calcShukuIndex内で参照）",
+        "COMPAT_TABLE": "宿同士の関係性11分類を定義するテーブル"
+      }
+    },
+    "middleware.js": {
+      "role": "VercelのRouting MiddlewareによるBasic認証。全パス(/:path*)に適用",
+      "envVars": ["BASIC_AUTH_USER", "BASIC_AUTH_PASS"],
+      "note": "デフォルト値(kosei-do / sukuyo2026)がコード内にあるが、本番ではVercel環境変数で必ず上書きする運用"
+    },
+    "package.json": {
+      "role": "type: moduleの指定のみ。依存パッケージなし（lunar-javascriptはCDN経由のため記載不要）"
+    },
+    "vercel.json": {
+      "role": "Vercel設定。検索エンジンへの非表示設定など"
+    },
+    "README.md": {
+      "role": "セットアップ手順、ロジック概要、検証済みテストケースを記載"
+    }
+  },
+  "verifiedTestCases": [
+    { "date": "1962-03-22", "expected": "底宿" },
+    { "date": "1975-08-11", "expected": "亢宿" },
+    { "date": "1973-01-01", "expected": "箕宿" }
+  ],
+  "deployment": {
+    "host": "Vercel",
+    "flow": "git push → Vercel自動デプロイ",
+    "auth": "Basic認証（middleware.js）"
+  }
+}
