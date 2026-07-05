@@ -2,5 +2,13 @@
   "appId": "com.trosystems.sukuyo",
   "appName": "宿曜相性",
   "webDir": "www",
-  "backgroundColor": "#120c24"
+  "backgroundColor": "#120c24",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "launchFadeOutDuration": 400,
+      "backgroundColor": "#120c24"
+    }
+  }
 }

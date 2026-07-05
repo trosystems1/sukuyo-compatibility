@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "sync:www": "mkdir -p www && cp index.html www/ && cp -r assets www/",
+    "ios": "npm run sync:www && npx cap sync ios && npx cap run ios --target-name \"iPhone 17 Pro\""
+  },
   "dependencies": {
     "@capacitor/cli": "^8.4.1",
     "@capacitor/core": "^8.4.1",
-    "@capacitor/ios": "^8.4.1"
+    "@capacitor/ios": "^8.4.1",
+    "@capacitor/splash-screen": "^8.0.1"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5"

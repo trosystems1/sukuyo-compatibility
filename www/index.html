@@ -153,6 +153,13 @@ body {
   padding: 40px 20px 80px;
 }
 
+/* 横はみ出し・横揺れの防止（モバイルWebView対策） */
+html, body {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  max-width: 100%;
+}
+
 /* ── Card ─────────────────────────────────────────────── */
 .card {
   background: #fff;
@@ -196,6 +203,51 @@ body {
   margin: -14px 0 22px;
   line-height: 1.6;
 }
+
+/* ── マイページ（プロフィール＋9グループ盤） ─────────────── */
+.gtag-filter, .gtag-pick { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.gtag-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 20px; padding: 4px 12px; font-size: 12px; cursor: pointer; font-family: inherit; transition: all var(--transition); }
+.gtag-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+.gtag-badge { display: inline-block; font-size: 10px; border: 1px solid var(--border); border-radius: 10px; padding: 1px 7px; color: var(--muted); margin-left: 4px; }
+.mypage-me { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--r); background: linear-gradient(135deg, var(--deep) 0%, var(--deep2) 100%); }
+.mypage-me-kanji { font-family: 'Shippori Mincho', serif; font-size: 34px; color: var(--gold-l); line-height: 1.1; white-space: nowrap; }
+.mypage-me-info { min-width: 0; }
+.mypage-me-name { font-size: 14px; color: var(--moon); font-weight: 600; margin-bottom: 3px; }
+.mypage-me-meta { font-size: 12px; color: rgba(232,224,245,.65); line-height: 1.7; }
+.mypage-empty { padding: 14px 16px; border: 1px dashed var(--border); border-radius: var(--r); font-size: 13px; color: var(--muted); line-height: 1.8; }
+.mypage-empty a { color: var(--teal); cursor: pointer; text-decoration: underline; }
+#book-card { display: block; }
+.book-lead { font-size: 13px; color: var(--muted); line-height: 1.8; margin-bottom: 14px; }
+.book-viewpoint { font-size: 13px; color: var(--ink); margin-bottom: 10px; line-height: 1.7; }
+.book-viewpoint b { color: var(--teal); }
+.gboard { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
+.gcell { border-radius: 8px; border: 1px solid var(--border); padding: 8px 7px; min-height: 96px; background: rgba(255,255,255,.55); transition: border-color var(--transition); }
+.gcell-head { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; flex-wrap: wrap; }
+.gcell-no { font-size: 11px; color: var(--muted); letter-spacing: .05em; white-space: nowrap; }
+.gcell-rel { font-size: 12.5px; font-weight: 600; }
+.gcell-sub { font-size: 10px; color: var(--muted); margin: 2px 0 5px; line-height: 1.5; }
+.gchip { display: inline-block; background: var(--deep); color: var(--moon); border: 1px solid transparent; border-radius: 20px; padding: 2px 9px; font-size: 11px; margin: 2px 3px 0 0; cursor: pointer; user-select: none; }
+.gchip.selected { border-color: var(--gold-l); color: var(--gold-l); box-shadow: 0 0 8px var(--gold-dim); }
+.book-hint { font-size: 11.5px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
+.book-list { border-top: 1px solid var(--border); padding-top: 14px; margin-bottom: 18px; }
+.book-list-title { font-size: 13px; color: var(--ink); letter-spacing: .08em; margin-bottom: 8px; font-weight: 600; }
+.book-empty { font-size: 12.5px; color: var(--muted); padding: 6px 0; }
+.book-row { display: flex; align-items: center; gap: 8px; padding: 7px 2px; border-bottom: 1px dashed var(--border); font-size: 13px; }
+.book-row-name { font-weight: 600; white-space: nowrap; }
+.book-row-meta { color: var(--muted); font-size: 12px; flex: 1; min-width: 0; }
+.book-del { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; font-size: 11px; padding: 3px 9px; cursor: pointer; font-family: inherit; white-space: nowrap; }
+.book-del:hover { border-color: #b04040; color: #b04040; }
+.book-add { border-top: 1px solid var(--border); padding-top: 14px; }
+.book-add input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; background: #fff; color: var(--ink); margin-bottom: 10px; }
+.book-add-actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+.book-me-check { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.save-person { margin-top: 18px; padding: 14px; border: 1px dashed var(--border); border-radius: var(--r); display: none; }
+.save-person.show { display: block; }
+.save-person-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.save-person-row input { flex: 1; min-width: 140px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 14px; background: #fff; color: var(--ink); }
+.btn-save-person { white-space: nowrap; }
+.save-person-note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.save-person-note a { color: var(--teal); cursor: pointer; text-decoration: underline; }
 
 /* ── Top mode tabs (自分を占う / 相性を占う) ─────────────── */
 .top-mode-tabs {
@@ -1217,6 +1269,7 @@ body {
     <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
     <a href="#" id="nav-senseiban" class="nav-link">占星盤</a>
+    <a href="#" id="nav-mypage" class="nav-link">👤 マイページ</a>
   </nav>
 </header>
 
@@ -1373,7 +1426,7 @@ body {
       <div class="shuku-pair">
         <div class="shuku-box">
           <div class="shuku-box-label">YOUR SHUKU</div>
-          <div class="shuku-box-name">自分</div>
+          <div class="shuku-box-name" id="shuku-a-name">自分</div>
           <div class="shuku-kanji" id="shuku-a-kanji">—</div>
           <div class="shuku-yomi" id="shuku-a-yomi"></div>
           <div class="shuku-nature" id="shuku-a-nature"></div>
@@ -1452,6 +1505,20 @@ body {
       <div class="biz-note-text" id="biz-note-text"></div>
     </div>
 
+    <!-- 人物帳へ保存 -->
+    <div class="save-person" id="save-person">
+      <div class="save-person-row">
+        <input type="text" id="save-person-name" maxlength="20" placeholder="名前" aria-label="保存する名前">
+        <button class="btn-retry btn-save-person" id="btn-save-person">☆ マイページに保存</button>
+      </div>
+      <div class="gtag-pick" id="save-person-tags" style="margin-top:10px;margin-bottom:0;">
+        <button type="button" class="gtag-btn" data-tag="family">家族</button>
+        <button type="button" class="gtag-btn" data-tag="work">仕事</button>
+        <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
+      </div>
+      <div class="save-person-note" id="save-person-note"></div>
+    </div>
+
     <!-- Retry -->
     <div class="retry-wrap">
       <button class="btn-retry" id="btn-retry"><span id="btn-retry-label">別の相性を占う</span></button>
@@ -1462,6 +1529,77 @@ body {
 
 </div>
 <!-- /Compatibility App -->
+
+<!-- My Page（独立ページ：ヘッダー右上から遷移） -->
+<div class="moon-rune-page" id="mypage-page">
+  <main class="main-wrap" style="padding-top:28px;">
+  <div class="card" id="book-card">
+    <div class="card-title">👤 マイページ</div>
+
+    <!-- わたしのプロフィール -->
+    <div id="mypage-profile"></div>
+
+    <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
+    <p class="book-lead">
+      保存した人たちを、宿曜の9グループ（宿番号の数字根1〜9）に配置した盤です。
+      同じマスの人とは命・業・胎の深い縁。グループ番号の差だけで、すべての関係が決まります。
+    </p>
+    <div class="gtag-filter" id="gtag-filter">
+      <button type="button" class="gtag-btn active" data-tag="all">すべて</button>
+      <button type="button" class="gtag-btn" data-tag="family">家族</button>
+      <button type="button" class="gtag-btn" data-tag="work">仕事</button>
+      <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
+    </div>
+    <div class="book-viewpoint" id="book-viewpoint"></div>
+    <div class="gboard" id="gboard"></div>
+    <div class="book-hint">
+      人物を1回タップ＝その人視点の盤に切り替え　／　視点がある状態で別の人物をタップ＝2人の相性を表示　／　視点の人をもう一度タップ＝解除
+    </div>
+
+    <div class="book-list">
+      <div class="book-list-title">保存した人物</div>
+      <div id="book-people"></div>
+    </div>
+
+    <div class="book-add">
+      <div class="book-list-title">人物を追加</div>
+      <input type="text" id="book-add-name" maxlength="20" placeholder="名前（例：A部長）" aria-label="名前">
+      <div class="gtag-pick" id="book-add-tags">
+        <button type="button" class="gtag-btn" data-tag="family">家族</button>
+        <button type="button" class="gtag-btn" data-tag="work">仕事</button>
+        <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
+      </div>
+      <div class="input-mode-toggle" id="input-mode-toggle-book" style="margin-bottom:10px;">
+        <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
+        <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+      </div>
+      <div class="date-select-row" id="date-select-book">
+        <select class="date-select" id="book-date-year" aria-label="年"></select>
+        <span class="date-select-unit">年</span>
+        <select class="date-select" id="book-date-month" aria-label="月"></select>
+        <span class="date-select-unit">月</span>
+        <select class="date-select" id="book-date-day" aria-label="日"></select>
+        <span class="date-select-unit">日</span>
+      </div>
+      <select id="shuku-book-select" class="date-input" style="display:none;">
+        <option value="">宿を選択してください</option>
+      </select>
+      <div class="book-add-actions">
+        <button class="btn-submit" id="btn-book-add" style="flex:1;">
+          <span>☆</span>
+          <span>追加する</span>
+        </button>
+        <label class="book-me-check"><input type="checkbox" id="book-add-isme"> わたしとして登録</label>
+      </div>
+      <div class="error-msg" id="book-error"></div>
+    </div>
+  </div>
+    <div class="retry-wrap" style="margin-top:24px;">
+      <button class="btn-retry" id="btn-back-from-mypage">占いに戻る</button>
+    </div>
+  </main>
+</div>
+
 
 <!-- Moon Rune Explainer Page -->
 <div class="moon-rune-page" id="moon-rune-page">
@@ -2119,9 +2257,17 @@ function getRelAdvice(rel, relKey, shukuA, shukuB) {
 
 let currentRel = "boss";
 let lastCompatResult = null; // 直前の相性結果（A/B/compat）。視点タブ切り替え時の再描画に使用
-let inputMode = { self: "date", a: "date", b: "date" }; // "date" | "shuku"
 
-const DATE_SELECT_PREFIXES = ["self", "a", "b"];
+/* ── 人物帳（9グループ盤）用の状態 ─────────────────────── */
+const BOOK_KEY = "sukuyo_people_v1";
+let resultSource = "form";     // 直前の結果の出どころ: "self" | "form" | "book"
+let bookPairNames = null;      // 人物帳ペア表示時の名前 { a, b }
+let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m, d }
+let lastCompatB = null;        // 相性占いのB側入力日付 { y, m, d } | null
+let bookViewpointId = null;    // 盤の視点になっている人物ID
+let inputMode = { self: "date", a: "date", b: "date", book: "date" }; // "date" | "shuku"
+
+const DATE_SELECT_PREFIXES = ["self", "a", "b", "book"];
 const YEAR_MIN = 1900, YEAR_MAX = 2099, YEAR_DEFAULT = 1980;
 
 function daysInMonth(year, month) {
@@ -2182,7 +2328,7 @@ function getDateSelectValue(prefix) {
 
 // 宿セレクトの選択肢を生成（self・A・B共通）
 (function populateShukuSelect() {
-  ["shuku-self-select", "shuku-a-select", "shuku-b-select"].forEach(id => {
+  ["shuku-self-select", "shuku-a-select", "shuku-b-select", "shuku-book-select"].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     SHUKU.forEach((s, idx) => {
@@ -2324,6 +2470,7 @@ function calculate() {
     }
     const [yB,mB,dB] = valB.split("-").map(Number);
     shukuB = getShuku(yB, mB, dB);
+    lastCompatB = { y: yB, m: mB, d: dB };
   } else {
     const selVal = document.getElementById("shuku-b-select").value;
     if (selVal === "") {
@@ -2333,9 +2480,12 @@ function calculate() {
     }
     const idx = parseInt(selVal, 10);
     shukuB = { ...SHUKU[idx], index: idx };
+    lastCompatB = null;
   }
 
   errEl.classList.remove("show");
+  resultSource = "form";
+  bookPairNames = null;
   const compat = calcCompatScore(shukuA.index, shukuB.index);
   document.getElementById("form-card").classList.remove("show");
   runWithLoadingWheel(null, "相性を読み解いています…", () => {
@@ -2346,6 +2496,9 @@ function calculate() {
 // 自分の宿だけを表示する単体結果ビュー
 function showSelfResult(shukuA, year, month, day) {
   lastCompatResult = null;
+  resultSource = "self";
+  bookPairNames = null;
+  lastSelfResult = { shukuA, y: year || null, m: month || null, d: day || null };
   document.getElementById("result-rel-label").textContent = "あなたの本命宿";
 
   document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
@@ -2375,6 +2528,7 @@ function showSelfResult(shukuA, year, month, day) {
 
   document.getElementById("self-card").classList.add("hide");
   document.getElementById("btn-retry-label").textContent = "もう一度調べる";
+  setupSaveSection();
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2428,7 +2582,9 @@ function showResult({ shukuA, shukuB, compat }) {
 
   // 表示切り替え
   document.getElementById("form-card").classList.remove("show");
-  document.getElementById("btn-retry-label").textContent = "別の相性を占う";
+  document.getElementById("btn-retry-label").textContent =
+    resultSource === "book" ? "マイページに戻る" : "別の相性を占う";
+  setupSaveSection();
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2458,6 +2614,17 @@ function renderResultForView(view) {
   const bLabels = { boss:"上司", sub:"部下", partner:"パートナー", corp:"法人" };
   document.getElementById("shuku-b-label").textContent = view === "corp" ? "CORP SHUKU" : "THEIR SHUKU";
   document.getElementById("shuku-b-name").textContent  = bLabels[view];
+
+  // 人物帳から開いたペアは、ラベルを保存済みの名前で上書き
+  if (resultSource === "book" && bookPairNames) {
+    document.getElementById("result-rel-label").textContent =
+      `${bookPairNames.a} と ${bookPairNames.b} の相性`;
+    document.getElementById("shuku-a-name").textContent = bookPairNames.a;
+    document.getElementById("shuku-b-name").textContent = bookPairNames.b;
+    document.getElementById("shuku-b-label").textContent = "THEIR SHUKU";
+  } else {
+    document.getElementById("shuku-a-name").textContent = "自分";
+  }
 
   // 宿情報
   document.getElementById("shuku-a-kanji").textContent  = shukuA.kanji;
@@ -2564,9 +2731,19 @@ document.querySelectorAll(".result-view-tab").forEach(tab => {
 document.getElementById("btn-retry").addEventListener("click", () => {
   document.getElementById("result").classList.remove("show");
   document.getElementById("ring-fill").style.strokeDashoffset = "314";
+  if (resultSource === "book") {
+    // マイページ発の結果 → マイページに戻る（自分を占うカードの状態も復元）
+    const activeTab = document.querySelector("#top-mode-tabs .top-mode-tab.active");
+    if (!activeTab || activeTab.dataset.mode === "self") {
+      document.getElementById("self-card").classList.remove("hide");
+    }
+    showMypage();
+    return;
+  }
   // 元のモードに応じてフォームを再表示
-  const compatActive = document.querySelector('#top-mode-tabs .top-mode-tab[data-mode="compat"]').classList.contains("active");
-  if (compatActive) {
+  const activeTab = document.querySelector("#top-mode-tabs .top-mode-tab.active");
+  const mode = activeTab ? activeTab.dataset.mode : "self";
+  if (mode === "compat") {
     document.getElementById("form-card").classList.add("show");
   } else {
     document.getElementById("self-card").classList.remove("hide");
@@ -2598,6 +2775,8 @@ function renderMoonRuneGrid() {
 function showMoonRunePage() {
   renderMoonRuneGrid();
   document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("nav-mypage").classList.remove("active");
   document.getElementById("moon-rune-page").classList.add("show");
   document.getElementById("nav-moon-rune").classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2687,6 +2866,8 @@ function showSukuyoAboutPage() {
   renderSukuyoRelationGrid();
   renderSukuyoSoulmateGrid();
   document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("nav-mypage").classList.remove("active");
   document.getElementById("sukuyo-about-page").classList.add("show");
   document.getElementById("nav-sukuyo-about").classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2877,6 +3058,8 @@ function showSenseibanPage() {
   renderSenseibanRelationTable();
 
   document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("nav-mypage").classList.remove("active");
   document.getElementById("senseiban-page").classList.add("show");
   document.getElementById("nav-senseiban").classList.add("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2921,6 +3104,429 @@ function goHome() {
 document.getElementById("logo-home-link").addEventListener("click", (e) => {
   e.preventDefault();
   goHome();
+});
+
+/* ══════════════════════════════════════════════════════════
+   わたしの人物帳（9グループ盤）
+   - 保存先: localStorage（端末内・完全オフライン）
+   - 9グループ = 宿番号(1〜27)の数字根(1〜9)。group = (idx % 9) + 1
+   - グループ番号の符号付き差だけで相性ワードが確定する
+     （暗算秘伝ロジック。COMPAT_TABLE/getRelationと648パターン全件一致検証済み）
+   ══════════════════════════════════════════════════════════ */
+
+// 竹本先生エレメント9分類（4足×27宿=108足の構成に基づく注釈）
+const GROUP_ELEMENT_NOTE = {
+  1: "火・地の混合", 2: "地の純粋", 3: "地・風の混合",
+  4: "風の純粋",     5: "風・水の混合", 6: "水の純粋",
+  7: "水の純粋",     8: "火の純粋", 9: "火の純粋",
+};
+
+// 各グループの構成宿（group g = idx g-1, g+8, g+17）
+const GROUP_SHUKU_NAMES = Array.from({ length: 9 }, (_, i) =>
+  [i, i + 9, i + 18].map(idx => SHUKU[idx].kanji.replace("宿", "")).join("・")
+);
+
+function groupOfIdx(idx) { return (idx % 9) + 1; }
+
+// d = 相手グループ − 自分グループ（符号付き）→ 自分側の役割ワード
+// +1=栄 +2=衰 +3=安 +4=危 +5=成 +6=壊 +7=友 +8=親（負側は9を法として対応）
+function relKeyByGroupDiff(d) {
+  const m = ((d % 9) + 9) % 9;
+  if (m === 0) return null; // 同グループ → 命・業・胎
+  return ["栄", "衰", "安", "危", "成", "壊", "友", "親"][m - 1];
+}
+
+function findRelEntry(key) {
+  return COMPAT_TABLE.find(r => r.key === key);
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function loadPeople() {
+  try { return JSON.parse(localStorage.getItem(BOOK_KEY)) || []; }
+  catch (e) { return []; }
+}
+function savePeople(list) {
+  try { localStorage.setItem(BOOK_KEY, JSON.stringify(list)); } catch (e) {}
+}
+function newPersonId() {
+  return "p" + Date.now().toString(36) + Math.floor(Math.random() * 1000);
+}
+
+function initBookViewpoint() {
+  const list = loadPeople();
+  if (bookViewpointId && list.some(p => p.id === bookViewpointId)) return;
+  const me = list.find(p => p.isMe);
+  bookViewpointId = me ? me.id : null;
+}
+
+/* ── マイページの表示／非表示（ヘッダー右上から遷移） ───── */
+function showMypage() {
+  // 他ページ・結果表示を閉じる
+  document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("moon-rune-page").classList.remove("show");
+  document.getElementById("sukuyo-about-page").classList.remove("show");
+  document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("nav-moon-rune").classList.remove("active");
+  document.getElementById("nav-sukuyo-about").classList.remove("active");
+  document.getElementById("nav-senseiban").classList.remove("active");
+  document.getElementById("result").classList.remove("show");
+
+  initBookViewpoint();
+  renderBook();
+  document.getElementById("mypage-page").classList.add("show");
+  document.getElementById("nav-mypage").classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function hideMypage() {
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-mypage").classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+document.getElementById("nav-mypage").addEventListener("click", (e) => {
+  e.preventDefault();
+  showMypage();
+});
+
+document.getElementById("btn-back-from-mypage").addEventListener("click", () => {
+  hideMypage();
+});
+
+/* ── タグ（家族／仕事／プライベート） ───────────────────── */
+const PERSON_TAGS = { family: "家族", work: "仕事", private: "プライベート" };
+let bookTagFilter = "all";   // 盤・リストの絞り込み
+let bookAddTag = null;       // 追加フォームで選択中のタグ
+let saveSelectedTag = null;  // 結果ページ保存UIで選択中のタグ
+
+function tagLabel(p) { return PERSON_TAGS[p.tag] || null; }
+
+// フィルタ切替
+document.getElementById("gtag-filter").addEventListener("click", (e) => {
+  const btn = e.target.closest(".gtag-btn");
+  if (!btn) return;
+  bookTagFilter = btn.dataset.tag;
+  document.querySelectorAll("#gtag-filter .gtag-btn").forEach(b =>
+    b.classList.toggle("active", b.dataset.tag === bookTagFilter));
+  renderBook();
+});
+
+// タグ選択（追加フォーム／保存UI共通の挙動: もう一度押すと解除=未分類）
+function bindTagPick(containerId, onChange) {
+  document.getElementById(containerId).addEventListener("click", (e) => {
+    const btn = e.target.closest(".gtag-btn");
+    if (!btn) return;
+    const container = document.getElementById(containerId);
+    const wasActive = btn.classList.contains("active");
+    container.querySelectorAll(".gtag-btn").forEach(b => b.classList.remove("active"));
+    if (!wasActive) btn.classList.add("active");
+    onChange(wasActive ? null : btn.dataset.tag);
+  });
+}
+bindTagPick("book-add-tags", t => { bookAddTag = t; });
+bindTagPick("save-person-tags", t => { saveSelectedTag = t; });
+
+function clearTagPick(containerId) {
+  document.querySelectorAll(`#${containerId} .gtag-btn`).forEach(b => b.classList.remove("active"));
+}
+
+/* ── 盤・人物リストの描画 ─────────────────────────────── */
+function renderBook() {
+  const list = loadPeople();
+  const vp = list.find(p => p.id === bookViewpointId) || null;
+
+  // わたしのプロフィール
+  const me = list.find(p => p.isMe) || null;
+  const profEl = document.getElementById("mypage-profile");
+  if (me) {
+    const g = groupOfIdx(me.shukuIdx);
+    const s = SHUKU[me.shukuIdx];
+    const dateStr = me.y ? `${me.y}年${me.m}月${me.d}日生まれ` : "生年月日未登録";
+    profEl.innerHTML = `
+      <div class="mypage-me">
+        <div class="mypage-me-kanji">${s.kanji}</div>
+        <div class="mypage-me-info">
+          <div class="mypage-me-name">☆ ${escapeHtml(me.name)}（${s.yomi}）</div>
+          <div class="mypage-me-meta">
+            ${dateStr}<br>
+            第${g}グループ（${GROUP_ELEMENT_NOTE[g]}）・属性：${s.element}<br>
+            ${s.desc}
+          </div>
+        </div>
+      </div>`;
+  } else {
+    profEl.innerHTML = `
+      <div class="mypage-empty">
+        まだ「わたし」が登録されていません。<br>
+        <a id="mypage-goto-self">☽ 自分を占う</a> から本命宿を調べて「わたしとして保存」するか、
+        下の追加フォームで「わたしとして登録」にチェックを入れてください。
+      </div>`;
+    const link = document.getElementById("mypage-goto-self");
+    if (link) link.addEventListener("click", () => { hideMypage(); selectTopMode("self"); });
+  }
+
+  // 視点表示
+  const vpEl = document.getElementById("book-viewpoint");
+  if (list.length === 0) {
+    vpEl.innerHTML = "まだ誰も保存されていません。下のフォームから追加するか、占い結果の「マイページに保存」から登録できます。";
+  } else if (vp) {
+    const g = groupOfIdx(vp.shukuIdx);
+    vpEl.innerHTML =
+      `視点：<b>${escapeHtml(vp.name)}</b>（${SHUKU[vp.shukuIdx].kanji}・第${g}グループ）` +
+      `　—　各マスはこの人から見た関係です`;
+  } else {
+    vpEl.innerHTML = "人物をタップすると、その人から見た関係で盤が色づきます。";
+  }
+
+  // タグで絞り込み（視点の人物はフィルタに関わらず常に表示）
+  const visible = list.filter(p =>
+    bookTagFilter === "all" || p.tag === bookTagFilter || p.id === bookViewpointId);
+
+  // 9マスの盤
+  const board = document.getElementById("gboard");
+  board.innerHTML = Array.from({ length: 9 }, (_, i) => {
+    const g = i + 1;
+    const members = visible.filter(p => groupOfIdx(p.shukuIdx) === g);
+    let relHTML = "";
+    let cellStyle = "";
+    let subExtra = "";
+
+    if (vp) {
+      const d = g - groupOfIdx(vp.shukuIdx);
+      const myKey = relKeyByGroupDiff(d);
+      if (myKey === null) {
+        const c = "#4a3f8c";
+        cellStyle = `background:${c}14;border-color:${c}55;`;
+        relHTML = `<span class="gcell-rel" style="color:${c}">命・業・胎</span>`;
+      } else {
+        const entry = findRelEntry(myKey);
+        cellStyle = `background:${entry.color}14;border-color:${entry.color}55;`;
+        relHTML = `<span class="gcell-rel" style="color:${entry.color}">${entry.pairName}</span>`;
+        subExtra = `　${escapeHtml(vp.name)}側：${myKey}`;
+      }
+    }
+
+    const chips = members.map(p =>
+      `<span class="gchip ${p.id === bookViewpointId ? "selected" : ""}" data-pid="${p.id}">` +
+      `${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>`
+    ).join("");
+
+    return `
+      <div class="gcell" style="${cellStyle}">
+        <div class="gcell-head">
+          <span class="gcell-no">第${g}</span>
+          ${relHTML}
+        </div>
+        <div class="gcell-sub">${GROUP_SHUKU_NAMES[i]}／${GROUP_ELEMENT_NOTE[g]}${subExtra}</div>
+        ${chips}
+      </div>`;
+  }).join("");
+
+  // 人物リスト（フィルタ適用）
+  const peopleEl = document.getElementById("book-people");
+  if (list.length === 0) {
+    peopleEl.innerHTML = `<div class="book-empty">保存された人物はまだいません。</div>`;
+  } else if (visible.length === 0) {
+    peopleEl.innerHTML = `<div class="book-empty">このタグの人物はいません。</div>`;
+  } else {
+    peopleEl.innerHTML = visible.map(p => {
+      const g = groupOfIdx(p.shukuIdx);
+      const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "宿のみ登録";
+      const tag = tagLabel(p);
+      return `
+        <div class="book-row">
+          <span class="book-row-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}${tag ? `<span class="gtag-badge">${tag}</span>` : ""}</span>
+          <span class="book-row-meta">${SHUKU[p.shukuIdx].kanji}・第${g}グループ・${dateStr}</span>
+          <button type="button" class="book-del" data-del="${p.id}">削除</button>
+        </div>`;
+    }).join("");
+  }
+}
+
+/* ── 盤の人物タップ（視点切替 → 2人目で相性表示） ─────── */
+document.getElementById("gboard").addEventListener("click", (e) => {
+  const chip = e.target.closest(".gchip");
+  if (!chip) return;
+  const pid = chip.dataset.pid;
+  const list = loadPeople();
+  const p = list.find(x => x.id === pid);
+  if (!p) return;
+
+  if (!bookViewpointId) {
+    bookViewpointId = pid;
+    renderBook();
+    return;
+  }
+  if (bookViewpointId === pid) {
+    bookViewpointId = null;
+    renderBook();
+    return;
+  }
+  const vp = list.find(x => x.id === bookViewpointId);
+  if (!vp) {
+    bookViewpointId = pid;
+    renderBook();
+    return;
+  }
+  showBookPairResult(vp, p);
+});
+
+/* ── 保存済みペアの相性表示 ─────────────────────────────── */
+function showBookPairResult(pA, pB) {
+  const shukuA = { ...SHUKU[pA.shukuIdx], index: pA.shukuIdx };
+  const shukuB = { ...SHUKU[pB.shukuIdx], index: pB.shukuIdx };
+  const compat = calcCompatScore(shukuA.index, shukuB.index);
+  resultSource = "book";
+  bookPairNames = { a: pA.name, b: pB.name };
+  // マイページを閉じて占い画面側に結果を表示
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("nav-mypage").classList.remove("active");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("self-card").classList.add("hide");
+  document.getElementById("form-card").classList.remove("show");
+  runWithLoadingWheel(null, "ふたりの縁を読み解いています…", () => {
+    showResult({ shukuA, shukuB, compat });
+  });
+}
+
+/* ── 人物の削除 ─────────────────────────────────────────── */
+document.getElementById("book-people").addEventListener("click", (e) => {
+  const btn = e.target.closest(".book-del");
+  if (!btn) return;
+  const pid = btn.dataset.del;
+  const list = loadPeople();
+  const p = list.find(x => x.id === pid);
+  if (!p) return;
+  if (!confirm(`「${p.name}」をマイページから削除しますか？`)) return;
+  savePeople(list.filter(x => x.id !== pid));
+  if (bookViewpointId === pid) bookViewpointId = null;
+  initBookViewpoint();
+  renderBook();
+});
+
+/* ── 人物の追加（人物帳フォーム） ───────────────────────── */
+document.getElementById("btn-book-add").addEventListener("click", () => {
+  const err = document.getElementById("book-error");
+  err.classList.remove("show");
+
+  const name = document.getElementById("book-add-name").value.trim();
+  if (!name) {
+    err.textContent = "名前を入力してください";
+    err.classList.add("show");
+    return;
+  }
+
+  let shuku, y = null, m = null, d = null;
+  if (inputMode.book === "date") {
+    if (typeof Solar === "undefined") {
+      err.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
+      err.classList.add("show");
+      return;
+    }
+    const val = getDateSelectValue("book");
+    if (!val) {
+      err.textContent = "生年月日を入力してください";
+      err.classList.add("show");
+      return;
+    }
+    [y, m, d] = val.split("-").map(Number);
+    shuku = getShuku(y, m, d);
+  } else {
+    const selVal = document.getElementById("shuku-book-select").value;
+    if (selVal === "") {
+      err.textContent = "宿を選択してください";
+      err.classList.add("show");
+      return;
+    }
+    const idx = parseInt(selVal, 10);
+    shuku = { ...SHUKU[idx], index: idx };
+  }
+  const isMe = document.getElementById("book-add-isme").checked;
+
+  const list = loadPeople();
+  if (isMe) list.forEach(p => { p.isMe = false; });
+  const person = { id: newPersonId(), name, y, m, d, shukuIdx: shuku.index, isMe, tag: bookAddTag };
+  list.push(person);
+  savePeople(list);
+
+  document.getElementById("book-add-name").value = "";
+  document.getElementById("book-add-isme").checked = false;
+  bookAddTag = null;
+  clearTagPick("book-add-tags");
+  if (isMe || !bookViewpointId) bookViewpointId = person.id;
+  renderBook();
+});
+
+/* ── 結果ページの保存UI ─────────────────────────────────── */
+function setupSaveSection() {
+  const box = document.getElementById("save-person");
+  const btn = document.getElementById("btn-save-person");
+  const input = document.getElementById("save-person-name");
+  const note = document.getElementById("save-person-note");
+  note.textContent = "";
+  input.value = "";
+  saveSelectedTag = null;
+  clearTagPick("save-person-tags");
+  document.getElementById("save-person-tags").style.display =
+    resultSource === "self" ? "none" : "flex";
+
+  if (resultSource === "book") {
+    box.classList.remove("show");
+    return;
+  }
+  box.classList.add("show");
+  if (resultSource === "self") {
+    input.placeholder = "わたし";
+    btn.textContent = "☆ わたしとしてマイページに保存";
+  } else {
+    input.placeholder = "名前（例：A部長）";
+    btn.textContent = "☆ 相手をマイページに保存";
+  }
+}
+
+document.getElementById("btn-save-person").addEventListener("click", () => {
+  const note = document.getElementById("save-person-note");
+  const nameIn = document.getElementById("save-person-name").value.trim();
+  let person = null;
+
+  if (resultSource === "self" && lastSelfResult) {
+    person = {
+      name: nameIn || "わたし",
+      shukuIdx: lastSelfResult.shukuA.index,
+      y: lastSelfResult.y, m: lastSelfResult.m, d: lastSelfResult.d,
+      isMe: true,
+    };
+  } else if (resultSource === "form" && lastCompatResult) {
+    person = {
+      name: nameIn || "名前未設定",
+      shukuIdx: lastCompatResult.shukuB.index,
+      y: lastCompatB ? lastCompatB.y : null,
+      m: lastCompatB ? lastCompatB.m : null,
+      d: lastCompatB ? lastCompatB.d : null,
+      isMe: false,
+    };
+  }
+  if (!person) return;
+
+  person.tag = resultSource === "self" ? null : saveSelectedTag;
+  person.id = newPersonId();
+  const list = loadPeople();
+  if (person.isMe) list.forEach(p => { p.isMe = false; });
+  list.push(person);
+  savePeople(list);
+  if (person.isMe || !bookViewpointId) bookViewpointId = person.id;
+
+  note.innerHTML =
+    `「${escapeHtml(person.name)}」を保存しました。 <a id="save-goto-book">マイページで見る →</a>`;
+  document.getElementById("save-goto-book").addEventListener("click", () => {
+    document.getElementById("result").classList.remove("show");
+    showMypage();
+  });
 });
 </script>
 </body>
