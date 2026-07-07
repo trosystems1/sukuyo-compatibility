@@ -1357,6 +1357,29 @@ html, body {
 .koyomi-day-num { font-size: 11.5px; color: inherit; line-height: 1; }
 .koyomi-cell .koyomi-moon { line-height: 0; }
 .koyomi-shuku { font-size: 11px; color: var(--gold, #b8953a); line-height: 1; }
+
+/* デスクトップ・タブレット幅：カード自体を main-wrap(860px) の外まで広げて、
+   高精堂の運勢カレンダーに近い見やすさに調整する */
+@media (min-width: 700px) {
+  #mypage-koyomi-card {
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(94vw, 1040px);
+    max-width: 1040px;
+  }
+  #mypage-koyomi-card .koyomi-grid { gap: 8px; }
+  #mypage-koyomi-card .koyomi-cell { min-height: 96px; padding: 10px 6px 8px; border-radius: 12px; }
+  #mypage-koyomi-card .koyomi-day-num { font-size: 16px; }
+  #mypage-koyomi-card .koyomi-shuku { font-size: 18px; font-weight: 600; }
+  #mypage-koyomi-card .koyomi-moon svg { width: 30px; height: 30px; }
+  #mypage-koyomi-card .koyomi-week-head div { font-size: 14px; padding: 4px 0; }
+  #mypage-koyomi-card .koyomi-month-label { font-size: 21px; }
+  #mypage-koyomi-card .koyomi-nav-btn { font-size: 17px; padding: 8px 18px; }
+  #mypage-koyomi-card .koyomi-saku { font-size: 10px; top: 5px; right: 6px; }
+  #mypage-koyomi-card .koyomi-legend { font-size: 13px; }
+  #mypage-koyomi-card .koyomi-detail { font-size: 14.5px; }
+}
 .koyomi-saku { position: absolute; top: 3px; right: 4px; font-size: 8px; color: var(--gold-l, #d9b45c); }
 .koyomi-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--muted, #9a927f); }
 .koyomi-legend span { display: inline-flex; align-items: center; gap: 4px; }
@@ -3203,7 +3226,7 @@ function renderKoyomi() {
       <div class="${classes.join(" ")}" data-day="${d}">
         ${saku}
         <div class="koyomi-day-num">${d}</div>
-        <div class="koyomi-moon">${moonPhaseSVG(info.moon.index, 20)}</div>
+        <div class="koyomi-moon">${moonPhaseSVG(info.moon.index, 24)}</div>
         <div class="koyomi-shuku">${info.shuku.kanji.charAt(0)}</div>
       </div>`;
   }
