@@ -1358,16 +1358,12 @@ html, body {
 .koyomi-cell .koyomi-moon { line-height: 0; }
 .koyomi-shuku { font-size: 11px; color: var(--gold, #b8953a); line-height: 1; }
 
-/* デスクトップ・タブレット幅：カード自体を main-wrap(860px) の外まで広げて、
-   高精堂の運勢カレンダーに近い見やすさに調整する */
+/* デスクトップ・タブレット幅：マイページ自体の横幅を広げて、
+   高精堂の運勢カレンダーに近い見やすさに調整する
+   （left/transformでの疑似breakoutは親幅とズレて画面が切れたため撤去し、
+     main-wrapのmax-widthを直接広げるシンプルな方式に変更） */
 @media (min-width: 700px) {
-  #mypage-koyomi-card {
-    position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(94vw, 1040px);
-    max-width: 1040px;
-  }
+  #mypage-page .main-wrap { max-width: 1040px; }
   #mypage-koyomi-card .koyomi-grid { gap: 8px; }
   #mypage-koyomi-card .koyomi-cell { min-height: 96px; padding: 10px 6px 8px; border-radius: 12px; }
   #mypage-koyomi-card .koyomi-day-num { font-size: 16px; }
