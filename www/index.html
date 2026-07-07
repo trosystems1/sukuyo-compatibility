@@ -97,6 +97,63 @@ body {
   border-bottom-color: var(--gold);
 }
 
+/* ── ハンバーガーメニュー（モバイル用） ───────────────────── */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 34px;
+  height: 34px;
+  margin-left: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--gold-l, #d9b45c);
+  border-radius: 2px;
+  transition: transform .22s ease, opacity .22s ease;
+}
+.nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+@media (max-width: 640px) {
+  .site-header { position: relative; flex-wrap: nowrap; padding-left: 20px; padding-right: 20px; }
+  .site-header .sep,
+  .site-header .page-name { display: none; }
+  .nav-toggle { display: flex; }
+  .header-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 2px;
+    margin-left: 0;
+    background: var(--deep);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 20px 16px;
+    z-index: 80;
+    box-shadow: 0 12px 24px rgba(0,0,0,.35);
+  }
+  .header-nav.open { display: flex; }
+  .header-nav .nav-link {
+    padding: 12px 4px;
+    border-bottom: 1px solid rgba(232,224,245,.08);
+    white-space: nowrap;
+  }
+  .header-nav .nav-link:last-child { border-bottom: none; }
+}
+
 /* ── Hero ─────────────────────────────────────────────── */
 .hero {
   background:
@@ -1308,6 +1365,10 @@ html, body {
 .koyomi-detail { display: none; margin-top: 12px; padding: 12px 14px; background: var(--paper2, rgba(255,255,255,.05)); border: 1px solid var(--line, rgba(184,149,58,.25)); border-radius: 12px; font-size: 13px; line-height: 1.7; }
 .koyomi-detail.show { display: block; }
 .koyomi-detail-date { color: var(--gold, #b8953a); font-size: 13.5px; margin-bottom: 4px; }
+#mypage-koyomi-empty { display: none; }
+#mypage-koyomi-content { display: block; }
+#mypage-koyomi-card.empty #mypage-koyomi-empty { display: block; }
+#mypage-koyomi-card.empty #mypage-koyomi-content { display: none; }
 </style>
 </head>
 <body>
@@ -1317,12 +1378,15 @@ html, body {
   <a href="#" id="logo-home-link" class="logo"><span class="logo-moon">☽</span> 宿曜占星術</a>
   <div class="sep">｜</div>
   <div class="page-name">BIRTH STAR READING</div>
-  <nav class="header-nav">
+  <nav class="header-nav" id="header-nav">
     <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
     <a href="#" id="nav-senseiban" class="nav-link">占星盤</a>
     <a href="#" id="nav-mypage" class="nav-link">👤 マイページ</a>
   </nav>
+  <button type="button" class="nav-toggle" id="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </header>
 
 <!-- Compatibility App (default view) -->
@@ -1619,6 +1683,33 @@ html, body {
     <!-- わたしのプロフィール -->
     <div id="mypage-profile"></div>
 
+    <!-- 宿曜こよみ ── 「わたし」の生年月日と自動連携（再入力不要） -->
+    <div class="card moon-rune-intro-card" id="mypage-koyomi-card">
+      <div class="card-title">🌙 宿曜こよみ</div>
+      <div id="mypage-koyomi-empty" class="mypage-empty">
+        「わたし」の生年月日を登録すると、ここにあなた専用のこよみ（毎日の宿と月の満ち欠け）が表示されます。
+      </div>
+      <div id="mypage-koyomi-content">
+        <p class="moon-rune-intro-text" id="koyomi-gate-info"></p>
+        <div class="koyomi-head">
+          <button class="koyomi-nav-btn" id="koyomi-prev" aria-label="前の月">◀</button>
+          <div class="koyomi-month-label" id="koyomi-month-label"></div>
+          <button class="koyomi-nav-btn" id="koyomi-next" aria-label="次の月">▶</button>
+        </div>
+        <div class="koyomi-week-head">
+          <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+        </div>
+        <div class="koyomi-grid" id="koyomi-grid"></div>
+        <div class="koyomi-legend">
+          <span><span class="koyomi-lg-today"></span>今日</span>
+          <span><span class="koyomi-lg-gate"></span>あなたのゲート日</span>
+          <span>朔＝旧暦一日（新月・宿の調整日）</span>
+        </div>
+        <div class="koyomi-detail" id="koyomi-detail"></div>
+      </div>
+    </div>
+
+
     <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
     <p class="book-lead">
       保存した人たちを、宿曜の9グループ（宿番号の数字根1〜9）に配置した盤です。
@@ -1757,34 +1848,6 @@ html, body {
           </p>
         </div>
       </div>
-    </div>
-
-    <!-- 宿曜こよみ ── 月と宿のカレンダー -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">宿曜こよみ ── 月と宿のカレンダー</div>
-      <p class="moon-rune-intro-text">
-        毎日の月の満ち欠けと、その日の宿を一覧できるカレンダーです。生年月日を入れると、あなたが生まれた時と同じ形の月がのぼる「ゲートの日」に印がつきます。その日は、月を眺めてメディテーション（エネルギー調整）を。
-      </p>
-      <div class="koyomi-gate-row">
-        <label for="koyomi-birth">あなたの生年月日：</label>
-        <input type="date" id="koyomi-birth" min="1900-01-01" max="2099-12-31">
-        <span class="koyomi-gate-info" id="koyomi-gate-info"></span>
-      </div>
-      <div class="koyomi-head">
-        <button class="koyomi-nav-btn" id="koyomi-prev" aria-label="前の月">◀</button>
-        <div class="koyomi-month-label" id="koyomi-month-label"></div>
-        <button class="koyomi-nav-btn" id="koyomi-next" aria-label="次の月">▶</button>
-      </div>
-      <div class="koyomi-week-head">
-        <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
-      </div>
-      <div class="koyomi-grid" id="koyomi-grid"></div>
-      <div class="koyomi-legend">
-        <span><span class="koyomi-lg-today"></span>今日</span>
-        <span><span class="koyomi-lg-gate"></span>あなたのゲート日</span>
-        <span>朔＝旧暦一日（新月・宿の調整日）</span>
-      </div>
-      <div class="koyomi-detail" id="koyomi-detail"></div>
     </div>
 
     <div class="retry-wrap">
@@ -1970,11 +2033,6 @@ html, body {
       </p>
       <p class="moon-rune-intro-text">
         キーワードを受け取り、意識を向けることで、見えていなかった扉が開いていく。宿曜道は、そのための3000年の叡智です。
-      </p>
-      <p class="moon-rune-intro-text">
-        より深く自分の三世（命・業・胎）を読み解きたい方、直接の鑑定や講座に関心のある方は、竹本先生の公式サイト
-        <a href="https://kosei-do.co.jp" target="_blank" rel="noopener" style="color: var(--gold, #b8953a);">光晴堂（kosei-do.co.jp）</a>
-        をご覧ください。本サイトの読み解きは、すべて竹本先生の教えを土台としています。
       </p>
     </div>
 
@@ -2756,9 +2814,16 @@ function showSelfResult(shukuA, year, month, day) {
 
   document.getElementById("biz-note").classList.remove("show");
 
-  // 月のルネーション表示は将来のマイページ（Googleログイン）機能で
-  // 生年月日を保存した際に連動表示する想定のため、現状の単発結果には表示しない
-  document.getElementById("moon-section").classList.remove("show");
+  // 月のルネーション：宿とミルフィーユのように重ねて表示する【2026/7/7 再実装】
+  // 同じ本命宿でも生まれた時の月相によって性格の機微が変わる、という竹本流の解釈。
+  // 生年月日が分かる場合（date入力モード）のみ算出可能。「宿で選ぶ」モードでは非表示。
+  if (year && month && day) {
+    const moon = calcMoonPhase(year, month, day);
+    showMoonPhase(moon);
+    document.querySelector("#moon-section .moon-title").textContent = "☽ あなたの月のルネーション（宿に重なる、もうひとつの層）";
+  } else {
+    document.getElementById("moon-section").classList.remove("show");
+  }
 
   document.getElementById("self-card").classList.add("hide");
   document.getElementById("btn-retry-label").textContent = "もう一度調べる";
@@ -3058,7 +3123,6 @@ function showMoonRunePage() {
   document.getElementById("nav-mypage").classList.remove("active");
   document.getElementById("moon-rune-page").classList.add("show");
   document.getElementById("nav-moon-rune").classList.add("active");
-  if (!koyomiState.rendered) renderKoyomi();  // 宿曜こよみ：初回表示時に描画
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -3082,6 +3146,7 @@ document.getElementById("btn-back-from-moon").addEventListener("click", () => {
    既存の確定ロジックのみを使用:
    - calcShukuIndex(y,m,d): その日の宿（本命宿と同一の旧暦ベース算出）
    - calcMoonPhase(y,m,d): 旧暦日→8フェーズ（ルネーション）
+   マイページの「わたし」プロフィールにひも付けて表示する（再入力不要）。
    凌犯期間の表示は算出基準を先生に確認するまで実装しない。      */
 const koyomiState = {
   year: new Date().getFullYear(),
@@ -3089,6 +3154,26 @@ const koyomiState = {
   birthPhaseIdx: null,                // ゲート日判定用（誕生ルネーション）
   rendered: false
 };
+
+// マイページ表示のたびに呼ぶ：「わたし」の生年月日で自動更新する。
+// 「わたし」未登録の場合は空状態を表示しカレンダー自体は描画しない。
+function updateMypageKoyomi() {
+  const card = document.getElementById("mypage-koyomi-card");
+  const list = loadPeople();
+  const me = list.find(p => p.isMe);
+
+  if (!me || !me.y || !me.m || !me.d) {
+    card.classList.add("empty");
+    koyomiState.birthPhaseIdx = null;
+    return;
+  }
+  card.classList.remove("empty");
+  const moon = calcMoonPhase(me.y, me.m, me.d);
+  koyomiState.birthPhaseIdx = moon.index;
+  document.getElementById("koyomi-gate-info").textContent =
+    `☆ ${me.name}さん（${me.y}年${me.m}月${me.d}日生まれ）は「${moon.name}」生まれ。同じ月相の日にゲート印がつきます。`;
+  renderKoyomi();
+}
 
 function koyomiDayInfo(y, m, d) {
   const idx = calcShukuIndex(y, m, d);
@@ -3157,21 +3242,6 @@ document.getElementById("koyomi-prev").addEventListener("click", () => {
 document.getElementById("koyomi-next").addEventListener("click", () => {
   koyomiState.month++;
   if (koyomiState.month > 12) { koyomiState.month = 1; koyomiState.year++; }
-  renderKoyomi();
-});
-document.getElementById("koyomi-birth").addEventListener("change", (e) => {
-  const v = e.target.value;
-  const gateInfo = document.getElementById("koyomi-gate-info");
-  if (!v) { koyomiState.birthPhaseIdx = null; gateInfo.textContent = ""; renderKoyomi(); return; }
-  const [y, m, d] = v.split("-").map(Number);
-  try {
-    const moon = calcMoonPhase(y, m, d);
-    koyomiState.birthPhaseIdx = moon.index;
-    gateInfo.textContent = `あなたは「${moon.name}」生まれ`;
-  } catch (err) {
-    koyomiState.birthPhaseIdx = null;
-    gateInfo.textContent = "";
-  }
   renderKoyomi();
 });
 
@@ -3483,6 +3553,30 @@ document.getElementById("logo-home-link").addEventListener("click", (e) => {
   goHome();
 });
 
+/* ── ハンバーガーメニュー（モバイル） ─────────────────────── */
+const navToggleBtn = document.getElementById("nav-toggle");
+const headerNavEl = document.getElementById("header-nav");
+
+function closeNavMenu() {
+  headerNavEl.classList.remove("open");
+  navToggleBtn.setAttribute("aria-expanded", "false");
+}
+function toggleNavMenu() {
+  const isOpen = headerNavEl.classList.toggle("open");
+  navToggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+}
+navToggleBtn.addEventListener("click", toggleNavMenu);
+// メニュー内のリンクをタップしたら閉じる（各ページへの遷移はそれぞれの既存リスナーに任せる）
+headerNavEl.querySelectorAll(".nav-link").forEach(link => {
+  link.addEventListener("click", closeNavMenu);
+});
+// メニュー外をタップしたら閉じる
+document.addEventListener("click", (e) => {
+  if (!headerNavEl.classList.contains("open")) return;
+  if (headerNavEl.contains(e.target) || navToggleBtn.contains(e.target)) return;
+  closeNavMenu();
+});
+
 /* ══════════════════════════════════════════════════════════
    わたしの人物帳（9グループ盤）
    - 保存先: localStorage（端末内・完全オフライン）
@@ -3616,6 +3710,8 @@ function clearTagPick(containerId) {
 function renderBook() {
   const list = loadPeople();
   const vp = list.find(p => p.id === bookViewpointId) || null;
+
+  updateMypageKoyomi(); // 宿曜こよみ：「わたし」の生年月日と自動連携
 
   // わたしのプロフィール
   const me = list.find(p => p.isMe) || null;
