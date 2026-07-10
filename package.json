@@ -1,26 +1,19 @@
 {
-  "name": "kosei-do-mock",
-  "version": "0.1.0",
+  "name": "sukuyo-compatibility",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "sync:www": "mkdir -p www && cp index.html www/ && cp -r assets www/",
+    "ios": "npm run sync:www && npx cap sync ios && npx cap run ios --target-name \"iPhone 17 Pro\""
   },
   "dependencies": {
-    "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "@capacitor/cli": "^8.4.1",
+    "@capacitor/core": "^8.4.1",
+    "@capacitor/ios": "^8.4.1",
+    "@capacitor/splash-screen": "^8.0.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.2.6",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@capacitor/assets": "^3.0.5"
   }
 }

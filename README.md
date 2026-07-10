@@ -1,36 +1,43 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 宿曜相性占いツール
 
-## Getting Started
+竹本光晴堂（kosei-do.co.jp）の宿曜占星術サイト用、相性診断ツールです。
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ファイル構成
+```
+.
+├── index.html       ← ツール本体（HTML/CSS/JS単一ファイル）
+├── middleware.js     ← Basic認証（Vercel Routing Middleware）
+├── package.json      ← ESモジュール指定のための設定
+└── vercel.json       ← Vercel設定（検索エンジン非表示など）
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## ロジックの要点
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- 本命宿の計算は新暦→旧暦変換（`lunar-javascript`をCDN経由で読み込み）をベースにしている
+- 旧暦の各月1日の宿は固定（1月=室、2月=奎…12月=虚）、月内は+1で進む
+- 検証済み確定値：1962/3/22→底宿、1975/8/11→亢宿、1973/1/1→箕宿
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ローカル開発（Cursor等での編集）
 
-## Learn More
+`index.html` を直接ブラウザで開いて確認できます（CDN読み込みのため要インターネット接続）。
+変更したら git commit → push するだけで、Vercel側が自動的に再デプロイします。
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+git add .
+git commit -m "変更内容"
+git push
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Basic認証
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`middleware.js` にデフォルト値がありますが、本番では必ずVercelダッシュボードの
+環境変数で上書きしてください：
 
-## Deploy on Vercel
+- Settings → Environment Variables
+- `BASIC_AUTH_USER` / `BASIC_AUTH_PASS` を設定 → 再デプロイ
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 動作確認用テストケース
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- 1962/3/22 → 底宿
+- 1975/8/11 → 亢宿
+- 1973/1/1 → 箕宿
