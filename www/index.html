@@ -3072,19 +3072,13 @@ function buildCompassBgSVG() {
     ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
   }
 
-  // 日付リング（今日を基準に27日分・最外周の外側に薄く）
+  // 日付リング：宿名を薄く外周に並べる（calcShukuIndex非依存）
   let dateLabels = "";
-  const today = new Date();
-  let todayIdx = 0;
-  try { todayIdx = calcShukuIndex(today.getFullYear(), today.getMonth()+1, today.getDate()); } catch(e){}
   for (let i = 0; i < N; i++) {
-    const shukuI = (todayIdx + i) % N;
     const deg = i * (360 / N) + (180 / N);
     const p = pt(R0 + 10, deg);
-    const rot = deg;
-    const isToday = (i === 0);
-    const label = isToday ? "今日" : `+${i}`;
-    dateLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${isToday ? 9 : 7}" fill="${gold}${isToday ? ".5)" : ".25)"}" font-family="'Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+    const label = shukuNames[i];
+    dateLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="7" fill="${gold}.2)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
   }
 
   return `
