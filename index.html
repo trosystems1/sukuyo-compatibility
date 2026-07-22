@@ -1253,6 +1253,119 @@ html, body {
   letter-spacing: .04em;
 }
 
+/* ── 占星術解説ページ ────────────────────────────────────── */
+.astro-filter-btn {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .2s;
+}
+.astro-filter-btn.active,
+.astro-filter-btn:hover {
+  background: var(--gold-l);
+  color: var(--deep);
+  border-color: var(--gold-l);
+}
+.astro-palace-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  background: var(--paper2);
+  cursor: pointer;
+  transition: all .2s;
+  margin-bottom: 10px;
+}
+.astro-palace-card:hover { border-color: var(--gold-l); background: rgba(201,169,97,.06); }
+.astro-palace-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.astro-palace-icon {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.astro-palace-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  color: var(--moon);
+  font-weight: 600;
+}
+.astro-palace-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: .04em;
+}
+.astro-palace-keyphrase {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--gold-l);
+  font-style: italic;
+  letter-spacing: .06em;
+}
+.astro-palace-body {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+.astro-palace-card.open .astro-palace-body { display: block; }
+.astro-shuku-tags {
+  display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px;
+}
+.astro-shuku-tag {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--gold-l);
+  color: var(--gold-l);
+  background: rgba(201,169,97,.08);
+}
+.astro-keywords {
+  font-size: 12px;
+  color: rgba(232,224,245,.7);
+  line-height: 1.9;
+}
+.astro-elem-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px;
+  background: var(--paper2);
+}
+.astro-elem-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.astro-quality-card {
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px;
+  background: var(--paper2);
+  text-align: center;
+}
+.astro-quality-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  color: var(--moon);
+  margin-bottom: 6px;
+}
+@media (max-width: 600px) {
+  #astro-element-grid { grid-template-columns: 1fr; }
+  #astro-quality-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Senseiban (占星盤) Interactive Page ───────────────── */
 .senseiban-wheel-card {
   display: flex;
@@ -1362,11 +1475,11 @@ html, body {
 @keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
 /* 中リング：ゆっくり反時計回り */
 @keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
-/* 固定層：ゆっくり反時計回り */
-#compass-fixed { animation: compassSlowCCW 120s linear infinite; transform-origin: 220px 220px; }
-/* 運気ラベル：固定層と逆方向（時計回り） */
-#compass-ring-compat { animation: compassSlowCW 90s linear infinite; transform-origin: 220px 220px; }
-/* 日付リングは使用しない */
+/* 固定層：静止（宿・12宮・惑星・エレメント） */
+#compass-fixed { /* static */ }
+/* 回転層：宿＋運気ラベルが一緒にゆっくり反時計回り 100秒/周 */
+#compass-ring-compat { animation: compassSlowCCW 100s linear infinite; transform-origin: 220px 220px; }
+/* 日付リングは削除済み */
 #compass-ring-date { display: none; }
 /* heroコンテンツはz-index:1で前面に */
 .hero-eyebrow, .hero-title, .hero-sub { position: relative; z-index: 1; }
@@ -1439,6 +1552,7 @@ html, body {
     <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
     <a href="#" id="nav-senseiban" class="nav-link">占星盤</a>
+    <a href="#" id="nav-astrology" class="nav-link">占星術</a>
     <a href="#" id="nav-mypage" class="nav-link">👤 マイページ</a>
   </nav>
   <button type="button" class="nav-toggle" id="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
@@ -2128,6 +2242,48 @@ html, body {
 </div>
 
 <!-- Senseiban (占星盤) Interactive Page -->
+<!-- ══ 占星術解説ページ ══ -->
+<div class="moon-rune-page" id="astrology-page">
+  <div class="main-wrap" style="max-width:860px;">
+
+    <!-- ヘッダー -->
+    <div style="text-align:center;padding:32px 0 24px;">
+      <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.35em;color:var(--gold-l);margin-bottom:8px;">WESTERN ASTROLOGY × SHUKUYO</div>
+      <h2 style="font-family:'Shippori Mincho',serif;font-size:26px;color:var(--moon);margin-bottom:10px;">12宮・エレメント・惑星</h2>
+      <p style="font-size:13px;color:var(--muted);line-height:1.8;max-width:560px;margin:0 auto;">
+        宿曜道と西洋占星術は同じ天の法則を別の言語で語っています。<br>
+        27宿は12宮（サイン）と対応し、守護惑星（オラクル）がそれぞれの宿に信託を与えます。
+      </p>
+    </div>
+
+    <!-- エレメントフィルター -->
+    <div id="astro-filter" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
+      <button class="astro-filter-btn active" data-elem="all">すべて</button>
+      <button class="astro-filter-btn" data-elem="火" style="--ec:#c94040;">🔥 火</button>
+      <button class="astro-filter-btn" data-elem="地" style="--ec:#8a7040;">🌿 地</button>
+      <button class="astro-filter-btn" data-elem="風" style="--ec:#4080b0;">💨 風</button>
+      <button class="astro-filter-btn" data-elem="水" style="--ec:#3a7a9c;">💧 水</button>
+    </div>
+
+    <!-- 12宮グリッド -->
+    <div id="astro-palace-grid"></div>
+
+    <!-- エレメント解説セクション -->
+    <div style="margin-top:40px;">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-l);text-align:center;margin-bottom:20px;">THE FOUR ELEMENTS</div>
+      <div id="astro-element-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
+    </div>
+
+    <!-- クオリティ解説 -->
+    <div style="margin-top:36px;">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-l);text-align:center;margin-bottom:20px;">QUALITY · 三区分</div>
+      <div id="astro-quality-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+    </div>
+
+    <div style="height:40px;"></div>
+  </div>
+</div>
+
 <div class="moon-rune-page senseiban-page" id="senseiban-page">
   <div class="hero moon-rune-hero">
     <div class="hero-eyebrow">SENSEIBAN · INTERACTIVE WHEEL</div>
@@ -3081,15 +3237,6 @@ function buildCompassBgSVG() {
     ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
   }
 
-  // 日付リング：宿名を薄く外周に並べる（calcShukuIndex非依存）
-  let dateLabels = "";
-  for (let i = 0; i < N; i++) {
-    const deg = i * (360 / N) + (180 / N);
-    const p = pt(R0 + 10, deg);
-    const label = shukuNames[i];
-    dateLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="7" fill="${gold}.2)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
-  }
-
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
 
@@ -3114,13 +3261,13 @@ function buildCompassBgSVG() {
     <!-- 27宿帯 -->
     ${circle(R4, `${gold}.3)`, 0.8)}
     ${spokes27}
-    ${labelRing(shukuNames, (R3+R4)/2, 10, `${gold}.65)`)}
   </g>
 
-  <!-- ══ 回転A：運気ラベル（栄・命・親…）反時計回り ══ -->
+  <!-- ══ 回転層：宿リング＋運気ラベル（一緒にゆっくり反時計回り） ══ -->
   <g id="compass-ring-compat">
+    ${labelRing(shukuNames,   (R3+R4)/2,   10, `${gold}.65)`)}
     ${circle(R5, `${gold}.2)`, 0.5)}
-    ${labelRing(compatLabels, (R4+R5)/2, 11, `${gold}.45)`)}
+    ${labelRing(compatLabels, (R4+R5)/2,   11, `${gold}.45)`)}
   </g>
 
   <!-- 中心（固定） -->
@@ -4082,6 +4229,136 @@ function renderSukuyoSoulmateGrid() {
   `).join("");
   grid.dataset.rendered = "true";
 }
+
+/* ══ 占星術解説ページ ══ */
+const ELEM_DETAIL = {
+  火: { emoji:"🔥", color:"#c94040", title:"火（Fire）", en:"FIRE",
+    desc:"創造・行動・情熱・自己表現のエネルギー。直感で動き、先陣を切る力。「始まり」と「照らす」を象徴します。",
+    keywords:["パイオニア","情熱","自己主張","瞬発力","競争心","開拓"],
+    palaces:["羊宮（I am）","獅子宮（I create）","弓宮（I explora）"] },
+  地: { emoji:"🌿", color:"#8a7040", title:"地（Earth）", en:"EARTH",
+    desc:"現実・安定・物質・実用のエネルギー。時間をかけて積み上げ、確かな価値を生む力。「持続」と「豊かさ」を象徴します。",
+    keywords:["安定","現実的","堅実","職人気質","計画的","蓄積"],
+    palaces:["牛宮（I have）","女宮（I analyze）","磨宮（I use）"] },
+  風: { emoji:"💨", color:"#4080b0", title:"風（Air）", en:"AIR",
+    desc:"知性・言語・コミュニケーション・社交のエネルギー。情報を結び、関係を調律し、概念を拡げる力。「繋ぐ」と「広げる」を象徴します。",
+    keywords:["言語能力","社交性","情報収集","コミュニケーション","多芸多才","先進性"],
+    palaces:["夫妻宮（I think）","秤宮（I balance）","瓶宮（I know）"] },
+  水: { emoji:"💧", color:"#3a7a9c", title:"水（Water）", en:"WATER",
+    desc:"感情・直感・記憶・霊性のエネルギー。目に見えないものを感じ取り、癒し、つながる力。「感じる」と「信じる」を象徴します。",
+    keywords:["感受性","直感","共感","記憶力","霊性","深い欲求"],
+    palaces:["蟹宮（I feel）","蠍宮（I desire）","魚宮（I believe）"] },
+};
+
+const QUALITY_DETAIL = [
+  { name:"活動（Cardinal）", en:"CARDINAL",
+    desc:"物事を「始める」力。新サイクルの入口に立ち、エネルギーを起動させる。リーダーシップと開拓の質。",
+    palaces:["羊宮","蟹宮","秤宮","磨宮"], keywords:["開拓","スタート","リーダー","瞬発力"] },
+  { name:"不動（Fixed）", en:"FIXED",
+    desc:"物事を「維持・深める」力。一点に集中してエネルギーを蓄積し、揺るぎない安定と強度を生む。",
+    palaces:["牛宮","獅子宮","蠍宮","瓶宮"], keywords:["持続","安定","集中","意志力"] },
+  { name:"柔軟（Mutable）", en:"MUTABLE",
+    desc:"物事を「変容・広げる」力。サイクルの橋渡しをし、柔軟に適応しながら次の段階へ移行させる。",
+    palaces:["夫妻宮","女宮","弓宮","魚宮"], keywords:["適応","変容","普及","多様性"] },
+];
+
+function renderAstrologyPage() {
+  renderAstroPalaceGrid("all");
+  renderAstroElementGrid();
+  renderAstroQualityGrid();
+}
+
+function renderAstroPalaceGrid(elemFilter) {
+  const grid = document.getElementById("astro-palace-grid");
+  if (!grid) return;
+  const eColorMap = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+  const filtered = elemFilter === "all" ? PALACE_DATA : PALACE_DATA.filter(p => p.element === elemFilter);
+  grid.innerHTML = filtered.map(p => {
+    const ec = eColorMap[p.element] || "#888";
+    const shukuList = p.shukuIdx.map(i => SHUKU[i]?.kanji).filter(Boolean);
+    const keywords = [...new Set(
+      shukuList.flatMap(k => (SHUKU_ORACLE[k]?.keywords || []).slice(0,2))
+    )].slice(0,5);
+    const oracleKey = shukuList[1] || shukuList[0];
+    const oracleTxt = SHUKU_ORACLE[oracleKey]?.oracle || "";
+    const iconSvg = (PALACE_ICONS[p.sym] || "").replace(/#c9a961/g, ec);
+    return `<div class="astro-palace-card" onclick="this.classList.toggle('open')">
+  <div class="astro-palace-head">
+    <div class="astro-palace-icon" style="background:${ec}22;border:1px solid ${ec}55;">
+      <svg viewBox="-12 -12 24 24" width="28" height="28" overflow="visible" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>
+    </div>
+    <div>
+      <div class="astro-palace-name">${p.name}</div>
+      <div class="astro-palace-meta">${p.element}・${p.quality}　守護惑星：${p.planet}</div>
+    </div>
+    <div class="astro-palace-keyphrase">${p.keyphrase}</div>
+  </div>
+  <div class="astro-palace-body">
+    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">対応する宿</div>
+    <div class="astro-shuku-tags">${shukuList.map(k=>`<span class="astro-shuku-tag">${k}</span>`).join("")}</div>
+    <div class="astro-keywords" style="margin-top:8px;">${keywords.join("　／　")}</div>
+    ${oracleTxt ? `<p style="font-size:11.5px;color:rgba(232,224,245,.55);margin-top:10px;line-height:1.85;border-left:2px solid ${ec}55;padding-left:10px;">${oracleTxt}</p>` : ""}
+  </div>
+</div>`;
+  }).join("");
+}
+
+function renderAstroElementGrid() {
+  const grid = document.getElementById("astro-element-grid");
+  if (!grid) return;
+  grid.innerHTML = Object.entries(ELEM_DETAIL).map(([,d]) => `
+<div class="astro-elem-card">
+  <div class="astro-elem-title" style="color:${d.color};">${d.emoji} ${d.title}</div>
+  <p style="font-size:12px;color:rgba(232,224,245,.7);line-height:1.85;margin-bottom:10px;">${d.desc}</p>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">対応する宮</div>
+  <div style="font-size:12px;color:var(--gold-l);line-height:2;margin-bottom:8px;">${d.palaces.join(" ／ ")}</div>
+  <div style="display:flex;flex-wrap:wrap;gap:5px;">
+    ${d.keywords.map(k=>`<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid ${d.color}44;color:${d.color};background:${d.color}11;">${k}</span>`).join("")}
+  </div>
+</div>`).join("");
+}
+
+function renderAstroQualityGrid() {
+  const grid = document.getElementById("astro-quality-grid");
+  if (!grid) return;
+  grid.innerHTML = QUALITY_DETAIL.map(q => `
+<div class="astro-quality-card">
+  <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:var(--gold-l);margin-bottom:4px;">${q.en}</div>
+  <div class="astro-quality-name">${q.name}</div>
+  <p style="font-size:11px;color:rgba(232,224,245,.65);line-height:1.85;margin-bottom:8px;">${q.desc}</p>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">該当する宮</div>
+  <div style="font-size:12px;color:var(--moon);">${q.palaces.join(" · ")}</div>
+</div>`).join("");
+}
+
+function showAstrologyPage() {
+  renderAstrologyPage();
+  ["compat-app"].forEach(id => document.getElementById(id)?.classList.add("hide"));
+  ["mypage-page","moon-rune-page","sukuyo-about-page","senseiban-page","astrology-page"].forEach(id => document.getElementById(id)?.classList.remove("show"));
+  ["nav-mypage","nav-moon-rune","nav-sukuyo-about","nav-senseiban","nav-astrology"].forEach(id => document.getElementById(id)?.classList.remove("active"));
+  document.getElementById("astrology-page").classList.add("show");
+  document.getElementById("nav-astrology").classList.add("active");
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+function hideAstrologyPage() {
+  document.getElementById("astrology-page").classList.remove("show");
+  document.getElementById("compat-app").classList.remove("hide");
+  document.getElementById("nav-astrology").classList.remove("active");
+}
+
+document.getElementById("nav-astrology").addEventListener("click", e => {
+  e.preventDefault();
+  showAstrologyPage();
+});
+
+document.getElementById("astro-filter")?.addEventListener("click", e => {
+  const btn = e.target.closest(".astro-filter-btn");
+  if (!btn) return;
+  document.querySelectorAll(".astro-filter-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+  renderAstroPalaceGrid(btn.dataset.elem);
+});
 
 function showSukuyoAboutPage() {
   renderSukuyoShukuGrid();
