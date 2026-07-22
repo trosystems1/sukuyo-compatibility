@@ -170,6 +170,7 @@ body {
   padding: 52px 24px 44px;
   position: relative;
   overflow: hidden;
+  min-height: 260px;
 }
 .hero::before {
   content: '';
@@ -1339,15 +1340,38 @@ html, body {
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 /* ── 12宮オラクル盤 ─────────────────────────────────────── */
-#palace-wheel-holder svg { display:block; width:100%; height:auto; }
-#palace-wheel-holder { user-select:none; }
-#palace-wheel-holder.grabbing { cursor:grabbing; }
-.palace-ring-date-text { font-family:'Noto Serif JP',serif; font-size:11px; fill:#241b3e; }
-.palace-ring-compat-text { font-family:'Shippori Mincho',serif; font-size:13px; font-weight:700; }
-.palace-ring-shuku-text { font-family:'Shippori Mincho',serif; font-size:12px; fill:#e8e0f5; }
-.palace-ring-planet-sym { font-size:13px; fill:#c9a961; }
-.palace-ring-palace-text { font-family:'Noto Serif JP',serif; font-size:10px; fill:#fdfaf4; }
-.palace-ring-element-text { font-size:9px; fill:rgba(253,250,244,.7); }
+/* hero背景として配置（絶対配置・ゴールド線画・自動回転） */
+#hero-compass-bg {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+#hero-compass-bg.loaded { opacity: 1; }
+#hero-compass-bg svg {
+  width: min(520px, 130vw);
+  height: min(520px, 130vw);
+  overflow: visible;
+}
+/* 外リング：ゆっくり時計回り */
+@keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
+/* 中リング：ゆっくり反時計回り */
+@keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
+#compass-ring-outer { animation: compassSlowCW  120s linear infinite; transform-origin: 220px 220px; }
+#compass-ring-mid   { animation: compassSlowCCW  80s linear infinite; transform-origin: 220px 220px; }
+#compass-ring-inner { animation: compassSlowCW   55s linear infinite; transform-origin: 220px 220px; }
+/* heroコンテンツはz-index:1で前面に */
+.hero-eyebrow, .hero-title, .hero-sub { position: relative; z-index: 1; }
+
+#palace-wheel-holder { display: none; } /* トップページのholder非表示（背景SVGに統合）*/
+#palace-info-panel   { display: none !important; }
+#palace-honmei-note  { display: none !important; }
+#top-palace-section  { display: none; } /* 旧セクション非表示 */
 
 /* ── 宿曜こよみ（月と宿のカレンダー） ─────────────────────── */
 .koyomi-head { display: flex; align-items: center; justify-content: space-between; margin: 4px 0 12px; }
@@ -1424,6 +1448,10 @@ html, body {
 
 <!-- Hero -->
 <div class="hero">
+  <!-- 羅針盤背景 -->
+  <div id="hero-compass-bg">
+    <!-- JS で buildCompassBgSVG() の結果を挿入 -->
+  </div>
   <div class="hero-eyebrow">SUKUYO · BIRTH STAR READING</div>
   <h1 class="hero-title">宿曜占い</h1>
   <p class="hero-sub">
@@ -2943,49 +2971,117 @@ function initPalaceWheelDrag(honmeiIdx, todayIdx) {
   });
 }
 
+// ─ 背景羅針盤SVG（ゴールド線画・装飾専用） ─
+function buildCompassBgSVG() {
+  const cx = 220, cy = 220, vb = 440;
+  const N = 27, Np = 12;
+  const gold     = "rgba(201,169,97,";  // ゴールドベース
+  const goldSolid = "#c9a961";
+
+  // 半径
+  const R0 = 214;  // 最外縁（装飾リング）
+  const R1 = 200;  // 宮帯外
+  const R2 = 172;  // 宮帯内／惑星帯外
+  const R3 = 144;  // 惑星帯内／宿帯外
+  const R4 = 116;  // 宿帯内／内リング外
+  const R5 =  80;  // 内リング内
+  const R6 =  46;  // 中心円
+
+  function pt(r, deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function circle(r, stroke, sw, fill) {
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill||'none'}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  function spoke(r1, r2, deg, stroke, sw) {
+    const p1 = pt(r1, deg), p2 = pt(r2, deg);
+    return `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  function textRing(items, r, fontSize, fillColor) {
+    return items.map((label, i) => {
+      const deg = (i / items.length) * 360 + (180 / items.length);
+      const p = pt(r, deg);
+      const rot = deg;
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fillColor}" font-family="'Cinzel','Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+    }).join("");
+  }
+
+  // 12宮記号
+  const palaceSyms   = PALACE_DATA.map(p => p.sym);
+  const palaceNames  = PALACE_DATA.map(p => p.name.replace("宮",""));
+  const planetSyms   = PALACE_DATA.map(p => p.planetSym);
+  // 27宿名（短縮）
+  const shukuNames   = SHUKU.map(s => s.kanji.replace("宿",""));
+  // 相性ラベル
+  const compatLabels = COMPAT_TABLE.map(r => r.key);
+
+  // 12宮 仕切り線
+  let spokes12 = "", spokes27 = "";
+  for (let i = 0; i < Np; i++) {
+    const deg = i * (360 / Np);
+    spokes12 += spoke(R1, R2, deg, `${gold}.25)`, 0.6);
+    spoke(R2, R3, deg, `${gold}.15)`, 0.4);
+  }
+  for (let i = 0; i < N; i++) {
+    const deg = i * (360 / N);
+    spokes27 += spoke(R3, R5, deg, `${gold}.18)`, 0.5);
+  }
+
+  // 12宮帯の細い区切り小刻み（装飾）
+  let ticks = "";
+  for (let i = 0; i < 120; i++) {
+    const deg = i * 3;
+    const isMain = i % 10 === 0;
+    ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
+  }
+
+  return `
+<svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
+  <!-- 外縁装飾リング（回転：時計回り） -->
+  <g id="compass-ring-outer">
+    ${circle(R0,     `${gold}.35)`, 1)}
+    ${circle(R0 - 14,`${gold}.2)`,  0.5)}
+    ${ticks}
+    ${textRing(palaceSyms,  (R0 + R1)/2 + 2, 11, `${gold}.7)`)}
+    ${textRing(palaceNames, (R0 + R1)/2 - 8, 7,  `${gold}.4)`)}
+  </g>
+
+  <!-- 惑星帯（回転：反時計回り） -->
+  <g id="compass-ring-mid">
+    ${circle(R2, `${gold}.3)`, 0.8)}
+    ${circle(R3, `${gold}.25)`,0.6)}
+    ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
+    ${textRing(planetSyms, (R2 + R3)/2, 13, `${gold}.65)`)}
+  </g>
+
+  <!-- 宿リング（回転：時計回り） -->
+  <g id="compass-ring-inner">
+    ${circle(R1, `${gold}.2)`,  0.5)}
+    ${circle(R4, `${gold}.3)`,  0.8)}
+    ${circle(R5, `${gold}.2)`,  0.5)}
+    ${spokes27}
+    ${textRing(shukuNames,   (R3 + R4)/2 + 1, 10, `${gold}.55)`)}
+    ${textRing(compatLabels, (R4 + R5)/2,     11, `${gold}.4)`)}
+  </g>
+
+  <!-- 中心（固定） -->
+  ${circle(R6, `${gold}.45)`, 1.2)}
+  ${circle(R6 - 14, `${gold}.2)`, 0.5)}
+  <!-- 方位針 -->
+  <polygon points="${cx},${cy-R6+6} ${cx-5},${cy} ${cx},${cy+R6-6} ${cx+5},${cy}"
+    fill="none" stroke="${goldSolid}" stroke-width="0.8" opacity="0.5"/>
+  <circle cx="${cx}" cy="${cy}" r="4" fill="${goldSolid}" opacity="0.6"/>
+</svg>`;
+}
+
 function renderPalaceWheel() {
-  const holder = document.getElementById("palace-wheel-holder");
-  if (!holder) return;
-
-  // わたしの本命宿を取得（未登録なら0=昴宿をデフォルト表示）
-  const people = JSON.parse(localStorage.getItem("sukuyo_people_v1") || "[]");
-  const me = people.find(p => p.isMe);
-  const honmeiIdx = (me && (me.shukuIdx || me.shukuIdx === 0)) ? me.shukuIdx : -1;
-
-  // 今日の宿を取得
-  const today = new Date();
-  let todayIdx = 0;
-  try {
-    todayIdx = calcShukuIndex(today.getFullYear(), today.getMonth()+1, today.getDate());
-  } catch(e) { todayIdx = 0; }
-
-  // 本命宿ノート更新
-  const note = document.getElementById("palace-honmei-note");
-  const desc = document.getElementById("top-palace-desc");
-  if (honmeiIdx >= 0) {
-    const shukuName = SHUKU[honmeiIdx]?.kanji || "";
-    if (note) { note.style.display = "block"; note.textContent = `あなたの命宿（${shukuName}）を基準に相性リングをセットしています`; }
-    if (desc) desc.textContent = `命宿：${shukuName} ／ 宿をタップで守護惑星・キーフレーズを表示`;
-  } else {
-    if (note) note.style.display = "none";
-    if (desc) desc.textContent = "宿をタップで守護惑星・キーフレーズを表示";
-  }
-
-  // 相性リングの基準：本命宿があればそれを12時に、なければ0
-  const compatBase = honmeiIdx >= 0 ? honmeiIdx : 0;
-
-  // 既に描画済みなら回転だけ更新
-  if (holder.dataset.rendered) {
-    palaceWheelCompatRot = -(compatBase * (360/27));
-    palaceWheelDateRot   = -(todayIdx   * (360/27));
-    document.getElementById("palace-compat-ring")?.setAttribute("transform", `rotate(${palaceWheelCompatRot.toFixed(2)} 220 220)`);
-    document.getElementById("palace-date-ring")?.setAttribute("transform",   `rotate(${palaceWheelDateRot.toFixed(2)} 220 220)`);
-    return;
-  }
-
-  holder.innerHTML = buildPalaceWheelSVG(compatBase, todayIdx);
-  holder.dataset.rendered = "true";
-  initPalaceWheelDrag(compatBase, todayIdx);
+  const bg = document.getElementById("hero-compass-bg");
+  if (!bg || bg.dataset.rendered) return;
+  bg.innerHTML = buildCompassBgSVG();
+  bg.dataset.rendered = "true";
+  // フェードイン
+  requestAnimationFrame(() => bg.classList.add("loaded"));
 }
 
 /* ══════════════════════════════════════════════════════════
