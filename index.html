@@ -3047,6 +3047,15 @@ function buildCompassBgSVG() {
     }).join("");
   }
 
+  // 日本語テキストリング（宿名・相性ラベル等）
+  function labelRing(items, r, fontSize, fillColor) {
+    return items.map((label, i) => {
+      const deg = (i / items.length) * 360 + (180 / items.length);
+      const p = pt(r, deg);
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fillColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+    }).join("");
+  }
+
 
   // 12宮記号
   const palaceSyms   = PALACE_DATA.map(p => p.sym);
