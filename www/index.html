@@ -1362,12 +1362,12 @@ html, body {
 @keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
 /* 中リング：ゆっくり反時計回り */
 @keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
-/* 固定層：アニメーションなし（宿・12宮・惑星・エレメント） */
+/* 固定層：アニメーションなし */
 #compass-fixed { /* static */ }
-/* 回転A：運気ラベル（ゆっくり時計回り 90秒/周） */
-#compass-ring-compat { animation: compassSlowCW  90s linear infinite; transform-origin: 220px 220px; }
-/* 回転B：日付リング（さらにゆっくり反時計回り 150秒/周） */
-#compass-ring-date   { animation: compassSlowCCW 150s linear infinite; transform-origin: 220px 220px; }
+/* 回転A：運気ラベル（反時計回り 90秒/周） */
+#compass-ring-compat { animation: compassSlowCCW 90s linear infinite; transform-origin: 220px 220px; }
+/* 日付リングは使用しない */
+#compass-ring-date { display: none; }
 /* heroコンテンツはz-index:1で前面に */
 .hero-eyebrow, .hero-title, .hero-sub { position: relative; z-index: 1; }
 
@@ -3117,16 +3117,10 @@ function buildCompassBgSVG() {
     ${labelRing(shukuNames, (R3+R4)/2, 10, `${gold}.65)`)}
   </g>
 
-  <!-- ══ 回転A：運気ラベル（栄・命・親…）ゆっくり時計回り ══ -->
+  <!-- ══ 回転A：運気ラベル（栄・命・親…）反時計回り ══ -->
   <g id="compass-ring-compat">
     ${circle(R5, `${gold}.2)`, 0.5)}
     ${labelRing(compatLabels, (R4+R5)/2, 11, `${gold}.45)`)}
-  </g>
-
-  <!-- ══ 回転B：日付リング　さらにゆっくり反時計回り ══ -->
-  <g id="compass-ring-date">
-    ${circle(R0 + 16, `${gold}.12)`, 0.4)}
-    ${dateLabels}
   </g>
 
   <!-- 中心（固定） -->
