@@ -1362,9 +1362,12 @@ html, body {
 @keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
 /* 中リング：ゆっくり反時計回り */
 @keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
-#compass-ring-outer { animation: compassSlowCW  120s linear infinite; transform-origin: 220px 220px; }
-#compass-ring-mid   { animation: compassSlowCCW  80s linear infinite; transform-origin: 220px 220px; }
-#compass-ring-inner { animation: compassSlowCW   55s linear infinite; transform-origin: 220px 220px; }
+/* 固定層：アニメーションなし（宿・12宮・惑星・エレメント） */
+#compass-fixed { /* static */ }
+/* 回転A：運気ラベル（ゆっくり時計回り 90秒/周） */
+#compass-ring-compat { animation: compassSlowCW  90s linear infinite; transform-origin: 220px 220px; }
+/* 回転B：日付リング（さらにゆっくり反時計回り 150秒/周） */
+#compass-ring-date   { animation: compassSlowCCW 150s linear infinite; transform-origin: 220px 220px; }
 /* heroコンテンツはz-index:1で前面に */
 .hero-eyebrow, .hero-title, .hero-sub { position: relative; z-index: 1; }
 
@@ -2998,109 +3001,70 @@ function buildCompassBgSVG() {
     const p1 = pt(r1, deg), p2 = pt(r2, deg);
     return `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${stroke}" stroke-width="${sw}"/>`;
   }
-  // ── 12宮・惑星のSVGアイコン（パス手描き・フォント依存なし）──
-  // 各シンボルは 0,0 中心・半径約8の正規化座標で定義
-  // stroke="currentColor" fill="none" で呼び出し元が色を制御
+  // ── 12宮・惑星SVGアイコン（パス手描き・フォント完全不使用）──
+  const S = "#c9a961";
   const PALACE_ICONS = {
-    "♈": `<path d="M0,-7 Q-6,0 0,4 Q6,0 0,-7z M0,4 L0,8" stroke-width="1.2" fill="none"/>`,  // 牡羊：角
-    "♉": `<path d="M-6,-2 Q-6,7 0,7 Q6,7 6,-2 M-8,-4 Q0,2 8,-4" stroke-width="1.2" fill="none"/>`,  // 牡牛：角＋U
-    "♊": `<line x1="-5" y1="-7" x2="-5" y2="7"/><line x1="5" y1="-7" x2="5" y2="7"/><line x1="-7" y1="-4" x2="7" y2="-4"/><line x1="-7" y1="4" x2="7" y2="4"/>`,  // 双子：II
-    "♋": `<path d="M-7,0 Q-7,-6 0,-6 Q7,-6 7,0" stroke-width="1.2" fill="none"/><path d="M7,0 Q7,6 0,6 Q-7,6 -7,0" stroke-width="1.2" fill="none"/><circle cx="-8" cy="0" r="1.5" fill="currentColor"/><circle cx="8" cy="0" r="1.5" fill="currentColor"/>`,  // 蟹：69
-    "♌": `<path d="M-7,-4 Q-7,4 0,4 Q7,4 7,-2 Q7,-8 2,-8 Q-2,-8 -2,-4" stroke-width="1.2" fill="none"/><circle cx="7" cy="6" r="1.8" fill="none" stroke-width="1.2"/>`,  // 獅子
-    "♍": `<line x1="-7" y1="-7" x2="-7" y2="7"/><line x1="0" y1="-7" x2="0" y2="3"/><line x1="7" y1="-7" x2="7" y2="7"/><path d="M-7,3 Q-3.5,7 0,3" stroke-width="1.2" fill="none"/><path d="M0,3 Q3.5,7 7,3" stroke-width="1.2" fill="none"/>`,  // 乙女：m
-    "♎": `<line x1="-8" y1="5" x2="8" y2="5"/><path d="M-6,-4 Q0,-10 6,-4" stroke-width="1.2" fill="none"/><line x1="-8" y1="1" x2="8" y2="1"/>`,  // 天秤：Ω型
-    "♏": `<line x1="-7" y1="-7" x2="-7" y2="5"/><line x1="0" y1="-7" x2="0" y2="5"/><line x1="7" y1="-7" x2="7" y2="2"/><path d="M-7,5 Q-3.5,9 0,5" stroke-width="1.2" fill="none"/><path d="M0,5 Q3.5,9 7,5" stroke-width="1.2" fill="none"/><path d="M5,-1 L9,2 L5,5" stroke-width="1.2" fill="none"/>`,  // 蠍：矢
-    "♐": `<line x1="-7" y1="7" x2="7" y2="-7"/><line x1="7" y1="-7" x2="2" y2="-7"/><line x1="7" y1="-7" x2="7" y2="-2"/>`,  // 射手：矢印
-    "♑": `<path d="M-7,-6 Q-7,0 -3,2 Q0,4 0,8" stroke-width="1.2" fill="none"/><path d="M-3,2 Q3,-2 7,-6" stroke-width="1.2" fill="none"/><path d="M7,-6 Q9,0 6,4 Q3,8 0,8" stroke-width="1.2" fill="none"/>`,  // 山羊
-    "♒": `<path d="M-8,-3 Q-4,-8 0,-3 Q4,2 8,-3" stroke-width="1.3" fill="none"/><path d="M-8,3 Q-4,-2 0,3 Q4,8 8,3" stroke-width="1.3" fill="none"/>`,  // 水瓶：波
-    "♓": `<line x1="0" y1="-8" x2="0" y2="8"/><path d="M-7,-4 Q0,-8 7,-4" stroke-width="1.2" fill="none"/><path d="M-7,4 Q0,8 7,4" stroke-width="1.2" fill="none"/>`,  // 魚：II＋弧
+    "♈": `<path d="M0,-7 Q-6,-1 0,4 Q6,-1 0,-7" stroke="${S}" stroke-width="1.3" fill="none"/><line x1="0" y1="4" x2="0" y2="8" stroke="${S}" stroke-width="1.3"/>`,
+    "♉": `<path d="M-6,1 Q-6,7 0,7 Q6,7 6,1" stroke="${S}" stroke-width="1.3" fill="none"/><path d="M-7,-4 Q0,1 7,-4" stroke="${S}" stroke-width="1.3" fill="none"/>`,
+    "♊": `<line x1="-4" y1="-7" x2="-4" y2="7" stroke="${S}" stroke-width="1.3"/><line x1="4" y1="-7" x2="4" y2="7" stroke="${S}" stroke-width="1.3"/><line x1="-7" y1="-5" x2="7" y2="-5" stroke="${S}" stroke-width="1.3"/><line x1="-7" y1="5" x2="7" y2="5" stroke="${S}" stroke-width="1.3"/>`,
+    "♋": `<path d="M-7,0 Q-7,-6 0,-5 Q7,-6 7,0" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M7,0 Q7,6 0,5 Q-7,6 -7,0" stroke="${S}" stroke-width="1.2" fill="none"/><circle cx="-8" cy="0" r="1.5" fill="${S}"/><circle cx="8" cy="0" r="1.5" fill="${S}"/>`,
+    "♌": `<path d="M-6,-3 Q-6,4 0,4 Q6,4 6,-1 Q6,-7 1,-7 Q-2,-7 -2,-3" stroke="${S}" stroke-width="1.2" fill="none"/><circle cx="6" cy="6" r="2" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "♍": `<line x1="-6" y1="-7" x2="-6" y2="4" stroke="${S}" stroke-width="1.2"/><line x1="0" y1="-7" x2="0" y2="4" stroke="${S}" stroke-width="1.2"/><line x1="6" y1="-7" x2="6" y2="7" stroke="${S}" stroke-width="1.2"/><path d="M-6,4 Q-3,8 0,4" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M0,4 Q3,8 6,4" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "♎": `<line x1="-7" y1="6" x2="7" y2="6" stroke="${S}" stroke-width="1.3"/><path d="M-5,-2 Q0,-9 5,-2" stroke="${S}" stroke-width="1.3" fill="none"/><line x1="-7" y1="2" x2="7" y2="2" stroke="${S}" stroke-width="1.3"/>`,
+    "♏": `<line x1="-6" y1="-7" x2="-6" y2="4" stroke="${S}" stroke-width="1.2"/><line x1="0" y1="-7" x2="0" y2="4" stroke="${S}" stroke-width="1.2"/><line x1="6" y1="-7" x2="6" y2="1" stroke="${S}" stroke-width="1.2"/><path d="M-6,4 Q-3,8 0,4" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M0,4 Q3,8 6,4" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M4,-2 L8,1 L4,4" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "♐": `<line x1="-6" y1="6" x2="6" y2="-6" stroke="${S}" stroke-width="1.5"/><line x1="6" y1="-6" x2="1" y2="-6" stroke="${S}" stroke-width="1.5"/><line x1="6" y1="-6" x2="6" y2="-1" stroke="${S}" stroke-width="1.5"/>`,
+    "♑": `<path d="M-7,-6 Q-7,0 -3,2 Q0,4 0,7" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M-3,2 Q2,-2 6,-6" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M6,-6 Q9,0 6,4 Q3,7 0,7" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "♒": `<path d="M-7,-2 Q-3.5,-7 0,-2 Q3.5,3 7,-2" stroke="${S}" stroke-width="1.4" fill="none"/><path d="M-7,4 Q-3.5,-1 0,4 Q3.5,9 7,4" stroke="${S}" stroke-width="1.4" fill="none"/>`,
+    "♓": `<line x1="0" y1="-8" x2="0" y2="8" stroke="${S}" stroke-width="1.2"/><path d="M-6,-4 Q0,-8 6,-4" stroke="${S}" stroke-width="1.2" fill="none"/><path d="M-6,4 Q0,8 6,4" stroke="${S}" stroke-width="1.2" fill="none"/>`,
   };
   const PLANET_ICONS = {
-    "♂":  `<circle cx="0" cy="-3" r="5" fill="none" stroke-width="1.2"/><line x1="4" y1="-7" x2="8" y2="-8"/><line x1="8" y1="-8" x2="8" y2="-4"/><line x1="8" y1="-8" x2="4" y2="-4"/>`,  // 火星：円＋矢
-    "♀":  `<circle cx="0" cy="-3" r="5" fill="none" stroke-width="1.2"/><line x1="0" y1="2" x2="0" y2="8"/><line x1="-4" y1="5" x2="4" y2="5"/>`,  // 金星：円＋十字
-    "☿":  `<circle cx="0" cy="0" r="4" fill="none" stroke-width="1.2"/><line x1="0" y1="4" x2="0" y2="8"/><line x1="-3" y1="6" x2="3" y2="6"/><path d="M-4,-4 Q0,-9 4,-4" stroke-width="1.2" fill="none"/>`,  // 水星：円＋十字＋角
-    "☽":  `<path d="M3,-7 Q-6,-4 -6,0 Q-6,4 3,7 Q-2,4 -2,0 Q-2,-4 3,-7z" fill="none" stroke-width="1.2"/>`,  // 月：三日月
-    "☀":  `<circle cx="0" cy="0" r="4" fill="none" stroke-width="1.2"/><circle cx="0" cy="0" r="1.5" fill="currentColor"/>`,  // 太陽：二重円（光線は省略）
-    "♃":  `<line x1="-4" y1="-7" x2="-4" y2="7"/><path d="M-4,-2 Q2,-7 6,-2" stroke-width="1.2" fill="none"/><line x1="-7" y1="2" x2="7" y2="2"/>`,  // 木星：4
-    "♄":  `<line x1="0" y1="-8" x2="0" y2="7"/><line x1="-4" y1="7" x2="4" y2="7"/><path d="M0,-3 Q-6,-3 -6,2 Q-6,6 0,6" stroke-width="1.2" fill="none"/>`,  // 土星：h
-    "⛢":  `<circle cx="0" cy="0" r="6" fill="none" stroke-width="1.2"/><line x1="0" y1="-8" x2="0" y2="-6"/><line x1="0" y1="6" x2="0" y2="8"/><line x1="-8" y1="0" x2="-6" y2="0"/><line x1="6" y1="0" x2="8" y2="0"/><circle cx="0" cy="0" r="2" fill="currentColor"/>`,  // 天王星
-    "♆":  `<line x1="0" y1="-8" x2="0" y2="8"/><path d="M-6,-2 Q0,-8 6,-2" stroke-width="1.2" fill="none"/><line x1="-5" y1="4" x2="5" y2="4"/>`,  // 海王星：トライデント
-    "PL": `<circle cx="-2" cy="2" r="4" fill="none" stroke-width="1.2"/><line x1="-2" y1="-2" x2="-2" y2="-8"/><line x1="-5" y1="-5" x2="1" y2="-5"/><line x1="3" y1="-2" x2="7" y2="-8"/>`,  // 冥王星：PL合体
+    "♂":  `<circle cx="0" cy="-2" r="5" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="3" y1="-6" x2="7" y2="-7" stroke="${S}" stroke-width="1.2"/><line x1="7" y1="-7" x2="7" y2="-3" stroke="${S}" stroke-width="1.2"/><line x1="7" y1="-7" x2="3" y2="-3" stroke="${S}" stroke-width="1.2"/>`,
+    "♀":  `<circle cx="0" cy="-2" r="5" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="0" y1="3" x2="0" y2="8" stroke="${S}" stroke-width="1.2"/><line x1="-3" y1="6" x2="3" y2="6" stroke="${S}" stroke-width="1.2"/>`,
+    "☿":  `<circle cx="0" cy="1" r="4" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="0" y1="5" x2="0" y2="8" stroke="${S}" stroke-width="1.2"/><line x1="-3" y1="7" x2="3" y2="7" stroke="${S}" stroke-width="1.2"/><path d="M-4,-3 Q0,-8 4,-3" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "☽":  `<path d="M3,-7 Q-6,-4 -6,0 Q-6,4 3,7 Q-1,4 -1,0 Q-1,-4 3,-7" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "☀":  `<circle cx="0" cy="0" r="5" stroke="${S}" stroke-width="1.2" fill="none"/><circle cx="0" cy="0" r="1.8" fill="${S}"/>`,
+    "♃":  `<line x1="-4" y1="-7" x2="-4" y2="7" stroke="${S}" stroke-width="1.2"/><path d="M-4,-1 Q1,-7 5,-1" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="-7" y1="3" x2="7" y2="3" stroke="${S}" stroke-width="1.2"/>`,
+    "♄":  `<line x1="1" y1="-8" x2="1" y2="7" stroke="${S}" stroke-width="1.2"/><line x1="-3" y1="7" x2="5" y2="7" stroke="${S}" stroke-width="1.2"/><path d="M1,-2 Q-5,-2 -5,2 Q-5,6 1,6" stroke="${S}" stroke-width="1.2" fill="none"/>`,
+    "⛢":  `<circle cx="0" cy="0" r="5" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="0" y1="-8" x2="0" y2="-5" stroke="${S}" stroke-width="1.2"/><line x1="0" y1="5" x2="0" y2="8" stroke="${S}" stroke-width="1.2"/><line x1="-8" y1="0" x2="-5" y2="0" stroke="${S}" stroke-width="1.2"/><line x1="5" y1="0" x2="8" y2="0" stroke="${S}" stroke-width="1.2"/><circle cx="0" cy="0" r="2" fill="${S}"/>`,
+    "♆":  `<line x1="0" y1="-8" x2="0" y2="8" stroke="${S}" stroke-width="1.2"/><path d="M-6,0 Q0,-7 6,0" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="-5" y1="5" x2="5" y2="5" stroke="${S}" stroke-width="1.2"/>`,
+    "PL": `<circle cx="-1" cy="3" r="4" stroke="${S}" stroke-width="1.2" fill="none"/><line x1="-1" y1="-1" x2="-1" y2="-7" stroke="${S}" stroke-width="1.2"/><line x1="-4" y1="-4" x2="2" y2="-4" stroke="${S}" stroke-width="1.2"/><line x1="4" y1="-1" x2="7" y2="-7" stroke="${S}" stroke-width="1.2"/>`,
   };
 
-  // 記号＋名前を横並び1行で描画（SVGパスアイコン使用）
-  function dualRing(syms, names, r, fontSize, symColor, labelColor, iconMap) {
-    const iconSize = fontSize * 0.9;
+  // アイコン＋名前を横並び1行で描画
+  function dualRing(syms, names, r, fontSize, _symColor, labelColor, iconMap) {
+    const sc      = fontSize / 16;
+    const iconOff = -(fontSize * 0.7);
+    const nameOff = fontSize * 0.85;
+    const nameSize = (fontSize * 0.75).toFixed(1);
     return syms.map((sym, i) => {
       const deg = (i / syms.length) * 360 + (180 / syms.length);
-      const p = pt(r, deg);
-      const rot = deg;
+      const p   = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
-      const iconW = iconSize;
-      const nameX = iconPath ? iconW * 0.7 : 0;
-      const iconX = iconPath ? -iconW * 0.4 : -999;
-
-      const iconSvg = iconPath
-        ? `<g transform="translate(${iconX.toFixed(1)},0) scale(${(iconSize/16).toFixed(3)})" stroke="${symColor}" fill="${symColor}" color="${symColor}">${iconPath}</g>`
-        : `<text x="${iconX.toFixed(1)}" y="0" font-size="${fontSize}" fill="${symColor}" font-family="serif" text-anchor="middle" dominant-baseline="middle">${sym}</text>`;
-
-      return `<g transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)}) translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
-        iconSvg +
-        `<text x="${nameX.toFixed(1)}" y="0" font-size="${(fontSize * 0.72).toFixed(1)}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
-        `</g>`;
-    }).join("");
-  }
-  // 日本語名専用
-  function labelRing(items, r, fontSize, fillColor) {
-    return items.map((label, i) => {
-      const deg = (i / items.length) * 360 + (180 / items.length);
-      const p = pt(r, deg);
-      const rot = deg;
-      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fillColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
-    }).join("");
-  }
-  // 記号＋名前を横並び1行で描画
-  function dualRing(syms, names, r, fontSize, symColor, labelColor) {
-    return syms.map((sym, i) => {
-      const deg = (i / syms.length) * 360 + (180 / syms.length);
-      const p = pt(r, deg);
-      const rot = deg;
-      const gap = fontSize * 0.6;
-      // 記号と名前を同じ座標系でrotateしたグループ内に横並び配置
-      return `<g transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">` +
-        `<text x="${(p.x - gap).toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${symColor}" font-family="serif" text-anchor="middle" dominant-baseline="middle">${sym}</text>` +
-        `<text x="${(p.x + gap).toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize * 0.7}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
+        (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
+        `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
         `</g>`;
     }).join("");
   }
 
-  // 互換用（既存呼び出しが残っていた場合のフォールバック）
-  function textRing(items, r, fontSize, fillColor) {
-    return labelRing(items, r, fontSize, fillColor);
-  }
 
   // 12宮記号
   const palaceSyms   = PALACE_DATA.map(p => p.sym);
-  const palaceNames  = PALACE_DATA.map(p => p.name.replace("宮",""));
+  const palaceNames  = PALACE_DATA.map(p => p.name);  // 「羊宮」のままフル表示
   const planetSyms   = PALACE_DATA.map(p => p.planetSym);
   // 27宿名（短縮）
   const shukuNames   = SHUKU.map(s => s.kanji.replace("宿",""));
-  // 相性ラベル
+  // 相性ラベル（運気：栄・命・親…）
   const compatLabels = COMPAT_TABLE.map(r => r.key);
 
-  // 12宮 仕切り線
-  let spokes12 = "", spokes27 = "";
-  for (let i = 0; i < Np; i++) {
-    const deg = i * (360 / Np);
-    spokes12 += spoke(R1, R2, deg, `${gold}.25)`, 0.6);
-    spoke(R2, R3, deg, `${gold}.15)`, 0.4);
-  }
+  // 27宿 仕切り線（宿帯R3〜R4の範囲）
+  let spokes27 = "";
   for (let i = 0; i < N; i++) {
     const deg = i * (360 / N);
-    spokes27 += spoke(R3, R5, deg, `${gold}.18)`, 0.5);
+    spokes27 += spoke(R3, R4, deg, `${gold}.18)`, 0.5);
   }
 
-  // 12宮帯の細い区切り小刻み（装飾）
+  // 12宮帯の細い区切り目盛り（装飾）
   let ticks = "";
   for (let i = 0; i < 120; i++) {
     const deg = i * 3;
@@ -3108,53 +3072,69 @@ function buildCompassBgSVG() {
     ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
   }
 
+  // 日付リング（今日を基準に27日分・最外周の外側に薄く）
+  let dateLabels = "";
+  const today = new Date();
+  let todayIdx = 0;
+  try { todayIdx = calcShukuIndex(today.getFullYear(), today.getMonth()+1, today.getDate()); } catch(e){}
+  for (let i = 0; i < N; i++) {
+    const shukuI = (todayIdx + i) % N;
+    const deg = i * (360 / N) + (180 / N);
+    const p = pt(R0 + 10, deg);
+    const rot = deg;
+    const isToday = (i === 0);
+    const label = isToday ? "今日" : `+${i}`;
+    dateLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${isToday ? 9 : 7}" fill="${gold}${isToday ? ".5)" : ".25)"}" font-family="'Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+  }
+
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
-  <!-- 外縁目盛りリング（回転：時計回り） -->
-  <g id="compass-ring-outer">
+
+  <!-- ══ 固定層：エレメント帯 / 12宮 / 惑星 / 27宿 ══ -->
+  <g id="compass-fixed">
+    <!-- 最外縁リング・目盛り -->
     ${circle(R0,      `${gold}.4)`,  1)}
-    ${circle(R0 - 24, `${gold}.2)`,  0.5)}
+    ${circle(R0 - 24, `${gold}.15)`, 0.4)}
     ${ticks}
-    ${dualRing(
-      palaceSyms, palaceNames,
-      (R0 + R1)/2,
-      13,
-      `${gold}.9)`, `${gold}.65)`,
-      PALACE_ICONS
-    )}
-  </g>
 
-  <!-- 惑星帯（回転：反時計回り） -->
-  <g id="compass-ring-mid">
-    ${circle(R2, `${gold}.3)`, 0.8)}
-    ${circle(R3, `${gold}.25)`, 0.6)}
-    ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
-    ${dualRing(
-      planetSyms, PALACE_DATA.map(p => p.planet),
-      (R2 + R3)/2,
-      11,
-      `${gold}.85)`, `${gold}.6)`,
-      PLANET_ICONS
-    )}
-  </g>
+    <!-- 12宮帯（記号＋宮名） -->
+    ${circle(R1, `${gold}.25)`, 0.6)}
+    ${circle(R2, `${gold}.2)`,  0.5)}
+    ${Array.from({length:Np}, (_,i) => spoke(R1, R2, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
+    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 12, `${gold}.9)`, `${gold}.7)`, PALACE_ICONS)}
 
-  <!-- 宿リング（回転：時計回り） -->
-  <g id="compass-ring-inner">
-    ${circle(R1, `${gold}.2)`,  0.5)}
-    ${circle(R4, `${gold}.3)`,  0.8)}
-    ${circle(R5, `${gold}.2)`,  0.5)}
+    <!-- 惑星帯（記号＋惑星名） -->
+    ${circle(R3, `${gold}.2)`, 0.5)}
+    ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.15)`, 0.4)).join("")}
+    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 10, `${gold}.85)`, `${gold}.6)`, PLANET_ICONS)}
+
+    <!-- 27宿帯 -->
+    ${circle(R4, `${gold}.3)`, 0.8)}
     ${spokes27}
-    ${labelRing(shukuNames,   (R3 + R4)/2, 10,   `${gold}.6)`)}
-    ${labelRing(compatLabels, (R4 + R5)/2, 11,   `${gold}.4)`)}
+    ${labelRing(shukuNames, (R3+R4)/2, 10, `${gold}.65)`)}
+  </g>
+
+  <!-- ══ 回転A：運気ラベル（栄・命・親…）ゆっくり時計回り ══ -->
+  <g id="compass-ring-compat">
+    ${circle(R5, `${gold}.2)`, 0.5)}
+    ${labelRing(compatLabels, (R4+R5)/2, 11, `${gold}.45)`)}
+  </g>
+
+  <!-- ══ 回転B：日付リング　さらにゆっくり反時計回り ══ -->
+  <g id="compass-ring-date">
+    ${circle(R0 + 16, `${gold}.12)`, 0.4)}
+    ${dateLabels}
   </g>
 
   <!-- 中心（固定） -->
-  ${circle(R6, `${gold}.5)`, 1.2)}
-  ${circle(R6 - 14, `${gold}.2)`, 0.5)}
-  <polygon points="${cx},${cy-R6+6} ${cx-5},${cy} ${cx},${cy+R6-6} ${cx+5},${cy}"
+  ${circle(R5, `${gold}.25)`, 0.6)}
+  ${circle(R6, `${gold}.5)`,  1.2)}
+  ${circle(R6 - 12, `${gold}.2)`, 0.5)}
+  <polygon points="${cx},${cy-R6+5} ${cx-4},${cy} ${cx},${cy+R6-5} ${cx+4},${cy}"
     fill="none" stroke="${goldSolid}" stroke-width="0.8" opacity="0.5"/>
   <circle cx="${cx}" cy="${cy}" r="4" fill="${goldSolid}" opacity="0.6"/>
 </svg>`;
+
 }
 
 function renderPalaceWheel() {
