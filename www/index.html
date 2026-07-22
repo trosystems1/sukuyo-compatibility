@@ -1362,10 +1362,10 @@ html, body {
 @keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
 /* 中リング：ゆっくり反時計回り */
 @keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
-/* 固定層：アニメーションなし */
-#compass-fixed { /* static */ }
-/* 回転A：運気ラベル（反時計回り 90秒/周） */
-#compass-ring-compat { animation: compassSlowCCW 90s linear infinite; transform-origin: 220px 220px; }
+/* 固定層：ゆっくり反時計回り */
+#compass-fixed { animation: compassSlowCCW 120s linear infinite; transform-origin: 220px 220px; }
+/* 運気ラベル：固定層と逆方向（時計回り） */
+#compass-ring-compat { animation: compassSlowCW 90s linear infinite; transform-origin: 220px 220px; }
 /* 日付リングは使用しない */
 #compass-ring-date { display: none; }
 /* heroコンテンツはz-index:1で前面に */
