@@ -4332,10 +4332,19 @@ function renderAstroQualityGrid() {
 }
 
 function showAstrologyPage() {
+  // 他の全ページを先に閉じる
+  document.getElementById("compat-app").classList.add("hide");
+  document.getElementById("mypage-page").classList.remove("show");
+  document.getElementById("moon-rune-page").classList.remove("show");
+  document.getElementById("sukuyo-about-page").classList.remove("show");
+  document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("astrology-page")?.classList.remove("show");
+  document.getElementById("nav-astrology")?.classList.remove("active");
+  ["nav-mypage","nav-moon-rune","nav-sukuyo-about","nav-senseiban","nav-astrology"].forEach(id => {
+    document.getElementById(id)?.classList.remove("active");
+  });
+  // 描画してから表示
   renderAstrologyPage();
-  ["compat-app"].forEach(id => document.getElementById(id)?.classList.add("hide"));
-  ["mypage-page","moon-rune-page","sukuyo-about-page","senseiban-page","astrology-page"].forEach(id => document.getElementById(id)?.classList.remove("show"));
-  ["nav-mypage","nav-moon-rune","nav-sukuyo-about","nav-senseiban","nav-astrology"].forEach(id => document.getElementById(id)?.classList.remove("active"));
   document.getElementById("astrology-page").classList.add("show");
   document.getElementById("nav-astrology").classList.add("active");
   window.scrollTo({ top:0, behavior:"smooth" });
@@ -4566,6 +4575,8 @@ function showSenseibanPage() {
 
 function hideSenseibanPage() {
   document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("astrology-page")?.classList.remove("show");
+  document.getElementById("nav-astrology")?.classList.remove("active");
   document.getElementById("compat-app").classList.remove("hide");
   document.getElementById("nav-senseiban").classList.remove("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -4586,10 +4597,12 @@ function goHome() {
   document.getElementById("moon-rune-page").classList.remove("show");
   document.getElementById("sukuyo-about-page").classList.remove("show");
   document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("astrology-page")?.classList.remove("show");
   document.getElementById("compat-app").classList.remove("hide");
   document.getElementById("nav-moon-rune").classList.remove("active");
   document.getElementById("nav-sukuyo-about").classList.remove("active");
   document.getElementById("nav-senseiban").classList.remove("active");
+  document.getElementById("nav-astrology")?.classList.remove("active");
 
   // 結果表示・フォームを初期状態（自分を占うモード）に戻す
   document.getElementById("result").classList.remove("show");
@@ -4693,6 +4706,8 @@ function showMypage() {
   document.getElementById("moon-rune-page").classList.remove("show");
   document.getElementById("sukuyo-about-page").classList.remove("show");
   document.getElementById("senseiban-page").classList.remove("show");
+  document.getElementById("astrology-page")?.classList.remove("show");
+  document.getElementById("nav-astrology")?.classList.remove("active");
   document.getElementById("nav-moon-rune").classList.remove("active");
   document.getElementById("nav-sukuyo-about").classList.remove("active");
   document.getElementById("nav-senseiban").classList.remove("active");
