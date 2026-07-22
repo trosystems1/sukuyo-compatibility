@@ -3364,14 +3364,15 @@ function daysInMonth(year, month) {
 
 // 12宮オラクル盤をページ起動時に描画（lunar-javascript ロード後に実行）
 (function initPalaceWheelOnLoad() {
-  function tryRender() {
-    if (typeof Solar !== "undefined" && typeof calcShukuIndex === "function") {
-      try { renderPalaceWheel(); } catch(e) { console.warn("palace wheel init:", e); }
-    } else {
-      setTimeout(tryRender, 200);
-    }
+  function doRender() {
+    try { renderPalaceWheel(); } catch(e) { console.warn("palace wheel:", e); }
   }
-  tryRender();
+  // DOMContentLoadedが既に済んでいる場合はrequestAnimationFrame、そうでなければ待つ
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => requestAnimationFrame(doRender));
+  } else {
+    requestAnimationFrame(doRender);
+  }
 })();
 
 // 指定prefix（self/a/b）の年月日プルダウンから "YYYY-MM-DD" 文字列を取得
