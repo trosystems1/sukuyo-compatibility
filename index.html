@@ -1432,6 +1432,30 @@ html, body {
   </p>
 </div>
 
+<!-- 12宮オラクル盤（トップページ hero 直下） -->
+<div id="top-palace-section" style="background:linear-gradient(180deg,var(--deep) 0%,var(--bg) 100%);padding:0 16px 40px;">
+  <div style="max-width:500px;margin:0 auto;text-align:center;">
+    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.35em;color:var(--gold-l);padding-top:32px;margin-bottom:6px;">ORACLE WHEEL · 12 PALACES</div>
+    <div style="font-size:12px;color:rgba(232,224,245,.55);margin-bottom:16px;" id="top-palace-desc">宿をタップで守護惑星・キーフレーズを表示</div>
+    <div id="palace-wheel-holder" style="width:100%;max-width:440px;margin:0 auto;touch-action:none;cursor:grab;"></div>
+    <!-- タップした宿の情報パネル -->
+    <div id="palace-info-panel" style="display:none;margin-top:14px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r);background:rgba(28,20,56,.85);text-align:left;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+        <div id="palace-info-shuku" style="font-family:'Shippori Mincho',serif;font-size:26px;color:var(--gold-l);"></div>
+        <div>
+          <div id="palace-info-palace" style="font-size:13px;color:var(--moon);font-weight:600;"></div>
+          <div id="palace-info-planet" style="font-size:12px;color:rgba(232,224,245,.65);"></div>
+        </div>
+        <div id="palace-info-keyphrase" style="margin-left:auto;font-size:12px;color:var(--gold-l);font-style:italic;letter-spacing:.05em;"></div>
+      </div>
+      <div id="palace-info-keywords" style="font-size:12px;color:rgba(232,224,245,.7);line-height:1.9;"></div>
+      <div id="palace-info-element" style="margin-top:5px;font-size:11px;color:rgba(232,224,245,.4);"></div>
+    </div>
+    <p id="palace-honmei-note" style="display:none;font-size:11px;color:var(--gold-l);margin-top:10px;"></p>
+    <p style="font-size:11px;color:rgba(232,224,245,.3);margin-top:8px;">宿をタップ→詳細 ／ 外リングをドラッグ→日付移動</p>
+  </div>
+</div>
+
 <!-- Main -->
 <main class="main-wrap">
 
@@ -1739,37 +1763,6 @@ html, body {
       </div>
     </div>
 
-
-    <!-- 12宮盤（インタラクティブ） -->
-    <div class="card moon-rune-intro-card" id="mypage-palace-card" style="margin-top:20px;">
-      <div class="card-title">🔮 12宮オラクル盤</div>
-      <div id="mypage-palace-empty" class="mypage-empty">
-        「わたし」の生年月日を登録すると、あなたの本命宿を基準にした12宮盤が表示されます。
-      </div>
-      <div id="mypage-palace-content" style="display:none;">
-        <p class="moon-rune-intro-text" style="margin-bottom:12px;">
-          内側の<strong>相性リング</strong>はあなたの本命宿（<span id="palace-honmei-label">—</span>）を基準に自動セット。
-          外側の<strong>日付リング</strong>は今日の宿を上に合わせています。
-        </p>
-        <div id="palace-wheel-holder" style="width:100%;max-width:440px;margin:0 auto;touch-action:none;cursor:grab;"></div>
-        <!-- タップした宿の情報パネル -->
-        <div id="palace-info-panel" style="display:none;margin-top:16px;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r);background:linear-gradient(135deg,var(--deep) 0%,var(--deep2) 100%);">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <div id="palace-info-shuku" style="font-family:'Shippori Mincho',serif;font-size:28px;color:var(--gold-l);"></div>
-            <div>
-              <div id="palace-info-palace" style="font-size:13px;color:var(--moon);font-weight:600;"></div>
-              <div id="palace-info-planet" style="font-size:12px;color:rgba(232,224,245,.7);"></div>
-            </div>
-            <div id="palace-info-keyphrase" style="margin-left:auto;font-size:12px;color:var(--gold-l);font-style:italic;letter-spacing:.05em;"></div>
-          </div>
-          <div id="palace-info-keywords" style="font-size:12px;color:rgba(232,224,245,.75);line-height:1.8;"></div>
-          <div id="palace-info-element" style="margin-top:6px;font-size:11px;color:rgba(232,224,245,.5);"></div>
-        </div>
-        <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;">
-          外リング（日付）をドラッグして回転 ／ 宿をタップで詳細表示
-        </p>
-      </div>
-    </div>
 
     <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
     <p class="book-lead">
@@ -2951,22 +2944,13 @@ function initPalaceWheelDrag(honmeiIdx, todayIdx) {
 }
 
 function renderPalaceWheel() {
-  const content = document.getElementById("mypage-palace-content");
-  const empty   = document.getElementById("mypage-palace-empty");
-  const holder  = document.getElementById("palace-wheel-holder");
-  if (!content || !holder) return;
+  const holder = document.getElementById("palace-wheel-holder");
+  if (!holder) return;
 
-  // わたしの本命宿を取得
-  const people = JSON.parse(localStorage.getItem("shukuyo_people") || "[]");
+  // わたしの本命宿を取得（未登録なら0=昴宿をデフォルト表示）
+  const people = JSON.parse(localStorage.getItem("sukuyo_people_v1") || "[]");
   const me = people.find(p => p.isMe);
-  if (!me || !me.shukuIdx && me.shukuIdx !== 0) {
-    if (empty)   empty.style.display = "block";
-    if (content) content.style.display = "none";
-    return;
-  }
-  const honmeiIdx = me.shukuIdx ?? 0;
-  empty.style.display   = "none";
-  content.style.display = "block";
+  const honmeiIdx = (me && (me.shukuIdx || me.shukuIdx === 0)) ? me.shukuIdx : -1;
 
   // 今日の宿を取得
   const today = new Date();
@@ -2975,22 +2959,33 @@ function renderPalaceWheel() {
     todayIdx = calcShukuIndex(today.getFullYear(), today.getMonth()+1, today.getDate());
   } catch(e) { todayIdx = 0; }
 
-  // ラベル更新
-  const label = document.getElementById("palace-honmei-label");
-  if (label) label.textContent = SHUKU[honmeiIdx]?.kanji || "—";
+  // 本命宿ノート更新
+  const note = document.getElementById("palace-honmei-note");
+  const desc = document.getElementById("top-palace-desc");
+  if (honmeiIdx >= 0) {
+    const shukuName = SHUKU[honmeiIdx]?.kanji || "";
+    if (note) { note.style.display = "block"; note.textContent = `あなたの命宿（${shukuName}）を基準に相性リングをセットしています`; }
+    if (desc) desc.textContent = `命宿：${shukuName} ／ 宿をタップで守護惑星・キーフレーズを表示`;
+  } else {
+    if (note) note.style.display = "none";
+    if (desc) desc.textContent = "宿をタップで守護惑星・キーフレーズを表示";
+  }
+
+  // 相性リングの基準：本命宿があればそれを12時に、なければ0
+  const compatBase = honmeiIdx >= 0 ? honmeiIdx : 0;
 
   // 既に描画済みなら回転だけ更新
   if (holder.dataset.rendered) {
-    palaceWheelCompatRot = -(honmeiIdx * (360/27));
-    palaceWheelDateRot   = -(todayIdx  * (360/27));
+    palaceWheelCompatRot = -(compatBase * (360/27));
+    palaceWheelDateRot   = -(todayIdx   * (360/27));
     document.getElementById("palace-compat-ring")?.setAttribute("transform", `rotate(${palaceWheelCompatRot.toFixed(2)} 220 220)`);
     document.getElementById("palace-date-ring")?.setAttribute("transform",   `rotate(${palaceWheelDateRot.toFixed(2)} 220 220)`);
     return;
   }
 
-  holder.innerHTML = buildPalaceWheelSVG(honmeiIdx, todayIdx);
+  holder.innerHTML = buildPalaceWheelSVG(compatBase, todayIdx);
   holder.dataset.rendered = "true";
-  initPalaceWheelDrag(honmeiIdx, todayIdx);
+  initPalaceWheelDrag(compatBase, todayIdx);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -3213,6 +3208,18 @@ function daysInMonth(year, month) {
     yearSel.addEventListener("change", rebuildDayOptions);
     monthSel.addEventListener("change", rebuildDayOptions);
   });
+})();
+
+// 12宮オラクル盤をページ起動時に描画（lunar-javascript ロード後に実行）
+(function initPalaceWheelOnLoad() {
+  function tryRender() {
+    if (typeof Solar !== "undefined" && typeof calcShukuIndex === "function") {
+      try { renderPalaceWheel(); } catch(e) { console.warn("palace wheel init:", e); }
+    } else {
+      setTimeout(tryRender, 200);
+    }
+  }
+  tryRender();
 })();
 
 // 指定prefix（self/a/b）の年月日プルダウンから "YYYY-MM-DD" 文字列を取得
@@ -4262,8 +4269,6 @@ function showMypage() {
   renderBook();
   document.getElementById("mypage-page").classList.add("show");
   document.getElementById("nav-mypage").classList.add("active");
-  // 12宮オラクル盤を描画（わたしの本命宿が登録されていれば自動表示）
-  try { renderPalaceWheel(); } catch(e) { console.warn("palace wheel:", e); }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -4607,6 +4612,12 @@ document.getElementById("btn-save-person").addEventListener("click", () => {
   list.push(person);
   savePeople(list);
   if (person.isMe || !bookViewpointId) bookViewpointId = person.id;
+  // わたし登録後に12宮盤を更新
+  if (person.isMe) {
+    const h = document.getElementById("palace-wheel-holder");
+    if (h) { delete h.dataset.rendered; }
+    try { renderPalaceWheel(); } catch(e) {}
+  }
 
   note.innerHTML =
     `「${escapeHtml(person.name)}」を保存しました。 <a id="save-goto-book">マイページで見る →</a>`;
