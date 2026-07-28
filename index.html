@@ -1254,33 +1254,65 @@ html, body {
 }
 
 /* ── 占星術解説ページ ────────────────────────────────────── */
+#astrology-page {
+  color: var(--ink);
+}
+#astrology-page .astro-page-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .35em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+#astrology-page .astro-page-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 26px;
+  color: var(--deep);
+  margin-bottom: 10px;
+}
+#astrology-page .astro-page-lead {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.8;
+  max-width: 560px;
+  margin: 0 auto;
+}
+#astrology-page .astro-section-label {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: .3em;
+  color: var(--gold);
+  text-align: center;
+  margin-bottom: 20px;
+}
 .astro-filter-btn {
   font-family: 'Noto Serif JP', serif;
   font-size: 13px;
   padding: 6px 16px;
   border-radius: 20px;
   border: 1px solid var(--border);
-  background: transparent;
-  color: var(--muted);
+  background: #fff;
+  color: var(--ink);
   cursor: pointer;
   transition: all .2s;
 }
 .astro-filter-btn.active,
 .astro-filter-btn:hover {
-  background: var(--gold-l);
-  color: var(--deep);
-  border-color: var(--gold-l);
+  background: var(--gold);
+  color: #fff;
+  border-color: var(--gold);
 }
 .astro-palace-card {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 16px;
-  background: var(--paper2);
+  background: #fff;
   cursor: pointer;
   transition: all .2s;
   margin-bottom: 10px;
+  box-shadow: 0 1px 3px rgba(18,12,36,.04);
 }
-.astro-palace-card:hover { border-color: var(--gold-l); background: rgba(201,169,97,.06); }
+.astro-palace-card:hover { border-color: var(--gold); background: #fffdf8; }
 .astro-palace-head {
   display: flex;
   align-items: center;
@@ -1296,7 +1328,7 @@ html, body {
 .astro-palace-name {
   font-family: 'Shippori Mincho', serif;
   font-size: 18px;
-  color: var(--moon);
+  color: var(--deep);
   font-weight: 600;
 }
 .astro-palace-meta {
@@ -1308,7 +1340,7 @@ html, body {
 .astro-palace-keyphrase {
   margin-left: auto;
   font-size: 12px;
-  color: var(--gold-l);
+  color: #8a7040;
   font-style: italic;
   letter-spacing: .06em;
 }
@@ -1327,20 +1359,28 @@ html, body {
   font-size: 13px;
   padding: 3px 10px;
   border-radius: 12px;
-  border: 1px solid var(--gold-l);
-  color: var(--gold-l);
-  background: rgba(201,169,97,.08);
+  border: 1px solid rgba(138,112,64,.45);
+  color: #6e5528;
+  background: rgba(201,169,97,.12);
 }
 .astro-keywords {
   font-size: 12px;
-  color: rgba(232,224,245,.7);
+  color: #3a3348;
   line-height: 1.9;
+}
+.astro-oracle-text {
+  font-size: 11.5px;
+  color: #3a3348;
+  margin-top: 10px;
+  line-height: 1.85;
+  padding-left: 10px;
 }
 .astro-elem-card {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 16px;
-  background: var(--paper2);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(18,12,36,.04);
 }
 .astro-elem-title {
   font-family: 'Shippori Mincho', serif;
@@ -1348,18 +1388,49 @@ html, body {
   font-weight: 600;
   margin-bottom: 8px;
 }
+.astro-elem-desc {
+  font-size: 12px;
+  color: #3a3348;
+  line-height: 1.85;
+  margin-bottom: 10px;
+}
+.astro-elem-palaces {
+  font-size: 12px;
+  color: #6e5528;
+  line-height: 2;
+  margin-bottom: 8px;
+}
 .astro-quality-card {
   border: 1px solid var(--border);
   border-radius: var(--r);
   padding: 14px;
-  background: var(--paper2);
+  background: #fff;
   text-align: center;
+  box-shadow: 0 1px 3px rgba(18,12,36,.04);
+}
+.astro-quality-en {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: .2em;
+  color: var(--gold);
+  margin-bottom: 4px;
 }
 .astro-quality-name {
   font-family: 'Shippori Mincho', serif;
   font-size: 15px;
-  color: var(--moon);
+  color: var(--deep);
   margin-bottom: 6px;
+}
+.astro-quality-desc {
+  font-size: 11px;
+  color: #3a3348;
+  line-height: 1.85;
+  margin-bottom: 8px;
+}
+.astro-quality-palaces {
+  font-size: 12px;
+  color: var(--deep);
+  font-weight: 600;
 }
 @media (max-width: 600px) {
   #astro-element-grid { grid-template-columns: 1fr; }
@@ -2300,9 +2371,9 @@ html, body {
 
     <!-- ヘッダー -->
     <div style="text-align:center;padding:32px 0 24px;">
-      <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.35em;color:var(--gold-l);margin-bottom:8px;">WESTERN ASTROLOGY × SHUKUYO</div>
-      <h2 style="font-family:'Shippori Mincho',serif;font-size:26px;color:var(--moon);margin-bottom:10px;">12宮・エレメント・惑星</h2>
-      <p style="font-size:13px;color:var(--muted);line-height:1.8;max-width:560px;margin:0 auto;">
+      <div class="astro-page-eyebrow">WESTERN ASTROLOGY × SHUKUYO</div>
+      <h2 class="astro-page-title">12宮・エレメント・惑星</h2>
+      <p class="astro-page-lead">
         宿曜道と西洋占星術は同じ天の法則を別の言語で語っています。<br>
         27宿は12宮（サイン）と対応し、守護惑星（オラクル）がそれぞれの宿に信託を与えます。
       </p>
@@ -2322,13 +2393,13 @@ html, body {
 
     <!-- エレメント解説セクション -->
     <div style="margin-top:40px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-l);text-align:center;margin-bottom:20px;">THE FOUR ELEMENTS</div>
+      <div class="astro-section-label">THE FOUR ELEMENTS</div>
       <div id="astro-element-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;"></div>
     </div>
 
     <!-- クオリティ解説 -->
     <div style="margin-top:36px;">
-      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:.3em;color:var(--gold-l);text-align:center;margin-bottom:20px;">QUALITY · 三区分</div>
+      <div class="astro-section-label">QUALITY · 三区分</div>
       <div id="astro-quality-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
     </div>
 
@@ -4416,7 +4487,7 @@ function renderAstroPalaceGrid(elemFilter) {
     const iconSvg = (PALACE_ICONS[p.sym] || "").replace(/#c9a961/g, ec);
     return `<div class="astro-palace-card" onclick="this.classList.toggle('open')">
   <div class="astro-palace-head">
-    <div class="astro-palace-icon" style="background:${ec}22;border:1px solid ${ec}55;">
+    <div class="astro-palace-icon" style="background:${ec}18;border:1px solid ${ec}66;">
       <svg viewBox="-12 -12 24 24" width="28" height="28" overflow="visible" stroke-linecap="round" stroke-linejoin="round">${iconSvg}</svg>
     </div>
     <div>
@@ -4426,10 +4497,10 @@ function renderAstroPalaceGrid(elemFilter) {
     <div class="astro-palace-keyphrase">${p.keyphrase}</div>
   </div>
   <div class="astro-palace-body">
-    <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">対応する宿</div>
+    <div class="astro-palace-meta" style="margin-bottom:6px;">対応する宿</div>
     <div class="astro-shuku-tags">${shukuList.map(k=>`<span class="astro-shuku-tag">${k}</span>`).join("")}</div>
     <div class="astro-keywords" style="margin-top:8px;">${keywords.join("　／　")}</div>
-    ${oracleTxt ? `<p style="font-size:11.5px;color:rgba(232,224,245,.55);margin-top:10px;line-height:1.85;border-left:2px solid ${ec}55;padding-left:10px;">${oracleTxt}</p>` : ""}
+    ${oracleTxt ? `<p class="astro-oracle-text" style="border-left:2px solid ${ec}88;">${oracleTxt}</p>` : ""}
   </div>
 </div>`;
   }).join("");
@@ -4441,11 +4512,11 @@ function renderAstroElementGrid() {
   grid.innerHTML = Object.entries(ELEM_DETAIL).map(([,d]) => `
 <div class="astro-elem-card">
   <div class="astro-elem-title" style="color:${d.color};">${d.emoji} ${d.title}</div>
-  <p style="font-size:12px;color:rgba(232,224,245,.7);line-height:1.85;margin-bottom:10px;">${d.desc}</p>
-  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">対応する宮</div>
-  <div style="font-size:12px;color:var(--gold-l);line-height:2;margin-bottom:8px;">${d.palaces.join(" ／ ")}</div>
+  <p class="astro-elem-desc">${d.desc}</p>
+  <div class="astro-palace-meta" style="margin-bottom:4px;">対応する宮</div>
+  <div class="astro-elem-palaces">${d.palaces.join(" ／ ")}</div>
   <div style="display:flex;flex-wrap:wrap;gap:5px;">
-    ${d.keywords.map(k=>`<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid ${d.color}44;color:${d.color};background:${d.color}11;">${k}</span>`).join("")}
+    ${d.keywords.map(k=>`<span style="font-size:11px;padding:2px 8px;border-radius:10px;border:1px solid ${d.color}66;color:${d.color};background:${d.color}14;font-weight:600;">${k}</span>`).join("")}
   </div>
 </div>`).join("");
 }
@@ -4455,11 +4526,11 @@ function renderAstroQualityGrid() {
   if (!grid) return;
   grid.innerHTML = QUALITY_DETAIL.map(q => `
 <div class="astro-quality-card">
-  <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:var(--gold-l);margin-bottom:4px;">${q.en}</div>
+  <div class="astro-quality-en">${q.en}</div>
   <div class="astro-quality-name">${q.name}</div>
-  <p style="font-size:11px;color:rgba(232,224,245,.65);line-height:1.85;margin-bottom:8px;">${q.desc}</p>
-  <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">該当する宮</div>
-  <div style="font-size:12px;color:var(--moon);">${q.palaces.join(" · ")}</div>
+  <p class="astro-quality-desc">${q.desc}</p>
+  <div class="astro-palace-meta" style="margin-bottom:4px;">該当する宮</div>
+  <div class="astro-quality-palaces">${q.palaces.join(" · ")}</div>
 </div>`).join("");
 }
 
