@@ -3165,7 +3165,6 @@ function buildCompassBgSVG() {
   const cx = 220, cy = 220, vb = 440;
   const N = 27, Np = 12;
   const gold     = "rgba(201,169,97,";  // ゴールドベース
-  const goldSolid = "#c9a961";
 
   // 半径
   const R0 = 214;  // 最外縁（目盛りリング）
@@ -3238,17 +3237,20 @@ function buildCompassBgSVG() {
     ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
   }
 
-  // 中心：命業胎を指す正三角形（運気リングと同じ角度オフセットで頂点を合わせる）
-  // labelRing と同じ: deg = i * (360/N) + 180/N
+  // 中心：命業胎を指す正三角形（運気ラベルと同じ半径・角度で頂点を一致させる）
+  // labelRing と同じ: deg = i * (360/N) + 180/N、半径 = (R4+R5)/2
   const slotHalf = 180 / N;
   const meiDeg = 0 * (360 / N) + slotHalf;   // 命
   const taiDeg = 9 * (360 / N) + slotHalf;   // 胎
   const gyoDeg = 18 * (360 / N) + slotHalf;  // 業
-  const triR = (R5 + R6) / 2; // 頂点が運気リング寄りの命・胎・業を指す大きさ
-  const meiPt = pt(triR, meiDeg);
-  const taiPt = pt(triR, taiDeg);
-  const gyoPt = pt(triR, gyoDeg);
+  const labelR = (R4 + R5) / 2;              // 命・胎・業が載る円周
+  const meiPt = pt(labelR, meiDeg);
+  const taiPt = pt(labelR, taiDeg);
+  const gyoPt = pt(labelR, gyoDeg);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)}`;
+  // 罫線は内リング外周（R5）と同じ色・太さ
+  const ringStroke = `${gold}.25)`;
+  const ringSw = 0.6;
 
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
@@ -3279,15 +3281,14 @@ function buildCompassBgSVG() {
   <!-- ══ 回転層：宿リング＋運気ラベル＋命業胎三角形 ══ -->
   <g id="compass-ring-compat">
     ${labelRing(shukuNames,   (R3+R4)/2,   10, `${gold}.65)`)}
-    ${circle(R5, `${gold}.2)`, 0.5)}
-    ${labelRing(compatLabels, (R4+R5)/2,   11, `${gold}.45)`)}
-    <!-- 命・胎・業の位置を指す正三角形（リングと一緒に回転） -->
-    <polygon points="${triPts}" fill="${gold}.08)" stroke="${goldSolid}" stroke-width="1.1" opacity="0.85"/>
-    <circle cx="${cx}" cy="${cy}" r="2.5" fill="${goldSolid}" opacity="0.55"/>
+    ${circle(R5, ringStroke, ringSw)}
+    ${labelRing(compatLabels, labelR,   11, `${gold}.45)`)}
+    <!-- 命・胎・業の円周まで伸ばした正三角形（リングと一緒に回転・外周円と同じ罫線） -->
+    <polygon points="${triPts}" fill="none" stroke="${ringStroke}" stroke-width="${ringSw}" stroke-linejoin="round"/>
   </g>
 
   <!-- 中心円（固定の枠） -->
-  ${circle(R5, `${gold}.25)`, 0.6)}
+  ${circle(R5, ringStroke, ringSw)}
   ${circle(R6, `${gold}.5)`,  1.2)}
 </svg>`;
 
