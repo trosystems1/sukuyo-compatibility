@@ -3238,6 +3238,17 @@ function buildCompassBgSVG() {
     ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
   }
 
+  // 中心：命を頂点とする命業胎の正三角形（実物盤の配置に合わせる）
+  const triR = R6 - 6;
+  const meiPt = pt(triR, 0);    // 命 · 頂点（12時）
+  const taiPt = pt(triR, 120);  // 胎 · 右下
+  const gyoPt = pt(triR, 240);  // 業 · 左下
+  const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)}`;
+  // 頂点ラベルは三角形の少し外側に置く
+  const meiLb = pt(triR + 7, 0);
+  const taiLb = pt(triR + 7, 120);
+  const gyoLb = pt(triR + 7, 240);
+
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
 
@@ -3271,13 +3282,14 @@ function buildCompassBgSVG() {
     ${labelRing(compatLabels, (R4+R5)/2,   11, `${gold}.45)`)}
   </g>
 
-  <!-- 中心（固定） -->
+  <!-- 中心（固定）：命を頂点とする命業胎の正三角形 -->
   ${circle(R5, `${gold}.25)`, 0.6)}
   ${circle(R6, `${gold}.5)`,  1.2)}
-  ${circle(R6 - 12, `${gold}.2)`, 0.5)}
-  <polygon points="${cx},${cy-R6+5} ${cx-4},${cy} ${cx},${cy+R6-5} ${cx+4},${cy}"
-    fill="none" stroke="${goldSolid}" stroke-width="0.8" opacity="0.5"/>
-  <circle cx="${cx}" cy="${cy}" r="4" fill="${goldSolid}" opacity="0.6"/>
+  <polygon points="${triPts}" fill="${gold}.08)" stroke="${goldSolid}" stroke-width="1.1" opacity="0.85"/>
+  <text x="${meiLb.x.toFixed(1)}" y="${meiLb.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="9" fill="${goldSolid}" opacity="0.9">命</text>
+  <text x="${taiLb.x.toFixed(1)}" y="${taiLb.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="9" fill="${goldSolid}" opacity="0.9">胎</text>
+  <text x="${gyoLb.x.toFixed(1)}" y="${gyoLb.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho','Noto Serif JP',serif" font-size="9" fill="${goldSolid}" opacity="0.9">業</text>
+  <circle cx="${cx}" cy="${cy}" r="2.5" fill="${goldSolid}" opacity="0.55"/>
 </svg>`;
 
 }
