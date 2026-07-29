@@ -1122,137 +1122,6 @@ html, body {
   .lunation-usage-item { gap: 12px; }
 }
 
-/* ── Sukuyo About Page: 27宿/11分類グリッド ─────────────── */
-.shuku-list-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-@media (max-width: 700px) { .shuku-list-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 460px) { .shuku-list-grid { grid-template-columns: 1fr; } }
-
-.shuku-mini-card {
-  background: var(--paper2);
-  border-radius: 8px;
-  padding: 14px;
-  border: 1px solid var(--border);
-}
-.shuku-mini-kanji {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 17.5px;
-  color: var(--ink);
-  margin-bottom: 2px;
-}
-.shuku-mini-yomi {
-  font-size: 12px;
-  color: var(--muted);
-  letter-spacing: .06em;
-  margin-bottom: 8px;
-}
-.shuku-mini-keywords {
-  font-size: 13px;
-  color: var(--gold);
-  letter-spacing: .04em;
-  margin-bottom: 6px;
-}
-.shuku-mini-desc {
-  font-size: 13.5px;
-  line-height: 1.7;
-  color: var(--muted);
-}
-
-.relation-list-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-@media (max-width: 600px) { .relation-list-grid { grid-template-columns: 1fr; } }
-.relation-mini-card {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-}
-.relation-mini-key {
-  flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Shippori Mincho', serif;
-  font-size: 16.5px;
-  font-weight: 500;
-}
-.relation-mini-body { flex: 1; min-width: 0; }
-.relation-mini-name {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 15px;
-  color: var(--ink);
-  margin-bottom: 3px;
-}
-.relation-mini-text {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: var(--muted);
-}
-
-/* ── Soulmate Group (命業胎の9グループ) ──────────────────── */
-.soulmate-group-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-@media (max-width: 700px) { .soulmate-group-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 460px) { .soulmate-group-grid { grid-template-columns: 1fr; } }
-
-.soulmate-group-card {
-  background: var(--deep);
-  border-radius: var(--r);
-  padding: 18px 16px;
-  border: 1px solid var(--border);
-  position: relative;
-  overflow: hidden;
-}
-.soulmate-group-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-.soulmate-group-no {
-  font-family: 'Cinzel', serif;
-  font-size: 12px;
-  color: var(--gold);
-  letter-spacing: .15em;
-  margin-bottom: 10px;
-}
-.soulmate-group-shuku-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.soulmate-group-shuku-item {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-.soulmate-group-shuku-kanji {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 15.5px;
-  color: var(--moon);
-}
-.soulmate-group-shuku-yomi {
-  font-size: 11.5px;
-  color: rgba(232,224,245,.45);
-  letter-spacing: .04em;
-}
-
 /* ── 占星術解説ページ ────────────────────────────────────── */
 #astrology-page {
   color: var(--ink);
@@ -1437,90 +1306,6 @@ html, body {
   #astro-quality-grid { grid-template-columns: 1fr; }
 }
 
-/* ── Senseiban (占星盤) Interactive Page ───────────────── */
-.senseiban-wheel-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 32px 0 24px;
-}
-.senseiban-wheel-holder {
-  position: relative;
-  width: 420px;
-  max-width: min(420px, 92vw);
-  touch-action: none;
-  user-select: none;
-}
-.senseiban-wheel-holder svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.senseiban-inner-ring-group {
-  cursor: grab;
-}
-.senseiban-inner-ring-group.dragging {
-  cursor: grabbing;
-}
-.senseiban-base-label {
-  font-family: 'Shippori Mincho', serif;
-  font-size: 16px;
-  color: var(--ink);
-  letter-spacing: .04em;
-}
-.senseiban-base-label span {
-  color: var(--gold);
-  font-weight: 500;
-}
-.senseiban-relation-table-wrap {
-  margin-top: 8px;
-}
-.senseiban-relation-table {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-}
-@media (max-width: 700px) {
-  .senseiban-relation-table { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 460px) {
-  .senseiban-relation-table { grid-template-columns: 1fr; }
-}
-.senseiban-relation-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-.senseiban-relation-cell.is-base {
-  border-color: var(--gold);
-  background: var(--gold-dim);
-}
-.senseiban-relation-badge {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Shippori Mincho', serif;
-  font-size: 13px;
-  font-weight: 500;
-}
-.senseiban-relation-name {
-  font-size: 13px;
-  color: var(--ink);
-}
-.senseiban-relation-rel {
-  font-size: 11px;
-  color: var(--muted);
-}
-
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 /* ── 12宮オラクル盤 ─────────────────────────────────────── */
@@ -1670,9 +1455,9 @@ html, body {
   <div class="sep">｜</div>
   <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav" id="header-nav">
-    <a href="#" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
+    <a href="sukuyo-about.html" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
-    <a href="#" id="nav-senseiban" class="nav-link">占星盤</a>
+    <a href="senseiban.html" id="nav-senseiban" class="nav-link">占星盤</a>
     <a href="#" id="nav-astrology" class="nav-link">占星術</a>
     <a href="#" id="nav-mypage" class="nav-link">👤 マイページ</a>
   </nav>
@@ -2178,192 +1963,6 @@ html, body {
   </main>
 </div>
 
-<!-- Sukuyo About Explainer Page -->
-<div class="moon-rune-page" id="sukuyo-about-page">
-  <div class="hero moon-rune-hero">
-    <div class="hero-eyebrow">SUKUYO ASTROLOGY · 27 MANSIONS</div>
-    <h1 class="hero-title">宿曜とは</h1>
-    <p class="hero-sub">
-      生まれた瞬間の月の位置から、27の「宿」のいずれかを導き出す。<br>
-      インドの占星術を起源とし、中国・日本へと伝わった東洋の星の知恵です。
-    </p>
-  </div>
-
-  <main class="main-wrap">
-    <!-- 竹本流の枕：空海の経典を土台にした東西統合の宣言 -->
-    <div class="card moon-rune-intro-card takemoto-lead-card">
-      <div class="card-title">このサイトの読み解きについて ── 竹本流宿曜道</div>
-      <p class="moon-rune-intro-text">
-        このサイトは、空海が唐より持ち帰った『宿曜経』を土台に、西洋占星術の概念──4つのエレメント（火・地・風・水）、12宮、10天体──を関連付けて統合した「竹本流宿曜道」に基づいています。
-      </p>
-      <p class="moon-rune-intro-text">
-        東洋と西洋、二つの占星術は風土や倫理観の違いから別々の発展を遂げましたが、研究を重ねるほど、その源流は一つ──星と月に行き着きます。インターネットで世界が繋がった「風の時代」にふさわしい、ワールドワイドな読み解きです。
-      </p>
-      <p class="moon-rune-intro-text">
-        ただし、軸は常に宿曜。エレメントや宮・天体の視点は、経典の読みを深めるための補助線です。たとえば「火」のエレメントは獅子宮・射手宮に関連し、同じ火にも活動・不動・柔軟という役割の違いがあります。こうした関連付けによって、27宿の理解はさらに立体的になります。
-      </p>
-    </div>
-
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">宿曜占星術の基本</div>
-      <p class="moon-rune-intro-text">
-        宿曜占星術は、月が天球を一周する約27.3日の動きに基づき、天を27のエリア（宿）に分けた占星術です。生まれた日に月がどの宿に位置していたかによって、その人の「本命宿」が決まります。本命宿は太陽星座のように固定的な性格区分ではなく、その人が持つ本質的な気質・才能・人生のテーマを示すものとされています。
-      </p>
-      <p class="moon-rune-intro-text">
-        二人の本命宿の位置関係（何宿分離れているか）によって、命・栄・衰・友・安・危・成・壊・親・胎・業という11種類の縁の質が決まります。これが宿曜における相性占いの基礎で、上司・部下・パートナー・取引先など、あらゆる対人関係に応用されます。
-      </p>
-    </div>
-
-    <!-- 27宿一覧 -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">27の宿</div>
-      <p class="moon-rune-intro-text">
-        天球を27分割した「宿」それぞれに、固有の気質と象徴が割り当てられています。
-      </p>
-      <div class="shuku-list-grid" id="sukuyo-shuku-grid"></div>
-    </div>
-
-    <!-- 11分類一覧 -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">11種類の縁（相性の分類）</div>
-      <p class="moon-rune-intro-text">
-        自分の宿から相手の宿までの位置関係によって、以下の11種類のいずれかの関係性が決まります。
-      </p>
-      <div class="relation-list-grid" id="sukuyo-relation-grid"></div>
-    </div>
-
-    <!-- 命業胎（ソウルメイトグループ）一覧 -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">命・業・胎のグループ（ソウルメイト）</div>
-      <p class="moon-rune-intro-text">
-        27の宿は、9つのグループ・3宿ずつに分けることができます。同じグループに属する3つの宿は、互いに「命（同じ運命）」「業（前世からの縁）」「胎（来世への縁）」という、宿曜の中でも特に深い結びつきを持つ関係にあります。誰を基準にするかによって自分から見た相手が命・業・胎のいずれになるかは変わりますが、同じグループの3宿はソウルメイト的な強い縁で結ばれていると考えられています。
-      </p>
-      <div class="soulmate-group-grid" id="sukuyo-soulmate-grid"></div>
-    </div>
-
-    <!-- 旧暦と宿曜 -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">旧暦と宿曜 ── 「根幹中の根幹」</div>
-      <p class="moon-rune-intro-text">
-        竹本先生の教えにおいて、「旧暦」は宿曜占星術の根幹中の根幹と位置づけられています。単なる計算上のルールにとどまらず、精神性や歴史的な背景も含めて、宿曜と旧暦の関係は深く論じられています。
-      </p>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">01</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">新暦ではなく「旧暦の誕生日」を使う理由</div>
-          <p class="lunation-usage-text">
-            今使われている新暦（グレゴリオ暦）の誕生日を、そのまま宿曜に当てはめることはできません。万年暦などの変換ツールを用いて、生まれた日の旧暦の誕生日を割り出す必要があります。日本人が新暦を使うようになったのは明治の改暦以降、たかだか150年ほど前のこと。それ以前の私たちのDNAには旧暦のリズムが刻まれているため、旧暦の誕生日こそが日本人としての「本当の誕生日」だと竹本先生は強調しています。中国や韓国では今でも旧暦の誕生日を重視していますが、日本人はその感覚を忘れてしまっていると指摘しています。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">02</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">月の満ち欠けと完全に連動する「1日」と「15日」</div>
-          <p class="lunation-usage-text">
-            旧暦は天文学的な月の動きと密接に計算されて作られており、毎月1日は必ず「新月」から始まり、15日は必ず「満月（十五夜）」になります。新暦の七五三（11月15日）に神社へお参りに行っても満月にはなっていませんが、本来の旧暦の15日にお参りに行けば、空には必ず満月が浮かんでいることになります。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">03</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">「大の月・小の月」による宿のスキップと足踏み</div>
-          <p class="lunation-usage-text">
-            宿曜の27の宿は基本的に順番に巡っていきますが、旧暦には30日で終わる「大の月」と、29日で終わる「小の月」が存在します。大の月の後は、翌月の1日（新月）に前日と同じ宿が連続する「足踏み（重なる）」現象が起きます。小の月の後は、翌月の1日に宿が一つ飛ぶ「スキップ」現象が起きます。新月のタイミングで発生するこの調整こそが、運勢のバイオリズムや凌犯期間（魔のウィーク）が引き戻されたりする理由です。この「旧暦に基づく新月ごとの調整ロジック」を理解し実装することが、正確な宿をWeb上で自動算出するための最大の鍵となります。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">04</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">凌犯期間は「リスクマネジメント」の期間</div>
-          <p class="lunation-usage-text">
-            凌犯期間（魔のウィーク）は、恐れるための期間ではなく、意識的にリスクマネジメントを行うための期間です。ビジネスに変換すれば、人間関係では誤解・行き違い・すれ違いに、実務では情報漏洩やコンプライアンス、ハラスメント対応に、いつも以上の注意を払うということ。危険を言語化して備えることこそ、宿曜をセルフマネジメントの道具として使う実践です。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">04</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">占いではなく「道」としての精神性</div>
-          <p class="lunation-usage-text">
-            昔の人々は、夜に月を見上げるだけで「今日は三日月だね」「十六夜だね」と、月の形で日付（旧暦）を把握し、宇宙と交信しながら高いスピリチュアリティを持って暮らしていました。竹本先生は、現代の私たちが新暦に縛られた状態から、月と共に暮らしていた感覚を取り戻すことが非常に重要だと語ります。宿曜占星術は、単なる現代的な「占い」の枠に収まるものではなく、茶道や柔道、陰陽道などと同じく「道」としての精神性を持つものとされています。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- 空海と宿曜経 -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">空海と宿曜経 ── 由緒ある叡智の伝来</div>
-      <p class="moon-rune-intro-text">
-        宿曜占星術の伝来には、単なる歴史的事実にとどまらない、ドラマチックで神秘的な逸話が残されています。
-      </p>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">01</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">インドから中国、そして空海へと渡った叡智</div>
-          <p class="lunation-usage-text">
-            宿曜経のルーツはインドにあり、知恵の仏である文殊菩薩（マンジュシュリー）が人類を救済するために地上に下ろした叡智であるとされています。この教えはインドから中国へと伝わり、不空三蔵から恵果（けいか）和尚へと受け継がれました。そして、それを日本へと持ち帰ったのが空海です。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">02</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">恵果和尚との出会いと「20年を2年」にした奇跡</div>
-          <p class="lunation-usage-text">
-            空海が唐に渡った際、恵果和尚は空海が来るのを待ち受けていたという史実が残されています。恵果は空海に教えを授け、本来であれば20年かかるはずの修行や伝授の期間を、わずか2年に短縮して日本へ持ち帰らせました。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">03</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">空海自身が「宿曜の暦通り」に行動していた</div>
-          <p class="lunation-usage-text">
-            竹本先生の研究によれば、空海の当時の旅の行程を辿っていくと、旅立った日や目的地に着いた日が、すべてぴったりと「いい日」に合致しているといいます。これは、空海が単に知識として宿曜経を持ち帰っただけでなく、その暦の法則を完全に理解し、自らの行動を暦通りに実践していたことを示しています。
-          </p>
-        </div>
-      </div>
-
-      <div class="lunation-usage-item">
-        <div class="lunation-usage-no">04</div>
-        <div class="lunation-usage-body">
-          <div class="lunation-usage-title">「占い」ではなく「宿曜道」としての位置づけ</div>
-          <p class="lunation-usage-text">
-            竹本先生は、空海がもたらしたこの宿曜の教えを、現代的な単なる「占い」としてではなく、陰陽道や茶道、武士道などに通じる高い精神性を持った「道（宿曜道）」であると位置づけています。
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- セルフマネジメント宣言（このサイトの存在意義） -->
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">「見てもらう占い」から「セルフマネジメントの道具」へ</div>
-      <p class="moon-rune-intro-text">
-        占いは「当ててもらう」「見てもらう」時代から、自分自身で使いこなす「セルフマネジメントの道具」へと進化しています。このサイトは、吉凶をジャッジするためのものではなく、あなたがまだ見ていない盲点──スコトーマ──に光を当て、人間関係や人生を自分の手で調整していくためにあります。
-      </p>
-      <p class="moon-rune-intro-text">
-        キーワードを受け取り、意識を向けることで、見えていなかった扉が開いていく。宿曜道は、そのための3000年の叡智です。
-      </p>
-    </div>
-
-    <div class="retry-wrap">
-      <button class="btn-retry" id="btn-back-from-sukuyo-about">占いに戻る</button>
-    </div>
-  </main>
-</div>
-
 <!-- Senseiban (占星盤) Interactive Page -->
 <!-- ══ 占星術解説ページ ══ -->
 <div class="moon-rune-page" id="astrology-page">
@@ -2405,41 +2004,6 @@ html, body {
 
     <div style="height:40px;"></div>
   </div>
-</div>
-
-<div class="moon-rune-page senseiban-page" id="senseiban-page">
-  <div class="hero moon-rune-hero">
-    <div class="hero-eyebrow">SENSEIBAN · INTERACTIVE WHEEL</div>
-    <h1 class="hero-title">占星盤</h1>
-    <p class="hero-sub">
-      内側のリングを指でドラッグして回し、<br>
-      好きな宿を「命」の位置に合わせて、27宿それぞれとの縁を確かめてみましょう。
-    </p>
-  </div>
-
-  <main class="main-wrap">
-    <div class="card moon-rune-intro-card">
-      <div class="card-title">使い方</div>
-      <p class="moon-rune-intro-text">
-        内側の運勢ワードのリングをドラッグすると回転します。リング中央上部（12時の位置）に重なった外側の宿が「基準（命）」になります。基準を変えると、下に表示される27宿それぞれとの関係が自動的に切り替わります。
-      </p>
-    </div>
-
-    <div class="senseiban-wheel-card">
-      <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
-      <div class="senseiban-base-label">
-        基準（命）：<span id="senseiban-base-shuku">昴宿</span>
-      </div>
-    </div>
-
-    <div class="senseiban-relation-table-wrap">
-      <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
-    </div>
-
-    <div class="retry-wrap">
-      <button class="btn-retry" id="btn-back-from-senseiban">占いに戻る</button>
-    </div>
-  </main>
 </div>
 
 <footer class="site-footer">
@@ -4370,69 +3934,6 @@ document.getElementById("koyomi-next").addEventListener("click", () => {
   renderKoyomi();
 });
 
-/* ── Sukuyo About Explainer Page ─────────────────────────── */
-function renderSukuyoShukuGrid() {
-  const grid = document.getElementById("sukuyo-shuku-grid");
-  if (!grid || grid.dataset.rendered) return;
-  grid.innerHTML = SHUKU.map(s => `
-    <div class="shuku-mini-card">
-      <div class="shuku-mini-kanji">${s.kanji}</div>
-      <div class="shuku-mini-yomi">${s.yomi}</div>
-      <div class="shuku-mini-keywords">${s.keywords.join("・")}</div>
-      <div class="shuku-mini-desc">${s.desc}</div>
-    </div>
-  `).join("");
-  grid.dataset.rendered = "true";
-}
-
-function renderSukuyoRelationGrid() {
-  const grid = document.getElementById("sukuyo-relation-grid");
-  if (!grid || grid.dataset.rendered) return;
-  // 11種類（命業胎は1つずつ、他は重複を除いて1つずつ）を順序立てて抽出
-  const seen = new Set();
-  const uniqueRelations = [];
-  COMPAT_TABLE.forEach(r => {
-    if (!seen.has(r.key)) {
-      seen.add(r.key);
-      uniqueRelations.push(r);
-    }
-  });
-  grid.innerHTML = uniqueRelations.map(r => `
-    <div class="relation-mini-card">
-      <div class="relation-mini-key" style="background:${r.color}22; color:${r.color};">${r.key}</div>
-      <div class="relation-mini-body">
-        <div class="relation-mini-name">${r.name}</div>
-        <div class="relation-mini-text">${r.text}</div>
-      </div>
-    </div>
-  `).join("");
-  grid.dataset.rendered = "true";
-}
-
-function renderSukuyoSoulmateGrid() {
-  const grid = document.getElementById("sukuyo-soulmate-grid");
-  if (!grid || grid.dataset.rendered) return;
-  // 27宿を9グループ・3宿ずつに分割（インデックスi, i+9, i+18が同じグループ）
-  const groups = [];
-  for (let i = 0; i < 9; i++) {
-    groups.push([SHUKU[i], SHUKU[i + 9], SHUKU[i + 18]]);
-  }
-  grid.innerHTML = groups.map((g, gi) => `
-    <div class="soulmate-group-card">
-      <div class="soulmate-group-no">GROUP ${gi + 1} / 9</div>
-      <div class="soulmate-group-shuku-row">
-        ${g.map(s => `
-          <div class="soulmate-group-shuku-item">
-            <span class="soulmate-group-shuku-kanji">${s.kanji}</span>
-            <span class="soulmate-group-shuku-yomi">${s.yomi}</span>
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `).join("");
-  grid.dataset.rendered = "true";
-}
-
 /* ══ 占星術解説ページ ══ */
 const ELEM_DETAIL = {
   火: { emoji:"🔥", color:"#c94040", title:"火（Fire）", en:"FIRE",
@@ -4539,9 +4040,7 @@ function showAstrologyPage() {
   document.getElementById("compat-app").classList.add("hide");
   document.getElementById("mypage-page").classList.remove("show");
   document.getElementById("moon-rune-page").classList.remove("show");
-  document.getElementById("sukuyo-about-page").classList.remove("show");
-  document.getElementById("senseiban-page").classList.remove("show");
-  ["nav-mypage","nav-moon-rune","nav-sukuyo-about","nav-senseiban","nav-astrology"].forEach(id => {
+  ["nav-mypage","nav-moon-rune","nav-astrology"].forEach(id => {
     document.getElementById(id)?.classList.remove("active");
   });
   // 先に表示してから描画（描画エラーでも真っ白にしない）
@@ -4574,240 +4073,17 @@ document.getElementById("astro-filter")?.addEventListener("click", e => {
   renderAstroPalaceGrid(btn.dataset.elem);
 });
 
-function showSukuyoAboutPage() {
-  renderSukuyoShukuGrid();
-  renderSukuyoRelationGrid();
-  renderSukuyoSoulmateGrid();
-  document.getElementById("compat-app").classList.add("hide");
-  document.getElementById("mypage-page").classList.remove("show");
-  document.getElementById("nav-mypage").classList.remove("active");
-  document.getElementById("sukuyo-about-page").classList.add("show");
-  document.getElementById("nav-sukuyo-about").classList.add("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function hideSukuyoAboutPage() {
-  document.getElementById("sukuyo-about-page").classList.remove("show");
-  document.getElementById("compat-app").classList.remove("hide");
-  document.getElementById("nav-sukuyo-about").classList.remove("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-document.getElementById("nav-sukuyo-about").addEventListener("click", (e) => {
-  e.preventDefault();
-  showSukuyoAboutPage();
-});
-
-document.getElementById("btn-back-from-sukuyo-about").addEventListener("click", () => {
-  hideSukuyoAboutPage();
-});
-
-/* ══════════════════════════════════════════════════════════
-   占星盤（インタラクティブ宿曜盤）
-   外側リング：27宿（固定）　内側リング：11分類の運勢ワード（ドラッグで回転）
-   内側リングの12時位置に重なった外側の宿が「基準（命）」になる
-   ══════════════════════════════════════════════════════════ */
-let senseibanRotation = 0; // 現在の内側リング回転角度（度）
-let senseibanBaseIdx = 0;  // 現在の基準宿のSHUKUインデックス
-
-function buildSenseibanSVG() {
-  const cx = 210, cy = 210;
-  const outerR = 185, innerR = 118;
-  const N = 27;
-
-  const relationRing = COMPAT_TABLE.map(r => r.key);
-  const outerNames = SHUKU.map(s => s.kanji.replace("宿", ""));
-
-  function ringText(items, radius, fontSize, extraClass, extraAttrs) {
-    return items.map((label, i) => {
-      const angle = (i / N) * 360 - 90;
-      const rad = angle * Math.PI / 180;
-      const x = cx + radius * Math.cos(rad);
-      const y = cy + radius * Math.sin(rad);
-      const rot = angle + 90;
-      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" class="${extraClass}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})" ${extraAttrs||""}>${label}</text>`;
-    }).join("");
-  }
-
-  return `
-<svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <radialGradient id="senseibanBg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#fdfaf4"/>
-      <stop offset="100%" stop-color="#f3ecdd"/>
-    </radialGradient>
-  </defs>
-  <circle cx="${cx}" cy="${cy}" r="205" fill="url(#senseibanBg)" stroke="#c9a961" stroke-width="1.5"/>
-
-  <!-- 外側リング：27宿（固定） -->
-  <g>
-    <circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="rgba(74,47,122,.25)" stroke-width="1"/>
-    <circle cx="${cx}" cy="${cy}" r="${outerR - 38}" fill="none" stroke="rgba(74,47,122,.18)" stroke-width="1"/>
-    <g fill="#241b3e">${ringText(outerNames, outerR - 19, 14, "senseiban-outer-text")}</g>
-  </g>
-
-  <!-- 内側リング：11分類の運勢ワード（ドラッグで回転） -->
-  <g class="senseiban-inner-ring-group" id="senseiban-inner-ring-group" transform="rotate(0 ${cx} ${cy})">
-    <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="#fff" stroke="rgba(201,169,97,.5)" stroke-width="1"/>
-    <circle cx="${cx}" cy="${cy}" r="${innerR - 36}" fill="none" stroke="rgba(201,169,97,.3)" stroke-width="1"/>
-    <g fill="#b8953a">${ringText(relationRing, innerR - 18, 15, "senseiban-inner-text")}</g>
-  </g>
-
-  <!-- 基準点マーカー（12時位置） -->
-  <polygon points="${cx-8},${cy-outerR-2} ${cx+8},${cy-outerR-2} ${cx},${cy-outerR+14}" fill="#c9a961"/>
-
-  <circle cx="${cx}" cy="${cy}" r="${innerR - 38}" fill="rgba(253,250,244,.9)" stroke="rgba(201,169,97,.4)" stroke-width="1"/>
-  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="28" fill="#4a3f8c">☽</text>
-</svg>`;
-}
-
-function renderSenseibanRelationTable() {
-  const table = document.getElementById("senseiban-relation-table");
-  const baseIdx = senseibanBaseIdx;
-  const cells = SHUKU.map((s, idx) => {
-    const rel = getRelation(baseIdx, idx);
-    const isBase = idx === baseIdx;
-    return `
-      <div class="senseiban-relation-cell ${isBase ? "is-base" : ""}">
-        <div class="senseiban-relation-badge" style="background:${rel.color}22; color:${rel.color};">${rel.key}</div>
-        <div>
-          <div class="senseiban-relation-name">${s.kanji}（${s.yomi}）</div>
-          <div class="senseiban-relation-rel">${isBase ? "基準（命）" : rel.name}</div>
-        </div>
-      </div>`;
-  }).join("");
-  table.innerHTML = cells;
-}
-
-function updateSenseibanBase() {
-  // 内側リングの回転角度から、12時位置に来ている外側の宿（基準）を逆算する
-  // 内側リングが時計回りに回転すると、相対的に基準点は反時計回りに動く
-  const N = 27;
-  const anglePerSlot = 360 / N;
-  // senseibanRotationは「内側リングが何度回転したか」。0番目の宿（昴）が基準のとき回転0度。
-  const rawIdx = Math.round((-senseibanRotation / anglePerSlot)) % N;
-  const idx = ((rawIdx % N) + N) % N;
-  senseibanBaseIdx = idx;
-  document.getElementById("senseiban-base-shuku").textContent = SHUKU[idx].kanji;
-  renderSenseibanRelationTable();
-}
-
-function initSenseibanDrag() {
-  const holder = document.getElementById("senseiban-wheel-holder");
-  const group = document.getElementById("senseiban-inner-ring-group");
-  if (!holder || !group || holder.dataset.dragInit) return;
-  holder.dataset.dragInit = "true";
-
-  const svg = holder.querySelector("svg");
-  const cx = 210, cy = 210;
-  let dragging = false;
-  let startAngle = 0;
-  let startRotation = 0;
-
-  function getSvgPoint(clientX, clientY) {
-    const rect = svg.getBoundingClientRect();
-    const scale = 420 / rect.width; // viewBoxは0 0 420 420
-    const x = (clientX - rect.left) * scale;
-    const y = (clientY - rect.top) * scale;
-    return { x, y };
-  }
-
-  function angleAt(clientX, clientY) {
-    const p = getSvgPoint(clientX, clientY);
-    return Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI;
-  }
-
-  function onPointerDown(e) {
-    dragging = true;
-    group.classList.add("dragging");
-    const point = e.touches ? e.touches[0] : e;
-    startAngle = angleAt(point.clientX, point.clientY);
-    startRotation = senseibanRotation;
-    e.preventDefault();
-  }
-
-  function onPointerMove(e) {
-    if (!dragging) return;
-    const point = e.touches ? e.touches[0] : e;
-    const currentAngle = angleAt(point.clientX, point.clientY);
-    const delta = currentAngle - startAngle;
-    senseibanRotation = startRotation + delta;
-    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
-    e.preventDefault();
-  }
-
-  function onPointerUp() {
-    if (!dragging) return;
-    dragging = false;
-    group.classList.remove("dragging");
-    // 27分割の最も近い角度にスナップ
-    const anglePerSlot = 360 / 27;
-    const snapped = Math.round(senseibanRotation / anglePerSlot) * anglePerSlot;
-    senseibanRotation = snapped;
-    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
-    updateSenseibanBase();
-  }
-
-  holder.addEventListener("mousedown", onPointerDown);
-  window.addEventListener("mousemove", onPointerMove);
-  window.addEventListener("mouseup", onPointerUp);
-  holder.addEventListener("touchstart", onPointerDown, { passive: false });
-  window.addEventListener("touchmove", onPointerMove, { passive: false });
-  window.addEventListener("touchend", onPointerUp);
-}
-
-function showSenseibanPage() {
-  const holder = document.getElementById("senseiban-wheel-holder");
-  if (!holder.dataset.rendered) {
-    holder.innerHTML = buildSenseibanSVG();
-    holder.dataset.rendered = "true";
-    initSenseibanDrag();
-  }
-  senseibanRotation = 0;
-  senseibanBaseIdx = 0;
-  const group = document.getElementById("senseiban-inner-ring-group");
-  if (group) group.setAttribute("transform", "rotate(0 210 210)");
-  document.getElementById("senseiban-base-shuku").textContent = SHUKU[0].kanji;
-  renderSenseibanRelationTable();
-
-  document.getElementById("compat-app").classList.add("hide");
-  document.getElementById("mypage-page").classList.remove("show");
-  document.getElementById("nav-mypage").classList.remove("active");
-  document.getElementById("senseiban-page").classList.add("show");
-  document.getElementById("nav-senseiban").classList.add("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-function hideSenseibanPage() {
-  document.getElementById("senseiban-page").classList.remove("show");
-  document.getElementById("astrology-page")?.classList.remove("show");
-  document.getElementById("nav-astrology")?.classList.remove("active");
-  document.getElementById("compat-app").classList.remove("hide");
-  document.getElementById("nav-senseiban").classList.remove("active");
-  window.scrollTo({ top: 0, behavior: "smooth" });
-}
-
-document.getElementById("nav-senseiban").addEventListener("click", (e) => {
-  e.preventDefault();
-  showSenseibanPage();
-});
-
-document.getElementById("btn-back-from-senseiban").addEventListener("click", () => {
-  hideSenseibanPage();
-});
-
 /* ── ロゴクリック：ホーム（自分を占うモード）に戻る ───────── */
 function goHome() {
-  // 月のルネーション／宿曜とは／占星盤ページが開いていれば閉じる
+  // 月のルネーション／その他ページが開いていれば閉じる
   document.getElementById("moon-rune-page").classList.remove("show");
-  document.getElementById("sukuyo-about-page").classList.remove("show");
-  document.getElementById("senseiban-page").classList.remove("show");
   document.getElementById("astrology-page")?.classList.remove("show");
+  document.getElementById("mypage-page")?.classList.remove("show");
   document.getElementById("compat-app").classList.remove("hide");
   document.getElementById("nav-moon-rune").classList.remove("active");
-  document.getElementById("nav-sukuyo-about").classList.remove("active");
-  document.getElementById("nav-senseiban").classList.remove("active");
   document.getElementById("nav-astrology")?.classList.remove("active");
+  document.getElementById("nav-mypage")?.classList.remove("active");
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 
   // 結果表示・フォームを初期状態（自分を占うモード）に戻す
   document.getElementById("result").classList.remove("show");
@@ -4909,13 +4185,9 @@ function showMypage() {
   // 他ページ・結果表示を閉じる
   document.getElementById("compat-app").classList.add("hide");
   document.getElementById("moon-rune-page").classList.remove("show");
-  document.getElementById("sukuyo-about-page").classList.remove("show");
-  document.getElementById("senseiban-page").classList.remove("show");
   document.getElementById("astrology-page")?.classList.remove("show");
   document.getElementById("nav-astrology")?.classList.remove("active");
   document.getElementById("nav-moon-rune").classList.remove("active");
-  document.getElementById("nav-sukuyo-about").classList.remove("active");
-  document.getElementById("nav-senseiban").classList.remove("active");
   document.getElementById("result").classList.remove("show");
 
   initBookViewpoint();
@@ -5279,6 +4551,17 @@ document.getElementById("btn-save-person").addEventListener("click", () => {
     showMypage();
   });
 });
+
+/* ── ディープリンク（#moon-rune 等）／宿曜とはからの遷移 ── */
+function applyLocationHash() {
+  const hash = (location.hash || "").replace(/^#/, "");
+  if (hash === "moon-rune") showMoonRunePage();
+  else if (hash === "astrology") showAstrologyPage();
+  else if (hash === "mypage") showMypage();
+}
+window.addEventListener("hashchange", applyLocationHash);
+if (location.hash) applyLocationHash();
+
 </script>
 </body>
 </html>

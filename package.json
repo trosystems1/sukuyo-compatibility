@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "sync:www": "mkdir -p www && cp index.html www/ && cp -r assets www/",
+    "sync:www": "mkdir -p www && cp index.html sukuyo-about.html senseiban.html www/ && cp -r assets www/",
     "ios": "npm run sync:www && npx cap sync ios && npx cap run ios --target-name \"iPhone 17 Pro\""
   },
   "dependencies": {
