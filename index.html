@@ -4431,11 +4431,9 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const gold = "rgba(201,169,97,";
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 142;
-  const R_MEM_O = 142, R_MEM_I = 118;
-  const R4 = 104, R5 = 78, R6 = 46;
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
-  const R_SHUKU = (R_MEM_I + R4) / 2;
+  const R_SHUKU = (R3 + R4) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
   const R_POINTER = R_COMPAT - 15;
@@ -4522,39 +4520,23 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
   }
 
-  // 4足メモリ帯：ストローク円で帯を塗り、各宿を4マスに罫線分割
+  // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ）
   const degFoot = degShuku / 4;
-  const rMemMid = (R_MEM_O + R_MEM_I) / 2;
-  const memStroke = (R_MEM_O - R_MEM_I).toFixed(1);
-  let ashiBand =
-    `<circle cx="${cx}" cy="${cy}" r="${rMemMid.toFixed(1)}" fill="none" stroke="#c9a961" stroke-opacity="0.52" stroke-width="${memStroke}"/>` +
-    circle(R_MEM_O, `${gold}.85)`, 1.25) +
-    circle(R_MEM_I, `${gold}.75)`, 1.05);
+  let footTicks = "";
   for (let si = 0; si < N; si++) {
-    const feet = feetOfGroup(groupOfIdx(si));
     const base = si * degShuku;
-    feet.forEach((elem, fi) => {
-      const a0 = base + fi * degFoot;
-      const a1 = a0 + degFoot;
-      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.18)";
-      const zebra = fi % 2 === 0 ? "rgba(253,246,220,.22)" : "rgba(48,34,12,.16)";
-      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${zebra}"/>`);
-      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${soft}"/>`);
-    });
+    footTicks += spoke(R1, R0, base, `${gold}.55)`, 0.85);
     for (let fi = 1; fi < 4; fi++) {
-      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(253,246,220,.95)", 1.05);
+      footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.5);
     }
-    ashiBand += spoke(R_MEM_O + 0.5, R4, base, "rgba(253,246,220,.55)", 2.4);
-    ashiBand += spoke(R_MEM_O, R4, base, "rgba(40,28,10,.96)", 1.55);
   }
-
 
   let compatLabels = "";
   const skip = new Set([0, 9, 18]);
   for (let i = 0; i < N; i++) {
     if (skip.has(i)) continue;
     const d = (27 - i) % 27;
-    const deg = slotDeg(i);
+    const deg = slotDeg(i) + degShuku / 2;
     const p = pt(R_COMPAT, deg);
     const c = COMPAT_TABLE[d].color || `${gold}.55)`;
     compatLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${c}" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${COMPAT_TABLE[d].key}</text>`;
@@ -4607,10 +4589,8 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     `</g>`;
 
   let ticks = "";
-  for (let i = 0; i < 120; i++) {
-    const deg = i * 3;
-    const isMain = i % 10 === 0;
-    ticks += spoke(R0 - (isMain ? 8 : 4), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.75 : 0.35);
+  for (let i = 0; i < N; i++) {
+    ticks += spoke(R3, R4, i * degShuku, `${gold}.2)`, 0.5);
   }
 
   const palaceSyms = PALACE_DATA.map(p => p.sym);
@@ -4630,15 +4610,15 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   <g id="mp-astro-ring" transform="rotate(${rot.toFixed(2)} ${cx} ${cy})">
     ${elemSectors}
     ${elemLabels}
-    ${ticks}
+    ${footTicks}
     ${circle(R0, `${gold}.4)`, 1)}
     ${circle(R1, `${gold}.28)`, 0.6)}
     ${circle(R2, `${gold}.22)`, 0.5)}
     ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
     ${circle(R3, `${gold}.22)`, 0.5)}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
-    ${ashiBand}
     ${circle(R4, `${gold}.3)`, 0.7)}
+    ${ticks}
     ${shukuLabels}
   </g>
 

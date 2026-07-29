@@ -576,7 +576,7 @@ html, body {
   <div class="card">
     <div class="card-title">使い方</div>
     <p class="intro-text">
-      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・4足メモリ・27宿）を一体で回し、「命」の下に基準の宿を合わせます。黄帯の1マス＝1足で、各宿は必ず4足。純粋（例：亢＝風×4）も、混成（例：角＝地×2・風×2、井＝風×3・水×1）も色分けで表します。
+      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・27宿）を一体で回し、「命」の下に基準の宿を合わせます。火地風水帯の外周目盛りは1宿＝4足（短い線が足の区切り、長い線が宿の境界）です。
     </p>
   </div>
 
@@ -592,9 +592,9 @@ html, body {
       <span><i style="background:#a89058"></i>地</span>
       <span><i style="background:#8a9eaa"></i>風</span>
       <span><i style="background:#7a9aa6"></i>水</span>
-      <span>1宿＝4足　／　盤はゴールド基調・色はアクセント</span>
+      <span>1宿＝4足　／　外周の短い線が足の区切り</span>
     </div>
-    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ · 黄帯は4足メモリ</div>
+    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ</div>
   </div>
 
   <div class="card">
@@ -795,13 +795,11 @@ function buildSenseibanSVG() {
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
-  // 外→内: 火地風水 / 惑星 / 宮 / 4足メモリ帯 / 27宿 / 運気
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 142;
-  const R_MEM_O = 142, R_MEM_I = 118; // 黄の4足メモリ（1宿=4マス・帯を太くして罫線を見やすく）
-  const R4 = 104, R5 = 78, R6 = 46;
+  // 外→内: 火地風水（外周に4足目盛り） / 惑星 / 宮 / 27宿 / 運気
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
   const R_COMPAT = (R4 + R5) / 2;
-  const R_SHUKU = (R_MEM_I + R4) / 2;
+  const R_SHUKU = (R3 + R4) / 2;
   const R_POINTER = R_COMPAT - 15;
 
   function pt(r, deg) {
@@ -889,42 +887,19 @@ function buildSenseibanSVG() {
     palaceSpokes += spoke(R2, R3, aStart, `${gold}.15)`, 0.4);
   });
 
-  let ticks = "";
-  for (let i = 0; i < 120; i++) {
-    const deg = i * 3;
-    const isMain = i % 10 === 0;
-    ticks += spoke(R0 - (isMain ? 8 : 4), R0, deg, `${gold}${isMain ? ".55)" : ".22)"}`, isMain ? 0.8 : 0.4);
-  }
-
-  // 4足メモリ帯：ストローク円で帯を塗り、各宿を4マスに罫線分割（evenodd全円アークは使わない）
+  // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ・帯の塗り分けはしない）
   const degFoot = degShuku / 4;
-  const rMemMid = (R_MEM_O + R_MEM_I) / 2;
-  const memStroke = (R_MEM_O - R_MEM_I).toFixed(1);
-  let ashiBand =
-    `<circle cx="${cx}" cy="${cy}" r="${rMemMid.toFixed(1)}" fill="none" stroke="#c9a961" stroke-opacity="0.52" stroke-width="${memStroke}"/>` +
-    circle(R_MEM_O, `${gold}.85)`, 1.3) +
-    circle(R_MEM_I, `${gold}.75)`, 1.1);
+  let footTicks = "";
   let spokes27 = "";
   for (let si = 0; si < N; si++) {
-    const feet = feetOfGroup(groupOfIdx(si));
     const base = si * degShuku;
-    feet.forEach((elem, fi) => {
-      const a0 = base + fi * degFoot;
-      const a1 = a0 + degFoot;
-      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.18)";
-      // ゼブラ：同色4足でもマスが読める
-      const zebra = fi % 2 === 0 ? "rgba(253,246,220,.22)" : "rgba(48,34,12,.16)";
-      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${zebra}"/>`);
-      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${soft}"/>`);
-    });
-    // 足の区切り（細・明色）
+    // 宿境界（長め）
+    footTicks += spoke(R1, R0, base, `${gold}.55)`, 0.9);
+    // 足の区切り3本（短め・外周寄り）
     for (let fi = 1; fi < 4; fi++) {
-      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(253,246,220,.95)", 1.05);
+      footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
     }
-    // 宿境界（太）— 帯の両端を白金で縁取りし、4マス単位が一目で分かる
-    ashiBand += spoke(R_MEM_O + 0.5, R4, base, "rgba(253,246,220,.55)", 2.4);
-    ashiBand += spoke(R_MEM_O, R4, base, "rgba(40,28,10,.96)", 1.55);
-    spokes27 += spoke(R_MEM_I, R4, base, `${gold}.3)`, 0.55);
+    spokes27 += spoke(R3, R4, base, `${gold}.22)`, 0.55);
   }
 
   const palaceMids = palaceAngles.map(a => a.aMid);
@@ -985,7 +960,7 @@ function buildSenseibanSVG() {
     ${elemSectors}
     ${elemLabels}
     ${circle(R0, `${gold}.45)`, 1.1)}
-    ${ticks}
+    ${footTicks}
     ${circle(R1, `${gold}.3)`, 0.7)}
     ${circle(R2, `${gold}.22)`, 0.5)}
     ${planetSpokes}
@@ -993,7 +968,6 @@ function buildSenseibanSVG() {
     ${circle(R3, `${gold}.22)`, 0.5)}
     ${palaceSpokes}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, `${gold}.8)`, PALACE_ICONS)}
-    ${ashiBand}
     ${circle(R4, `${gold}.32)`, 0.8)}
     ${spokes27}
     ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.88)`)}
