@@ -501,7 +501,7 @@ html, body {
   <h1 class="hero-title">占星盤</h1>
   <p class="hero-sub">
     12宮・守護惑星・27宿を重ねた盤。<br>
-    自分の本命宿を12時（命）に据えて、縁の配置を確かめてみましょう。
+    好きな宿を12時（命）に据えて、27宿それぞれの縁を確かめてみましょう。
   </p>
 </div>
 
@@ -509,20 +509,8 @@ html, body {
   <div class="card">
     <div class="card-title">使い方</div>
     <p class="intro-text">
-      外側は12宮と守護惑星、その内側に27宿と運気（命・栄・親…）が並びます。宿のリングをドラッグするか、下の宿ボタンを押すと基準が変わります。12時の位置にある宿が「基準（命）」です。
+      外側は12宮と守護惑星、その内側に27宿と運気（命・栄・親…）が並びます。宿のリングをドラッグするか、下の宿ボタンを押すと基準が変わります。12時の頂点が常に「命」で、そこに来た宿が基準です。
     </p>
-  </div>
-
-  <div class="me-banner" id="me-banner">
-    <div>
-      <div class="me-banner-label">MY HONMEI</div>
-      <div class="me-banner-name" id="me-banner-name">—</div>
-      <div class="me-banner-hint">登録した「わたし」の本命宿を12時にセットできます</div>
-    </div>
-    <button type="button" class="btn-me" id="btn-set-me">わたしの宿を12時に</button>
-  </div>
-  <div class="me-empty" id="me-empty">
-    マイページに「わたし」が未登録です。占い結果から保存するか、<a href="index.html#mypage">マイページ</a>で登録すると、ワンタップで本命宿を12時に据えられます。
   </div>
 
   <div class="senseiban-wheel-card">
@@ -685,30 +673,23 @@ function getRelation(idxA, idxB) {
   return { ...COMPAT_TABLE[diff], diff };
 }
 
-const BOOK_KEY = "sukuyo_people_v1";
-
 let senseibanBaseIdx = 0;
-let senseibanRotation = 0; // 宿リングの回転（度）
-let myShukuIdx = null;
-let myPerson = null;
+let senseibanRotation = 0; // 宿リングの回転（度）。12時=命に宿を合わせる
 
-function loadMe() {
-  try {
-    const list = JSON.parse(localStorage.getItem(BOOK_KEY) || "[]");
-    myPerson = list.find(p => p.isMe) || null;
-    myShukuIdx = myPerson && Number.isInteger(myPerson.shukuIdx) ? myPerson.shukuIdx : null;
-  } catch (e) {
-    myPerson = null;
-    myShukuIdx = null;
-  }
+function slotDeg(i, n) {
+  // スロット中心ではなくスロット境界＝頂点合わせ。i=0 が正確に12時
+  return (i / n) * 360;
 }
 
 function buildSenseibanSVG() {
   const cx = 220, cy = 220, vb = 440;
   const N = 27, Np = 12;
   const gold = "rgba(201,169,97,";
+  const violet = "#6b4ba8";
 
   const R0 = 214, R1 = 196, R2 = 164, R3 = 132, R4 = 108, R5 = 76, R6 = 44;
+  const R_COMPAT = (R4 + R5) / 2;
+  const R_SHUKU = (R3 + R4) / 2;
 
   function pt(r, deg) {
     const rad = (deg - 90) * Math.PI / 180;
@@ -736,16 +717,16 @@ function buildSenseibanSVG() {
         `</g>`;
     }).join("");
   }
-  function labelRing(items, r, fontSize, fillFn) {
+  function labelRing(items, r, fontSize, fillFn, skipIdx) {
     return items.map((label, i) => {
-      const deg = (i / items.length) * 360 + (180 / items.length);
+      if (skipIdx && skipIdx.has(i)) return "";
+      const deg = slotDeg(i, items.length);
       const p = pt(r, deg);
       const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
       return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
     }).join("");
   }
 
-  // エレメント帯（薄い色セクター）
   const degPerPalace = 360 / Np;
   let elemSectors = "";
   PALACE_DATA.forEach((p, i) => {
@@ -766,7 +747,7 @@ function buildSenseibanSVG() {
 
   let spokes27 = "";
   for (let i = 0; i < N; i++) {
-    spokes27 += spoke(R3, R4, i * (360 / N), `${gold}.18)`, 0.5);
+    spokes27 += spoke(R3, R4, slotDeg(i, N), `${gold}.18)`, 0.5);
   }
 
   const palaceSyms = PALACE_DATA.map(p => p.sym);
@@ -774,29 +755,41 @@ function buildSenseibanSVG() {
   const planetSyms = PALACE_DATA.map(p => p.planetSym);
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
 
-  // 固定の運気ラベル：12時=命。表示位置 i には COMPAT[(27-i)%27]
-  const compatDisplay = Array.from({ length: N }, (_, i) => {
-    const d = (27 - i) % 27;
-    return COMPAT_TABLE[d].key;
-  });
-  const compatFill = (i) => {
-    const d = (27 - i) % 27;
-    return COMPAT_TABLE[d].color || `${gold}.55)`;
-  };
+  // 表示位置 i に COMPAT[(27-i)%27] → 12時(i=0)=命、時計回りに正しい縁
+  const compatDisplay = Array.from({ length: N }, (_, i) => COMPAT_TABLE[(27 - i) % 27].key);
+  const compatDiff = (i) => (27 - i) % 27;
+  const meiGyoTaiIdx = new Set([0, 9, 18]); // 表示位置：命・業・胎
 
-  const slotHalf = 180 / N;
-  const meiDeg = 0 * (360 / N) + slotHalf;
-  const gyoDeg = 9 * (360 / N) + slotHalf;
-  const taiDeg = 18 * (360 / N) + slotHalf;
-  const triR = R5;
+  const meiDeg = slotDeg(0, N);   // 0° = 12時
+  const gyoDeg = slotDeg(9, N);   // 120°
+  const taiDeg = slotDeg(18, N);  // 240°
+  // 頂点を紫丸の中心に合わせる正三角形（上向き：命が頂点）
+  const triR = R_COMPAT;
   const meiPt = pt(triR, meiDeg);
   const gyoPt = pt(triR, gyoDeg);
   const taiPt = pt(triR, taiDeg);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
-  const ringStroke = `${gold}.25)`;
 
-  // 12時マーカー（宿帯の外側）
+  // 命・業・胎：紫円・白抜き
+  const badgeR = 11;
+  function meiGyoTaiBadge(deg, label) {
+    const p = pt(R_COMPAT, deg);
+    return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
+      `<circle r="${badgeR}" fill="#fff" stroke="${violet}" stroke-width="1.6"/>` +
+      `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="12" fill="${violet}" font-weight="700">${label}</text>` +
+      `</g>`;
+  }
+  const meiGyoTaiBadges =
+    meiGyoTaiBadge(meiDeg, "命") +
+    meiGyoTaiBadge(gyoDeg, "業") +
+    meiGyoTaiBadge(taiDeg, "胎");
+
   const marker = `<polygon points="${cx-8},${cy-R3+2} ${cx+8},${cy-R3+2} ${cx},${cy-R4+6}" fill="#c9a961" opacity="0.95"/>`;
+
+  const otherCompatFill = (i) => {
+    const d = compatDiff(i);
+    return COMPAT_TABLE[d].color || `${gold}.55)`;
+  };
 
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
@@ -808,7 +801,6 @@ function buildSenseibanSVG() {
   </defs>
   <circle cx="${cx}" cy="${cy}" r="${R0+6}" fill="url(#sbBg)" stroke="${gold}.45)" stroke-width="1.2"/>
 
-  <!-- 固定：目盛り・エレメント・12宮・惑星 -->
   <g id="sb-fixed">
     ${elemSectors}
     ${circle(R0, `${gold}.4)`, 1)}
@@ -824,22 +816,21 @@ function buildSenseibanSVG() {
     ${spokes27}
   </g>
 
-  <!-- 回転：27宿 -->
   <g id="sb-shuku-ring" transform="rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})">
-    ${labelRing(shukuNames, (R3+R4)/2, 11, `${gold}.85)`)}
+    ${labelRing(shukuNames, R_SHUKU, 11, `${gold}.85)`)}
   </g>
 
-  <!-- 固定：運気ラベル（12時=命）＋命業胎三角形 -->
   <g id="sb-compat-fixed">
-    ${circle(R5, ringStroke, 0.6)}
-    ${labelRing(compatDisplay, (R4+R5)/2, 11, (i) => compatFill(i))}
-    <polygon points="${triPts}" fill="none" stroke="${ringStroke}" stroke-width="0.6" stroke-linejoin="round"/>
+    ${circle(R5, `${gold}.25)`, 0.6)}
+    ${labelRing(compatDisplay, R_COMPAT, 11, otherCompatFill, meiGyoTaiIdx)}
+    <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.85"/>
+    ${meiGyoTaiBadges}
   </g>
 
   ${marker}
   ${circle(R6, `${gold}.55)`, 1.3, "rgba(20,15,40,.95)")}
   <text id="sb-center-kanji" x="${cx}" y="${cy-8}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="18" fill="#c9a961" font-weight="700">昴</text>
-  <text x="${cx}" y="${cy+12}" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="rgba(201,169,97,.7)">命宿</text>
+  <text x="${cx}" y="${cy+12}" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="rgba(201,169,97,.7)">命 · 12時</text>
 </svg>`;
 }
 
@@ -861,7 +852,6 @@ function setBaseIdx(idx, { animate = true } = {}) {
   updateLabels();
   renderRelationTable();
   syncPicker();
-  syncMeButton();
 }
 
 function updateLabels() {
@@ -869,11 +859,7 @@ function updateLabels() {
   document.getElementById("senseiban-base-shuku").textContent = s.kanji;
   const palace = PALACE_DATA[SHUKU_TO_PALACE[senseibanBaseIdx]];
   const palaceEl = document.getElementById("senseiban-base-palace");
-  if (palace) {
-    palaceEl.textContent = `／ ${palace.name} · ${palace.planet} · ${palace.element}`;
-  } else {
-    palaceEl.textContent = "";
-  }
+  palaceEl.textContent = palace ? `／ ${palace.name} · ${palace.planet} · ${palace.element}` : "";
   const center = document.getElementById("sb-center-kanji");
   if (center) center.textContent = s.kanji.replace("宿", "");
 }
@@ -898,22 +884,17 @@ function renderRelationTable() {
   }).join("");
 
   table.querySelectorAll(".senseiban-relation-cell").forEach(cell => {
-    cell.addEventListener("click", () => {
-      const idx = parseInt(cell.dataset.idx, 10);
-      setBaseIdx(idx);
-    });
+    cell.addEventListener("click", () => setBaseIdx(parseInt(cell.dataset.idx, 10)));
   });
 }
 
 function renderPicker() {
   const grid = document.getElementById("base-picker-grid");
-  grid.innerHTML = SHUKU.map((s, i) => {
-    const isMe = myShukuIdx === i;
-    return `<button type="button" class="base-picker-btn${isMe ? " is-me" : ""}" data-idx="${i}">
+  grid.innerHTML = SHUKU.map((s, i) => `
+    <button type="button" class="base-picker-btn" data-idx="${i}">
       ${s.kanji.replace("宿","")}
-      <small>${isMe ? "わたし" : s.yomi}</small>
-    </button>`;
-  }).join("");
+      <small>${s.yomi}</small>
+    </button>`).join("");
   grid.querySelectorAll(".base-picker-btn").forEach(btn => {
     btn.addEventListener("click", () => setBaseIdx(parseInt(btn.dataset.idx, 10)));
   });
@@ -924,30 +905,6 @@ function syncPicker() {
   document.querySelectorAll(".base-picker-btn").forEach(btn => {
     btn.classList.toggle("active", parseInt(btn.dataset.idx, 10) === senseibanBaseIdx);
   });
-}
-
-function syncMeButton() {
-  const btn = document.getElementById("btn-set-me");
-  if (!btn) return;
-  const on = myShukuIdx !== null && senseibanBaseIdx === myShukuIdx;
-  btn.classList.toggle("active", on);
-  btn.textContent = on ? "わたしの宿（12時）" : "わたしの宿を12時に";
-}
-
-function renderMeUI() {
-  const banner = document.getElementById("me-banner");
-  const empty = document.getElementById("me-empty");
-  if (myShukuIdx !== null && myPerson) {
-    banner.classList.add("show");
-    empty.classList.remove("show");
-    const s = SHUKU[myShukuIdx];
-    const name = myPerson.name ? `${myPerson.name} · ` : "";
-    document.getElementById("me-banner-name").innerHTML =
-      `${name}<span>${s.kanji}</span>（${s.yomi}）`;
-  } else {
-    banner.classList.remove("show");
-    empty.classList.add("show");
-  }
 }
 
 function initDrag() {
@@ -990,14 +947,12 @@ function initDrag() {
     senseibanRotation = startRotation + delta;
     const group = document.getElementById("sb-shuku-ring");
     if (group) group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
-    // ライブで基準を更新
     const raw = Math.round((-senseibanRotation / degPerSlot)) % N;
     const idx = ((raw % N) + N) % N;
     if (idx !== senseibanBaseIdx) {
       senseibanBaseIdx = idx;
       updateLabels();
       syncPicker();
-      syncMeButton();
     }
     e.preventDefault();
   }
@@ -1006,7 +961,7 @@ function initDrag() {
     dragging = false;
     holder.classList.remove("grabbing");
     const snapped = Math.round(senseibanRotation / degPerSlot) * degPerSlot;
-    setBaseIdx(Math.round((-snapped / degPerSlot) % N + N) % N, { animate: true });
+    setBaseIdx(((Math.round(-snapped / degPerSlot) % N) + N) % N, { animate: true });
   }
 
   holder.addEventListener("mousedown", onDown);
@@ -1017,20 +972,10 @@ function initDrag() {
   window.addEventListener("touchend", onUp);
 }
 
-// ── boot ──
-loadMe();
-renderMeUI();
 document.getElementById("senseiban-wheel-holder").innerHTML = buildSenseibanSVG();
 initDrag();
 renderPicker();
-
-const initial = myShukuIdx !== null ? myShukuIdx : 0;
-setBaseIdx(initial, { animate: false });
-
-document.getElementById("btn-set-me").addEventListener("click", () => {
-  if (myShukuIdx === null) return;
-  setBaseIdx(myShukuIdx);
-});
+setBaseIdx(0, { animate: false });
 
 const navToggleBtn = document.getElementById("nav-toggle");
 const headerNavEl = document.getElementById("header-nav");
