@@ -2060,10 +2060,10 @@ html, body {
     <!-- エレメントフィルター -->
     <div id="astro-filter" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:24px;">
       <button class="astro-filter-btn active" data-elem="all">すべて</button>
-      <button class="astro-filter-btn" data-elem="火" style="--ec:#c94040;">🔥 火</button>
-      <button class="astro-filter-btn" data-elem="地" style="--ec:#8a7040;">🌿 地</button>
-      <button class="astro-filter-btn" data-elem="風" style="--ec:#4080b0;">💨 風</button>
-      <button class="astro-filter-btn" data-elem="水" style="--ec:#3a7a9c;">💧 水</button>
+      <button class="astro-filter-btn" data-elem="火" style="--ec:#b8785c;">🔥 火</button>
+      <button class="astro-filter-btn" data-elem="地" style="--ec:#a89058;">🌿 地</button>
+      <button class="astro-filter-btn" data-elem="風" style="--ec:#8a9eaa;">💨 風</button>
+      <button class="astro-filter-btn" data-elem="水" style="--ec:#7a9aa6;">💧 水</button>
     </div>
 
     <!-- 12宮グリッド -->
@@ -2153,6 +2153,14 @@ const GROUP_ELEMENTS = {
 };
 function elementsLabel(g) {
   return Object.entries(GROUP_ELEMENTS[g] || {}).map(([k, v]) => `${k}×${v}`).join("・");
+}
+function feetOfGroup(g) {
+  const el = GROUP_ELEMENTS[g] || {};
+  const feet = [];
+  for (const [elem, n] of Object.entries(el)) {
+    for (let i = 0; i < n; i++) feet.push(elem);
+  }
+  return feet.slice(0, 4);
 }
 
 /**
@@ -2606,7 +2614,7 @@ const PALACE_DATA = [
   { name:"魚宮",  sym:"♓", planet:"海王星",planetSym:"♆",  element:"水", quality:"柔軟", keyphrase:"I believe", color:"#7087f7", shukuIdx:[22,23,24] },
 ];
 
-// 宿インデックス → 宮インデックスの逆引きマップ（境界宿は最初の宮に割り当て）
+// 宿 → 代表宮（境界宿は配列上先に出る宮＝羊寄り）。表示の「対応する宿」は PALACE_DATA.shukuIdx（共有あり）
 const SHUKU_TO_PALACE = (() => {
   const map = {};
   PALACE_DATA.forEach((p, pi) => {
@@ -2617,6 +2625,12 @@ const SHUKU_TO_PALACE = (() => {
 
 // エレメント色
 const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+const ELEM_ON_GOLD = {
+  火: "rgba(176,96,72,.42)",
+  地: "rgba(168,138,72,.40)",
+  風: "rgba(130,155,175,.38)",
+  水: "rgba(110,145,160,.38)"
+};
 
 let palaceWheelDateRot   = 0;  // 日付リング（外回転）の現在角度
 let palaceWheelCompatRot = 0;  // 相性リング（内回転）の現在角度
@@ -2653,32 +2667,51 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     return `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" font-size="${fontSize}" fill="${fill}" font-family="${fontFamily||'sans-serif'}" font-weight="${weight||'normal'}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${p.x.toFixed(2)} ${p.y.toFixed(2)})">${text}</text>`;
   }
 
-  // ─ 固定層：エレメント帯（12宮ごとに色分けセクター）─
-  const degPerPalace = 360 / Np;
+  // ─ 固定層：エレメント帯（PALACE_DATA.shukuIdx＝占星術ページと同じ宿配置）─
+  const degPerShuku0 = 360 / N;
+  function palaceAnglesFromIdx(idxs) {
+    const sorted = [...idxs].sort((a, b) => a - b);
+    const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
+    let aStart, aEnd;
+    if (wraps) {
+      let gapAt = 0;
+      for (let k = 0; k < sorted.length - 1; k++) {
+        if (sorted[k + 1] - sorted[k] > 1) { gapAt = k; break; }
+      }
+      aStart = sorted[gapAt + 1] * degPerShuku0;
+      aEnd = (sorted[gapAt] + 1) * degPerShuku0;
+    } else {
+      aStart = sorted[0] * degPerShuku0;
+      aEnd = (sorted[sorted.length - 1] + 1) * degPerShuku0;
+    }
+    let end = aEnd;
+    if (end <= aStart) end += 360;
+    return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+  }
   let elemSectors = "", palaceLabels = "", planetLabels = "", dividers12 = "";
-  PALACE_DATA.forEach((p, i) => {
-    const aStart = i * degPerPalace;
-    const aEnd   = aStart + degPerPalace;
-    const aMid   = aStart + degPerPalace / 2;
-    const eColor = ELEM_COLOR[p.element] || "#555";
+  PALACE_DATA.forEach((p) => {
+    const { aStart, aEnd, aMid } = palaceAnglesFromIdx(p.shukuIdx);
+    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
+    let end = aEnd;
+    if (end <= aStart) end += 360;
+    const sweep = end - aStart;
+    const large = sweep > 180 ? 1 : 0;
+    const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, end);
+    const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, end);
+    const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 1 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 0 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
+    // ゴールド基調 + 火地風水は淡いアクセント
+    elemSectors += `<path d="${sectorD}" fill="#c9a961" opacity="0.22"/>`;
+    elemSectors += `<path d="${sectorD}" fill="${soft}"/>`;
 
-    // エレメント帯セクター
-    const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, aEnd);
-    const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, aEnd);
-    elemSectors += `<path d="M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 0 1 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 0 0 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z" fill="${eColor}" opacity="0.85"/>`;
-
-    // 宮名 + 記号（宮リング内 R_PALACE〜R_PLANET）
     const pr = (R_PALACE + R_PLANET) / 2;
-    palaceLabels += textOnArc(p.sym, pr + 7, aMid, 14, "#fdfaf4", "'Cinzel',serif", "600");
-    palaceLabels += textOnArc(p.name, pr - 9, aMid, 8.5, "rgba(253,250,244,.8)", "'Noto Serif JP',serif", "400");
+    palaceLabels += textOnArc(p.sym, pr + 7, aMid, 14, "#e8d9a8", "'Cinzel',serif", "600");
+    palaceLabels += textOnArc(p.name, pr - 9, aMid, 8.5, "rgba(232,217,168,.82)", "'Noto Serif JP',serif", "400");
 
-    // 守護惑星記号（惑星リング内 R_PLANET〜R_SHUKU）
     const plr = (R_PLANET + R_SHUKU) / 2;
     planetLabels += textOnArc(p.planetSym, plr + 5, aMid, 14, "#c9a961", "'Cinzel',serif", "600");
     planetLabels += textOnArc(p.planet, plr - 7, aMid, 7.5, "rgba(201,169,97,.75)", "'Noto Serif JP',serif", "400");
 
-    // 仕切り線（宮境界）
-    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, "rgba(253,250,244,.5)", 0.8);
+    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, "rgba(201,169,97,.45)", 0.8);
   });
 
   // ─ 固定層：27宿リング ─
@@ -4015,19 +4048,19 @@ document.getElementById("koyomi-next").addEventListener("click", () => {
 
 /* ══ 占星術解説ページ ══ */
 const ELEM_DETAIL = {
-  火: { emoji:"🔥", color:"#c94040", title:"火（Fire）", en:"FIRE",
+  火: { emoji:"🔥", color:"#b8785c", title:"火（Fire）", en:"FIRE",
     desc:"創造・行動・情熱・自己表現のエネルギー。直感で動き、先陣を切る力。「始まり」と「照らす」を象徴します。",
     keywords:["パイオニア","情熱","自己主張","瞬発力","競争心","開拓"],
     palaces:["羊宮（I am）","獅子宮（I create）","弓宮（I explora）"] },
-  地: { emoji:"🌿", color:"#8a7040", title:"地（Earth）", en:"EARTH",
+  地: { emoji:"🌿", color:"#a89058", title:"地（Earth）", en:"EARTH",
     desc:"現実・安定・物質・実用のエネルギー。時間をかけて積み上げ、確かな価値を生む力。「持続」と「豊かさ」を象徴します。",
     keywords:["安定","現実的","堅実","職人気質","計画的","蓄積"],
     palaces:["牛宮（I have）","女宮（I analyze）","磨宮（I use）"] },
-  風: { emoji:"💨", color:"#4080b0", title:"風（Air）", en:"AIR",
+  風: { emoji:"💨", color:"#8a9eaa", title:"風（Air）", en:"AIR",
     desc:"知性・言語・コミュニケーション・社交のエネルギー。情報を結び、関係を調律し、概念を拡げる力。「繋ぐ」と「広げる」を象徴します。",
     keywords:["言語能力","社交性","情報収集","コミュニケーション","多芸多才","先進性"],
     palaces:["夫妻宮（I think）","秤宮（I balance）","瓶宮（I know）"] },
-  水: { emoji:"💧", color:"#3a7a9c", title:"水（Water）", en:"WATER",
+  水: { emoji:"💧", color:"#7a9aa6", title:"水（Water）", en:"WATER",
     desc:"感情・直感・記憶・霊性のエネルギー。目に見えないものを感じ取り、癒し、つながる力。「感じる」と「信じる」を象徴します。",
     keywords:["感受性","直感","共感","記憶力","霊性","深い欲求"],
     palaces:["蟹宮（I feel）","蠍宮（I desire）","魚宮（I believe）"] },
@@ -4054,17 +4087,33 @@ function renderAstrologyPage() {
 function renderAstroPalaceGrid(elemFilter) {
   const grid = document.getElementById("astro-palace-grid");
   if (!grid) return;
-  const eColorMap = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+  const eColorMap = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
   const filtered = elemFilter === "all" ? PALACE_DATA : PALACE_DATA.filter(p => p.element === elemFilter);
+  // 境界宿（隣接宮と共有）を判定 — 占星盤・PALACE_DATA.shukuIdx と同じ定義
+  const shukuPalaceCount = {};
+  PALACE_DATA.forEach(p => p.shukuIdx.forEach(si => {
+    shukuPalaceCount[si] = (shukuPalaceCount[si] || 0) + 1;
+  }));
+
   grid.innerHTML = filtered.map(p => {
     const ec = eColorMap[p.element] || "#888";
-    const shukuList = p.shukuIdx.map(i => SHUKU[i]?.kanji).filter(Boolean);
+    const shukuEntries = p.shukuIdx.map(i => ({
+      idx: i,
+      kanji: SHUKU[i]?.kanji,
+      boundary: (shukuPalaceCount[i] || 0) > 1
+    })).filter(e => e.kanji);
+    const shukuList = shukuEntries.map(e => e.kanji);
     const keywords = [...new Set(
       shukuList.flatMap(k => (SHUKU_ORACLE[k]?.keywords || []).slice(0,2))
     )].slice(0,5);
-    const oracleKey = shukuList[1] || shukuList[0];
-    const oracleTxt = SHUKU_ORACLE[oracleKey]?.oracle || "";
+    // 中央の宿（境界でないもの優先）をオラクル代表に
+    const primary = shukuEntries.find(e => !e.boundary) || shukuEntries[1] || shukuEntries[0];
+    const oracleKey = primary?.kanji;
+    const oracleTxt = (oracleKey && SHUKU_ORACLE[oracleKey]?.oracle) || "";
     const iconSvg = (PALACE_ICONS[p.sym] || "").replace(/#c9a961/g, ec);
+    const tags = shukuEntries.map(e =>
+      `<span class="astro-shuku-tag"${e.boundary ? ' title="隣接する宮とも共有する境界の宿" style="opacity:.72;border-style:dashed;"' : ""}>${e.kanji}${e.boundary ? "·境" : ""}</span>`
+    ).join("");
     return `<div class="astro-palace-card" onclick="this.classList.toggle('open')">
   <div class="astro-palace-head">
     <div class="astro-palace-icon" style="background:${ec}18;border:1px solid ${ec}66;">
@@ -4077,8 +4126,8 @@ function renderAstroPalaceGrid(elemFilter) {
     <div class="astro-palace-keyphrase">${p.keyphrase}</div>
   </div>
   <div class="astro-palace-body">
-    <div class="astro-palace-meta" style="margin-bottom:6px;">対応する宿</div>
-    <div class="astro-shuku-tags">${shukuList.map(k=>`<span class="astro-shuku-tag">${k}</span>`).join("")}</div>
+    <div class="astro-palace-meta" style="margin-bottom:6px;">対応する宿（占星盤と同じ配置・「境」は隣宮と共有）</div>
+    <div class="astro-shuku-tags">${tags}</div>
     <div class="astro-keywords" style="margin-top:8px;">${keywords.join("　／　")}</div>
     ${oracleTxt ? `<p class="astro-oracle-text" style="border-left:2px solid ${ec}88;">${oracleTxt}</p>` : ""}
   </div>
@@ -4212,9 +4261,9 @@ document.addEventListener("click", (e) => {
 
 // 竹本先生エレメント9分類（4足×27宿=108足の構成に基づく注釈）
 const GROUP_ELEMENT_NOTE = {
-  1: "火・地の混合", 2: "地の純粋", 3: "地・風の混合",
-  4: "風の純粋",     5: "風・水の混合", 6: "水の純粋",
-  7: "水の純粋",     8: "火の純粋", 9: "火の純粋",
+  1: "火×1・地×3（2面性）", 2: "地×4（純粋）", 3: "地×2・風×2（2面性）",
+  4: "風×4（純粋）",         5: "風×3・水×1（2面性）", 6: "水×4（純粋）",
+  7: "水×4（純粋）",         8: "火×4（純粋）", 9: "火×4（純粋）",
 };
 
 // 各グループの構成宿（group g = idx g-1, g+8, g+17）
@@ -4382,9 +4431,11 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const gold = "rgba(201,169,97,";
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 140;
+  const R_MEM_O = 140, R_MEM_I = 126;
+  const R4 = 106, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
-  const R_SHUKU = (R3 + R4) / 2;
+  const R_SHUKU = (R_MEM_I + R4) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
   const R_POINTER = R_COMPAT - 15;
@@ -4428,9 +4479,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   }
 
   const degShuku = 360 / N;
-  const palaceShuku = Array.from({ length: Np }, () => []);
-  for (let si = 0; si < N; si++) palaceShuku[SHUKU_TO_PALACE[si]].push(si);
-  const palaceAngles = palaceShuku.map((idxs) => {
+  function anglesFromShukuIdx(idxs) {
     const sorted = [...idxs].sort((a, b) => a - b);
     const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
     let aStart, aEnd;
@@ -4449,17 +4498,19 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     if (end <= aStart) end += 360;
     const aMid = (aStart + end) / 2 % 360;
     return { aStart, aEnd, aMid };
-  });
+  }
+  const palaceAngles = PALACE_DATA.map(p => anglesFromShukuIdx(p.shukuIdx));
   const palaceMids = palaceAngles.map(a => a.aMid);
 
   let elemSectors = "", elemLabels = "";
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aMid } = palaceAngles[i];
-    const eColor = ELEM_COLOR[p.element] || "#555";
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${eColor}" opacity="0.28"/>`);
+    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
+    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="#c9a961" opacity="0.14"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="#fdfaf4" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="#e8d9a8" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
     elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
   });
 
@@ -4470,6 +4521,28 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const p = pt(R_SHUKU, deg);
     shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
   }
+
+  // 4足メモリ帯（占星盤ページと同じ・1宿=4目盛り）
+  const degFoot = degShuku / 4;
+  let ashiBand =
+    `<path fill="#c9a961" fill-opacity="0.38" fill-rule="evenodd" d="M${cx},${cy - R_MEM_O} A${R_MEM_O},${R_MEM_O} 0 1 1 ${cx - 0.01},${cy - R_MEM_O} Z M${cx},${cy - R_MEM_I} A${R_MEM_I},${R_MEM_I} 0 1 0 ${cx - 0.01},${cy - R_MEM_I} Z"/>` +
+    circle(R_MEM_O, `${gold}.7)`, 1.05) +
+    circle(R_MEM_I, `${gold}.55)`, 0.85);
+  for (let si = 0; si < N; si++) {
+    const feet = feetOfGroup(groupOfIdx(si));
+    const base = slotDeg(si);
+    feet.forEach((elem, fi) => {
+      const a0 = base + fi * degFoot;
+      const a1 = a0 + degFoot;
+      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.15)";
+      ashiBand += sectorPath(R_MEM_O - 0.5, R_MEM_I + 0.5, a0, a1).replace("/>", ` fill="${soft}"/>`);
+    });
+    ashiBand += spoke(R_MEM_O, R_MEM_I, base, "rgba(72,52,24,.72)", 1.1);
+    for (let fi = 1; fi < 4; fi++) {
+      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(90,68,32,.42)", 0.5);
+    }
+  }
+
 
   let compatLabels = "";
   const skip = new Set([0, 9, 18]);
@@ -4559,6 +4632,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
     ${circle(R3, `${gold}.22)`, 0.5)}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
+    ${ashiBand}
     ${circle(R4, `${gold}.3)`, 0.7)}
     ${shukuLabels}
   </g>

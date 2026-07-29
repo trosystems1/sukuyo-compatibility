@@ -333,6 +333,76 @@ html, body {
   color: var(--gold);
   font-weight: 500;
 }
+.senseiban-ashi {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--moon);
+  letter-spacing: .04em;
+}
+.senseiban-ashi-group {
+  font-family: 'Shippori Mincho', serif;
+  color: var(--gold-l);
+  font-weight: 600;
+}
+.senseiban-ashi-feet {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+.senseiban-ashi-foot {
+  width: 22px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid rgba(201,169,97,.55);
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fdfaf4;
+  font-family: 'Shippori Mincho', serif;
+  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+.senseiban-ashi-label {
+  font-size: 12px;
+  opacity: .9;
+}
+.senseiban-ashi-mixed {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(201,169,97,.55);
+  color: var(--gold-l);
+  background: rgba(201,169,97,.12);
+  letter-spacing: .06em;
+}
+.senseiban-ashi-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 14px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: rgba(232,224,245,.7);
+}
+.senseiban-ashi-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.senseiban-ashi-legend i {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(253,250,244,.3);
+}
 .senseiban-drag-hint {
   font-size: 12px;
   color: var(--muted);
@@ -507,7 +577,7 @@ html, body {
   <div class="card">
     <div class="card-title">使い方</div>
     <p class="intro-text">
-      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・27宿）だけをドラッグまたは宿ボタンで一体回転させ、「命」の下に基準の宿を合わせます。
+      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・4足メモリ・27宿）を一体で回し、「命」の下に基準の宿を合わせます。黄帯の1マス＝1足で、各宿は必ず4足。純粋（例：亢＝風×4）も、混成（例：角＝地×2・風×2、井＝風×3・水×1）も色分けで表します。
     </p>
   </div>
 
@@ -517,7 +587,15 @@ html, body {
       基準（命）：<span id="senseiban-base-shuku">昴宿</span>
       <span id="senseiban-base-palace" style="opacity:.7;font-size:13px;margin-left:8px;"></span>
     </div>
-    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ</div>
+    <div class="senseiban-ashi" id="senseiban-ashi"></div>
+    <div class="senseiban-ashi-legend" aria-hidden="true">
+      <span><i style="background:#b8785c"></i>火</span>
+      <span><i style="background:#a89058"></i>地</span>
+      <span><i style="background:#8a9eaa"></i>風</span>
+      <span><i style="background:#7a9aa6"></i>水</span>
+      <span>1宿＝4足　／　盤はゴールド基調・色はアクセント</span>
+    </div>
+    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ · 黄帯は4足メモリ</div>
   </div>
 
   <div class="card">
@@ -637,6 +715,39 @@ const SHUKU_TO_PALACE = (() => {
 })();
 
 const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+/* 盤面用：ゴールド基調に乗せる淡いアクセント（UIチップは ELEM_COLOR） */
+const ELEM_ON_GOLD = {
+  火: "rgba(176,96,72,.42)",
+  地: "rgba(168,138,72,.40)",
+  風: "rgba(130,155,175,.38)",
+  水: "rgba(110,145,160,.38)"
+};
+const ELEM_CHIP = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
+
+/** 竹本流 9グループ × 4足（火地風水）。各宿は必ず4足。27×4=108足 */
+const GROUP_ELEMENTS = {
+  1: { 火: 1, 地: 3 },
+  2: { 地: 4 },
+  3: { 地: 2, 風: 2 },
+  4: { 風: 4 },
+  5: { 風: 3, 水: 1 },
+  6: { 水: 4 },
+  7: { 水: 4 },
+  8: { 火: 4 },
+  9: { 火: 4 }
+};
+function groupOfIdx(idx) { return (idx % 9) + 1; }
+function feetOfGroup(g) {
+  const el = GROUP_ELEMENTS[g] || {};
+  const feet = [];
+  for (const [elem, n] of Object.entries(el)) {
+    for (let i = 0; i < n; i++) feet.push(elem);
+  }
+  return feet.slice(0, 4);
+}
+function elementsLabel(g) {
+  return Object.entries(GROUP_ELEMENTS[g] || {}).map(([k, v]) => `${k}×${v}`).join("・");
+}
 
 const _ICON_S = "#c9a961";
 const PALACE_ICONS = {
@@ -685,10 +796,13 @@ function buildSenseibanSVG() {
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
+  // 外→内: 火地風水 / 惑星 / 宮 / 4足メモリ帯 / 27宿 / 運気
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 140;
+  const R_MEM_O = 140, R_MEM_I = 126; // 黄の4足メモリ（1宿=4目盛り）
+  const R4 = 106, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
   const R_COMPAT = (R4 + R5) / 2;
-  const R_SHUKU = (R3 + R4) / 2;
+  const R_SHUKU = (R_MEM_I + R4) / 2;
   const R_POINTER = R_COMPAT - 15;
 
   function pt(r, deg) {
@@ -736,12 +850,9 @@ function buildSenseibanSVG() {
     return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  // 12宮セクターを27宿の区画に合わせる（均等30°だと婁・胃が魚宮側にずれる）
+  // 12宮セクター = PALACE_DATA.shukuIdx（占星術ページの「対応する宿」と同じ定義・境界宿は共有）
   const degShuku = 360 / N;
-  const palaceShuku = Array.from({ length: Np }, () => []);
-  for (let si = 0; si < N; si++) palaceShuku[SHUKU_TO_PALACE[si]].push(si);
-
-  const palaceAngles = palaceShuku.map((idxs) => {
+  function anglesFromShukuIdx(idxs) {
     const sorted = [...idxs].sort((a, b) => a - b);
     const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
     let aStart, aEnd;
@@ -760,16 +871,18 @@ function buildSenseibanSVG() {
     if (end <= aStart) end += 360;
     const aMid = (aStart + end) / 2 % 360;
     return { aStart, aEnd, aMid };
-  });
+  }
+  const palaceAngles = PALACE_DATA.map(p => anglesFromShukuIdx(p.shukuIdx));
 
   let elemSectors = "", elemLabels = "", palaceSpokes = "", planetSpokes = "";
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aMid } = palaceAngles[i];
-    const eColor = ELEM_COLOR[p.element] || "#555";
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${eColor}" opacity="0.28"/>`);
+    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
+    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="#c9a961" opacity="0.14"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#fdfaf4" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#e8d9a8" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
     elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
     // 境界線は惑星帯・宮帯にも
     planetSpokes += spoke(R1, R2, aStart, `${gold}.2)`, 0.5);
@@ -785,7 +898,29 @@ function buildSenseibanSVG() {
 
   let spokes27 = "";
   for (let i = 0; i < N; i++) {
-    spokes27 += spoke(R3, R4, slotDeg(i, N), `${gold}.18)`, 0.5);
+    spokes27 += spoke(R_MEM_I, R4, slotDeg(i, N), `${gold}.22)`, 0.55);
+  }
+
+  // 4足メモリ帯：実物同様ゴールド基調。足の違いは淡いアクセント色で示す
+  const degFoot = degShuku / 4;
+  let ashiBand =
+    `<path fill="#c9a961" fill-opacity="0.38" fill-rule="evenodd" d="M${cx},${cy - R_MEM_O} A${R_MEM_O},${R_MEM_O} 0 1 1 ${cx - 0.01},${cy - R_MEM_O} Z M${cx},${cy - R_MEM_I} A${R_MEM_I},${R_MEM_I} 0 1 0 ${cx - 0.01},${cy - R_MEM_I} Z"/>` +
+    circle(R_MEM_O, `${gold}.7)`, 1.1) +
+    circle(R_MEM_I, `${gold}.55)`, 0.9);
+  for (let si = 0; si < N; si++) {
+    const feet = feetOfGroup(groupOfIdx(si));
+    const base = slotDeg(si, N);
+    feet.forEach((elem, fi) => {
+      const a0 = base + fi * degFoot;
+      const a1 = a0 + degFoot;
+      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.15)";
+      ashiBand += sectorPath(R_MEM_O - 0.5, R_MEM_I + 0.5, a0, a1).replace("/>", ` fill="${soft}"/>`);
+    });
+    // 宿境界（太）＋足の目盛り（細）— 濃い金茶
+    ashiBand += spoke(R_MEM_O, R_MEM_I, base, "rgba(72,52,24,.72)", 1.15);
+    for (let fi = 1; fi < 4; fi++) {
+      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(90,68,32,.42)", 0.55);
+    }
   }
 
   const palaceMids = palaceAngles.map(a => a.aMid);
@@ -854,6 +989,7 @@ function buildSenseibanSVG() {
     ${circle(R3, `${gold}.22)`, 0.5)}
     ${palaceSpokes}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, `${gold}.8)`, PALACE_ICONS)}
+    ${ashiBand}
     ${circle(R4, `${gold}.32)`, 0.8)}
     ${spokes27}
     ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.88)`)}
@@ -970,7 +1106,23 @@ function updateLabels() {
   const palaceEl = document.getElementById("senseiban-base-palace");
   palaceEl.textContent = palace ? `／ ${palace.name} · ${palace.planet} · ${palace.element}` : "";
   const center = document.getElementById("sb-center-kanji");
-  if (center) center.textContent = s.kanji.replace("宿", ""); // 中央は宿の1文字のみ
+  if (center) center.textContent = s.kanji.replace("宿", "");
+  const g = groupOfIdx(senseibanBaseIdx);
+  const feet = feetOfGroup(g);
+  const ashiEl = document.getElementById("senseiban-ashi");
+  if (ashiEl) {
+    const mixed = Object.keys(GROUP_ELEMENTS[g] || {}).length > 1;
+    const feetHtml = feet.map(e =>
+      `<span class="senseiban-ashi-foot" style="background:${ELEM_CHIP[e]}" title="${e}">${e}</span>`
+    ).join("");
+    ashiEl.innerHTML =
+      `<span class="senseiban-ashi-group">第${g}グループ</span>` +
+      (mixed
+        ? `<span class="senseiban-ashi-mixed">2面性・混成</span>`
+        : `<span class="senseiban-ashi-mixed" style="opacity:.65;border-color:rgba(232,224,245,.25);color:rgba(232,224,245,.75);">純粋</span>`) +
+      `<span class="senseiban-ashi-feet">${feetHtml}</span>` +
+      `<span class="senseiban-ashi-label">${elementsLabel(g)}</span>`;
+  }
 }
 
 function renderRelationTable() {
