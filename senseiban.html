@@ -296,23 +296,21 @@ html, body {
 .me-empty a { color: var(--gold); }
 
 .senseiban-wheel-card {
-  background:
-    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(74,47,122,.45), transparent 70%),
-    linear-gradient(180deg, #1a1230 0%, #0d0920 100%);
-  border: 1px solid var(--border);
-  border-radius: var(--r);
+  background: transparent;
+  border: none;
+  border-radius: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 28px 16px 24px;
-  margin-bottom: 20px;
+  gap: 12px;
+  padding: 4px 0 20px;
+  margin-bottom: 12px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 .senseiban-wheel-holder {
   position: relative;
-  width: min(520px, 94vw);
+  width: min(680px, 98vw);
   touch-action: none;
   user-select: none;
   cursor: grab;
@@ -322,22 +320,22 @@ html, body {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 0 24px rgba(201,169,97,.12));
+  filter: drop-shadow(0 8px 28px rgba(18,12,36,.18));
 }
 .senseiban-base-label {
   font-family: 'Shippori Mincho', serif;
   font-size: 16px;
-  color: var(--moon);
+  color: var(--ink);
   letter-spacing: .06em;
   text-align: center;
 }
 .senseiban-base-label span {
-  color: var(--gold-l);
+  color: var(--gold);
   font-weight: 500;
 }
 .senseiban-drag-hint {
   font-size: 12px;
-  color: rgba(232,224,245,.4);
+  color: var(--muted);
   letter-spacing: .06em;
 }
 
@@ -682,12 +680,21 @@ function slotDeg(i, n) {
 }
 
 function buildSenseibanSVG() {
-  const cx = 220, cy = 220, vb = 440;
+  const cx = 230, cy = 230, vb = 460;
   const N = 27, Np = 12;
   const gold = "rgba(201,169,97,";
   const violet = "#6b4ba8";
+  const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
-  const R0 = 214, R1 = 196, R2 = 164, R3 = 132, R4 = 108, R5 = 76, R6 = 44;
+  // 外周に火地風水帯を確保しつつ全体を拡大
+  const R0 = 224;  // 最外縁
+  const R1 = 200;  // 宮帯外縁
+  const R2 = 168;  // 宮／惑星境界
+  const R3 = 136;  // 惑星／宿境界
+  const R4 = 110;  // 宿／運気境界
+  const R5 = 78;   // 運気内縁
+  const R6 = 46;   // 中心
+  const R_ELEM = (R0 + R1) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_SHUKU = (R3 + R4) / 2;
 
@@ -729,20 +736,28 @@ function buildSenseibanSVG() {
 
   const degPerPalace = 360 / Np;
   let elemSectors = "";
+  let elemLabels = "";
   PALACE_DATA.forEach((p, i) => {
     const aStart = i * degPerPalace;
     const aEnd = aStart + degPerPalace;
+    const aMid = aStart + degPerPalace / 2;
     const eColor = ELEM_COLOR[p.element] || "#555";
-    const o1 = pt(R0 - 2, aStart), o2 = pt(R0 - 2, aEnd);
+    const o1 = pt(R0 - 1, aStart), o2 = pt(R0 - 1, aEnd);
     const i1 = pt(R1, aStart), i2 = pt(R1, aEnd);
-    elemSectors += `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${R0-2},${R0-2} 0 0 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${R1},${R1} 0 0 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z" fill="${eColor}" opacity="0.22"/>`;
+    elemSectors += `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${R0-1},${R0-1} 0 0 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${R1},${R1} 0 0 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z" fill="${eColor}" opacity="0.28"/>`;
+
+    const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
+    const label = `${p.element}(${q})`;
+    const ep = pt(R_ELEM, aMid);
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#fdfaf4" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${label}</text>`;
+    elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
   });
 
   let ticks = "";
   for (let i = 0; i < 120; i++) {
     const deg = i * 3;
     const isMain = i % 10 === 0;
-    ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
+    ticks += spoke(R0 - (isMain ? 8 : 4), R0, deg, `${gold}${isMain ? ".55)" : ".22)"}`, isMain ? 0.8 : 0.4);
   }
 
   let spokes27 = "";
@@ -755,28 +770,26 @@ function buildSenseibanSVG() {
   const planetSyms = PALACE_DATA.map(p => p.planetSym);
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
 
-  // 表示位置 i に COMPAT[(27-i)%27] → 12時(i=0)=命、時計回りに正しい縁
   const compatDisplay = Array.from({ length: N }, (_, i) => COMPAT_TABLE[(27 - i) % 27].key);
   const compatDiff = (i) => (27 - i) % 27;
-  const meiGyoTaiIdx = new Set([0, 9, 18]); // 表示位置：命・業・胎
+  const meiGyoTaiIdx = new Set([0, 9, 18]);
 
-  const meiDeg = slotDeg(0, N);   // 0° = 12時
-  const gyoDeg = slotDeg(9, N);   // 120°
-  const taiDeg = slotDeg(18, N);  // 240°
-  // 頂点を紫丸の中心に合わせる正三角形（上向き：命が頂点）
+  const meiDeg = slotDeg(0, N);
+  const gyoDeg = slotDeg(9, N);
+  const taiDeg = slotDeg(18, N);
   const triR = R_COMPAT;
   const meiPt = pt(triR, meiDeg);
   const gyoPt = pt(triR, gyoDeg);
   const taiPt = pt(triR, taiDeg);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
 
-  // 命・業・胎：紫円・白抜き
-  const badgeR = 11;
+  // 命・業・胎：紫地に白文字（実物盤どおり）
+  const badgeR = 12;
   function meiGyoTaiBadge(deg, label) {
     const p = pt(R_COMPAT, deg);
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
-      `<circle r="${badgeR}" fill="#fff" stroke="${violet}" stroke-width="1.6"/>` +
-      `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="12" fill="${violet}" font-weight="700">${label}</text>` +
+      `<circle r="${badgeR}" fill="${violet}" stroke="#fff" stroke-width="1.4"/>` +
+      `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="12" fill="#fff" font-weight="700">${label}</text>` +
       `</g>`;
   }
   const meiGyoTaiBadges =
@@ -799,37 +812,38 @@ function buildSenseibanSVG() {
       <stop offset="100%" stop-color="#0d0920"/>
     </radialGradient>
   </defs>
-  <circle cx="${cx}" cy="${cy}" r="${R0+6}" fill="url(#sbBg)" stroke="${gold}.45)" stroke-width="1.2"/>
+  <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#sbBg)" stroke="${gold}.5)" stroke-width="1.3"/>
 
   <g id="sb-fixed">
     ${elemSectors}
-    ${circle(R0, `${gold}.4)`, 1)}
+    ${elemLabels}
+    ${circle(R0, `${gold}.45)`, 1.1)}
     ${ticks}
-    ${circle(R1, `${gold}.25)`, 0.6)}
-    ${circle(R2, `${gold}.2)`, 0.5)}
+    ${circle(R1, `${gold}.3)`, 0.7)}
+    ${circle(R2, `${gold}.22)`, 0.5)}
     ${Array.from({length:Np}, (_,i) => spoke(R1, R2, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
-    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 12, `${gold}.75)`, PALACE_ICONS)}
-    ${circle(R3, `${gold}.2)`, 0.5)}
+    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 12.5, `${gold}.8)`, PALACE_ICONS)}
+    ${circle(R3, `${gold}.22)`, 0.5)}
     ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.15)`, 0.4)).join("")}
-    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 10, `${gold}.65)`, PLANET_ICONS)}
-    ${circle(R4, `${gold}.3)`, 0.8)}
+    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 10.5, `${gold}.68)`, PLANET_ICONS)}
+    ${circle(R4, `${gold}.32)`, 0.8)}
     ${spokes27}
   </g>
 
   <g id="sb-shuku-ring" transform="rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})">
-    ${labelRing(shukuNames, R_SHUKU, 11, `${gold}.85)`)}
+    ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.88)`)}
   </g>
 
   <g id="sb-compat-fixed">
     ${circle(R5, `${gold}.25)`, 0.6)}
-    ${labelRing(compatDisplay, R_COMPAT, 11, otherCompatFill, meiGyoTaiIdx)}
-    <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.85"/>
+    ${labelRing(compatDisplay, R_COMPAT, 11.5, otherCompatFill, meiGyoTaiIdx)}
+    <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.2" stroke-linejoin="round" opacity="0.9"/>
     ${meiGyoTaiBadges}
   </g>
 
   ${marker}
   ${circle(R6, `${gold}.55)`, 1.3, "rgba(20,15,40,.95)")}
-  <text id="sb-center-kanji" x="${cx}" y="${cy-8}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="18" fill="#c9a961" font-weight="700">昴</text>
+  <text id="sb-center-kanji" x="${cx}" y="${cy-8}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="19" fill="#c9a961" font-weight="700">昴</text>
   <text x="${cx}" y="${cy+12}" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="rgba(201,169,97,.7)">命 · 12時</text>
 </svg>`;
 }
@@ -843,7 +857,7 @@ function setBaseIdx(idx, { animate = true } = {}) {
   if (group) {
     if (animate) group.style.transition = "transform .35s ease";
     else group.style.transition = "none";
-    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} 220 220)`);
+    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} 230 230)`);
     if (animate) {
       clearTimeout(setBaseIdx._t);
       setBaseIdx._t = setTimeout(() => { group.style.transition = "none"; }, 380);
@@ -912,7 +926,7 @@ function initDrag() {
   if (!holder || holder.dataset.dragInit) return;
   holder.dataset.dragInit = "true";
 
-  const cx = 220, cy = 220;
+  const cx = 230, cy = 230;
   const N = 27;
   const degPerSlot = 360 / N;
   let dragging = false;
@@ -922,7 +936,7 @@ function initDrag() {
   function getSvgPoint(clientX, clientY) {
     const svg = holder.querySelector("svg");
     const rect = svg.getBoundingClientRect();
-    const scale = 440 / rect.width;
+    const scale = 460 / rect.width;
     return { x: (clientX - rect.left) * scale, y: (clientY - rect.top) * scale };
   }
   function angleAt(clientX, clientY) {
