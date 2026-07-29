@@ -1883,7 +1883,7 @@ html, body {
       </div>
       <div id="mypage-senseiban-content">
         <p class="book-lead" style="margin-bottom:0;">
-          外側の宿・宮・火地風水は固定。運気リングの「命」が基準人物の宿を指します。中心から保存人物へ縁の色で線を引きます。
+          中央の命・業・胎は固定。外周を回して基準人物の宿を命に合わせ、縁の色の線で人物を示します。
         </p>
         <div class="mypage-senseiban-wrap">
           <div id="mypage-senseiban-holder"></div>
@@ -4388,7 +4388,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
   const R_POINTER = R_COMPAT - 15;
-  const rot = baseIdx * (360 / N); // 命を基準宿の角度へ
+  const rot = -baseIdx * (360 / N); // 外周を回して基準宿を12時（命）へ
 
   function slotDeg(i) { return (i / N) * 360; }
   function pt(r, deg) {
@@ -4402,13 +4402,13 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const p1 = pt(r1, deg), p2 = pt(r2, deg);
     return `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${stroke}" stroke-width="${sw}"/>`;
   }
-  function dualRing(syms, names, r, fontSize, labelColor, iconMap) {
+  function dualRingAt(syms, names, angles, r, fontSize, labelColor, iconMap) {
     const sc = fontSize / 16;
     const iconOff = -(fontSize * 0.65);
     const nameOff = fontSize * 0.8;
     const nameSize = (fontSize * 0.72).toFixed(1);
     return syms.map((sym, i) => {
-      const deg = (i / syms.length) * 360 + (180 / syms.length);
+      const deg = angles[i];
       const p = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
       return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
@@ -4417,17 +4417,46 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
         `</g>`;
     }).join("");
   }
+  function sectorPath(rOuter, rInner, aStart, aEnd) {
+    let end = aEnd;
+    if (end <= aStart) end += 360;
+    const sweep = end - aStart;
+    const large = sweep > 180 ? 1 : 0;
+    const o1 = pt(rOuter, aStart), o2 = pt(rOuter, end);
+    const i1 = pt(rInner, aStart), i2 = pt(rInner, end);
+    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
+  }
 
-  const degPerPalace = 360 / Np;
+  const degShuku = 360 / N;
+  const palaceShuku = Array.from({ length: Np }, () => []);
+  for (let si = 0; si < N; si++) palaceShuku[SHUKU_TO_PALACE[si]].push(si);
+  const palaceAngles = palaceShuku.map((idxs) => {
+    const sorted = [...idxs].sort((a, b) => a - b);
+    const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
+    let aStart, aEnd;
+    if (wraps) {
+      let gapAt = 0;
+      for (let k = 0; k < sorted.length - 1; k++) {
+        if (sorted[k + 1] - sorted[k] > 1) { gapAt = k; break; }
+      }
+      aStart = sorted[gapAt + 1] * degShuku;
+      aEnd = (sorted[gapAt] + 1) * degShuku;
+    } else {
+      aStart = sorted[0] * degShuku;
+      aEnd = (sorted[sorted.length - 1] + 1) * degShuku;
+    }
+    let end = aEnd;
+    if (end <= aStart) end += 360;
+    const aMid = (aStart + end) / 2 % 360;
+    return { aStart, aEnd, aMid };
+  });
+  const palaceMids = palaceAngles.map(a => a.aMid);
+
   let elemSectors = "", elemLabels = "";
   PALACE_DATA.forEach((p, i) => {
-    const aStart = i * degPerPalace;
-    const aEnd = aStart + degPerPalace;
-    const aMid = aStart + degPerPalace / 2;
+    const { aStart, aMid } = palaceAngles[i];
     const eColor = ELEM_COLOR[p.element] || "#555";
-    const o1 = pt(R0 - 1, aStart), o2 = pt(R0 - 1, aEnd);
-    const i1 = pt(R1, aStart), i2 = pt(R1, aEnd);
-    elemSectors += `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${R0-1},${R0-1} 0 0 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${R1},${R1} 0 0 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z" fill="${eColor}" opacity="0.28"/>`;
+    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${eColor}" opacity="0.28"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="#fdfaf4" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
@@ -4462,24 +4491,24 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       `<circle r="11" fill="${violet}" stroke="#fff" stroke-width="1.4"/>` +
       `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="11" fill="#fff" font-weight="700">${label}</text></g>`;
   }
+  const hubR = 28;
   function pointerArm(deg) {
     const tip = pt(R_POINTER, deg);
-    const L = pt(R6 + 2, deg - 14);
-    const R = pt(R6 + 2, deg + 14);
+    const L = pt(hubR + 1, deg - 11);
+    const R = pt(hubR + 1, deg + 11);
     return `<polygon points="${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${L.x.toFixed(1)},${L.y.toFixed(1)} ${R.x.toFixed(1)},${R.y.toFixed(1)}" fill="#c9a961" stroke="#a88840" stroke-width="0.4"/>`;
   }
   const goldPointer = pointerArm(0) + pointerArm(120) + pointerArm(240) +
-    `<circle cx="${cx}" cy="${cy}" r="${R6 - 6}" fill="#c9a961" stroke="#a88840" stroke-width="1"/>` +
-    `<circle cx="${cx}" cy="${cy}" r="4.5" fill="#1c1438" stroke="#e0c785" stroke-width="1"/>`;
+    `<circle cx="${cx}" cy="${cy}" r="${hubR}" fill="#120c24" stroke="#c9a961" stroke-width="1.6"/>`;
 
-  // 人物は外側固定の宿位置に配置。命の位置（基準宿の角度）から線を引く
+  // 命は12時固定。人物は基準からの相対角で配置（外周回転後の見た目に合わせる）
   const slotCounts = {};
   let lines = "", markers = "";
-  const meiAnchor = pt(R_PEOPLE, slotDeg(baseIdx));
+  const meiAnchor = pt(R_PEOPLE, 0);
 
   others.forEach((p) => {
     const rel = getRelation(baseIdx, p.shukuIdx);
-    const slot = p.shukuIdx;
+    const slot = ((p.shukuIdx - baseIdx) % N + N) % N;
     const n = slotCounts[slot] || 0;
     slotCounts[slot] = n + 1;
     const deg = slotDeg(slot);
@@ -4493,10 +4522,9 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       `</g>`;
   });
 
-  const mePos = pt(R_PEOPLE, slotDeg(baseIdx));
+  const mePos = pt(R_PEOPLE, 0);
   markers += `<g transform="translate(${mePos.x.toFixed(1)},${mePos.y.toFixed(1)})">` +
     `<circle r="11" fill="#c9a961" stroke="#fff" stroke-width="1.5"/>` +
-    `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#120c24" font-family="'Shippori Mincho',serif" font-weight="700">命</text>` +
     `<text y="20" text-anchor="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml((basePerson.name || "基準").slice(0, 4))}</text>` +
     `</g>`;
 
@@ -4521,21 +4549,21 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   </defs>
   <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#mpSbBg)" stroke="${gold}.45)" stroke-width="1.2"/>
 
-  <g id="mp-astro-fixed">
+  <g id="mp-astro-ring" transform="rotate(${rot.toFixed(2)} ${cx} ${cy})">
     ${elemSectors}
     ${elemLabels}
     ${ticks}
     ${circle(R0, `${gold}.4)`, 1)}
     ${circle(R1, `${gold}.28)`, 0.6)}
     ${circle(R2, `${gold}.22)`, 0.5)}
-    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
+    ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
     ${circle(R3, `${gold}.22)`, 0.5)}
-    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
+    ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
     ${circle(R4, `${gold}.3)`, 0.7)}
     ${shukuLabels}
   </g>
 
-  <g id="mp-compat-ring" transform="rotate(${rot.toFixed(2)} ${cx} ${cy})">
+  <g id="mp-compat-fixed">
     ${circle(R5, `${gold}.22)`, 0.5)}
     ${compatLabels}
     <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.9"/>
@@ -4546,7 +4574,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   <g id="mp-rel-lines">${lines}</g>
   <g id="mp-people">${markers}</g>
 
-  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="15" fill="#fdfaf4" font-weight="700" style="pointer-events:none">${SHUKU[baseIdx].kanji.replace("宿","")}</text>
+  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-family="'Shippori Mincho',serif" font-size="22" fill="#e0c785" font-weight="700" style="pointer-events:none">${SHUKU[baseIdx].kanji.replace("宿","")}</text>
 </svg>`;
 }
 
