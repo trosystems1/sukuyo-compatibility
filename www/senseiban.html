@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>占星盤 - 宿曜占星術</title>
-<meta name="description" content="宿曜の占星盤。内側リングを回して基準（命）を変え、27宿それぞれとの縁を確かめるインタラクティブ盤。">
+<meta name="description" content="宿曜の占星盤。12宮・守護惑星・27宿を重ね、自分の本命宿を12時に据えて縁を確かめる。">
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="assets/fonts/fonts.css">
 <style>
@@ -57,7 +57,6 @@ html, body {
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  cursor: pointer;
   transition: opacity var(--transition);
 }
 .site-header .logo:hover { opacity: .8; }
@@ -113,7 +112,7 @@ html, body {
   display: block;
   width: 22px;
   height: 2px;
-  background: var(--gold-l, #d9b45c);
+  background: var(--gold-l);
   border-radius: 2px;
   transition: transform .22s ease, opacity .22s ease;
 }
@@ -130,8 +129,7 @@ html, body {
     display: none;
     position: absolute;
     top: 100%;
-    left: 0;
-    right: 0;
+    left: 0; right: 0;
     flex-direction: column;
     gap: 2px;
     margin-left: 0;
@@ -157,12 +155,9 @@ html, body {
     radial-gradient(1.5px 1.5px at 45% 15%, rgba(232,224,245,.8), transparent),
     radial-gradient(1px 1px at 62% 78%, rgba(232,224,245,.6), transparent),
     radial-gradient(1px 1px at 78% 30%, rgba(232,224,245,.9), transparent),
-    radial-gradient(1.5px 1.5px at 88% 60%, rgba(232,224,245,.7), transparent),
-    radial-gradient(1px 1px at 35% 85%, rgba(232,224,245,.5), transparent),
-    radial-gradient(1px 1px at 95% 12%, rgba(232,224,245,.6), transparent),
     linear-gradient(180deg, var(--deep) 0%, var(--violet) 130%);
   text-align: center;
-  padding: 90px 24px 80px;
+  padding: 72px 24px 64px;
   position: relative;
   overflow: hidden;
 }
@@ -200,7 +195,7 @@ html, body {
 }
 
 .main-wrap {
-  max-width: 860px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 40px 20px 80px;
 }
@@ -209,7 +204,7 @@ html, body {
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 32px 28px;
+  padding: 28px 24px;
   margin-bottom: 20px;
   position: relative;
   overflow: hidden;
@@ -227,88 +222,178 @@ html, body {
   font-weight: 500;
   letter-spacing: .1em;
   color: var(--ink);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
-.moon-rune-intro-card { text-align: left; }
-.moon-rune-intro-text {
-  font-size: 15.5px;
+.intro-text {
+  font-size: 15px;
   line-height: 1.9;
   color: var(--muted);
-  margin-bottom: 0;
 }
 
-.retry-wrap {
-  background: #fff;
+.me-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--deep);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  padding: 20px 28px;
-  text-align: center;
-  margin-top: 20px;
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  color: var(--moon);
 }
-.btn-retry {
-  display: inline-block;
-  padding: 10px 28px;
+.me-banner.show { display: flex; }
+.me-banner-label {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: .2em;
+  color: var(--gold);
+  margin-bottom: 4px;
+}
+.me-banner-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  letter-spacing: .06em;
+}
+.me-banner-name span { color: var(--gold-l); }
+.me-banner-hint {
+  font-size: 12.5px;
+  color: rgba(232,224,245,.45);
+  margin-top: 4px;
+}
+.btn-me {
+  padding: 10px 18px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--gold);
   border-radius: 5px;
+  color: var(--gold-l);
   font-family: 'Noto Serif JP', serif;
-  font-size: 13.5px;
-  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .08em;
   cursor: pointer;
-  letter-spacing: .12em;
-  text-decoration: none;
   transition: all var(--transition);
+  white-space: nowrap;
 }
-.btn-retry:hover { border-color: var(--gold); color: var(--gold); }
+.btn-me:hover { background: var(--gold-dim); }
+.btn-me.active {
+  background: var(--gold);
+  color: var(--deep);
+}
 
-.site-footer {
-  background: var(--deep);
-  text-align: center;
-  padding: 24px;
-  font-size: 12px;
-  color: rgba(232,224,245,.25);
-  letter-spacing: .15em;
-  border-top: 1px solid var(--border);
+.me-empty {
+  display: none;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--paper2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
 }
+.me-empty.show { display: block; }
+.me-empty a { color: var(--gold); }
 
 .senseiban-wheel-card {
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(74,47,122,.45), transparent 70%),
+    linear-gradient(180deg, #1a1230 0%, #0d0920 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 32px 0 24px;
+  gap: 14px;
+  padding: 28px 16px 24px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
 }
 .senseiban-wheel-holder {
   position: relative;
-  width: 420px;
-  max-width: min(420px, 92vw);
+  width: min(520px, 94vw);
   touch-action: none;
   user-select: none;
+  cursor: grab;
 }
+.senseiban-wheel-holder.grabbing { cursor: grabbing; }
 .senseiban-wheel-holder svg {
   display: block;
   width: 100%;
   height: auto;
-}
-.senseiban-inner-ring-group {
-  cursor: grab;
-}
-.senseiban-inner-ring-group.dragging {
-  cursor: grabbing;
+  filter: drop-shadow(0 0 24px rgba(201,169,97,.12));
 }
 .senseiban-base-label {
   font-family: 'Shippori Mincho', serif;
   font-size: 16px;
-  color: var(--ink);
-  letter-spacing: .04em;
+  color: var(--moon);
+  letter-spacing: .06em;
+  text-align: center;
 }
 .senseiban-base-label span {
-  color: var(--gold);
+  color: var(--gold-l);
   font-weight: 500;
 }
-.senseiban-relation-table-wrap {
-  margin-top: 8px;
+.senseiban-drag-hint {
+  font-size: 12px;
+  color: rgba(232,224,245,.4);
+  letter-spacing: .06em;
 }
+
+.base-picker-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15px;
+  letter-spacing: .08em;
+  margin-bottom: 12px;
+  color: var(--ink);
+}
+.base-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+}
+@media (max-width: 700px) {
+  .base-picker-grid { grid-template-columns: repeat(5, 1fr); }
+}
+@media (max-width: 420px) {
+  .base-picker-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.base-picker-btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 6px;
+  padding: 8px 4px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all var(--transition);
+  line-height: 1.3;
+}
+.base-picker-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.base-picker-btn.active {
+  background: var(--deep);
+  border-color: var(--gold);
+  color: var(--gold-l);
+}
+.base-picker-btn.is-me {
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+.base-picker-btn small {
+  display: block;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 9.5px;
+  color: var(--muted);
+  letter-spacing: .02em;
+  margin-top: 2px;
+}
+.base-picker-btn.active small { color: rgba(232,224,245,.45); }
+
 .senseiban-relation-table {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -345,15 +430,47 @@ html, body {
   font-size: 13px;
   font-weight: 500;
 }
-.senseiban-relation-name {
-  font-size: 13px;
-  color: var(--ink);
-}
-.senseiban-relation-rel {
-  font-size: 11px;
-  color: var(--muted);
+.senseiban-relation-name { font-size: 13px; color: var(--ink); }
+.senseiban-relation-rel { font-size: 11px; color: var(--muted); }
+.senseiban-relation-meta {
+  font-size: 10.5px;
+  color: var(--gold);
+  margin-top: 2px;
+  letter-spacing: .04em;
 }
 
+.retry-wrap {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 28px;
+  text-align: center;
+  margin-top: 8px;
+}
+.btn-retry {
+  display: inline-block;
+  padding: 10px 28px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Noto Serif JP', serif;
+  font-size: 13.5px;
+  color: var(--muted);
+  text-decoration: none;
+  letter-spacing: .12em;
+  transition: all var(--transition);
+}
+.btn-retry:hover { border-color: var(--gold); color: var(--gold); }
+
+.site-footer {
+  background: var(--deep);
+  text-align: center;
+  padding: 24px;
+  font-size: 12px;
+  color: rgba(232,224,245,.25);
+  letter-spacing: .15em;
+  border-top: 1px solid var(--border);
+}
 
 @media (max-width: 900px) {
   .header-nav { gap: 14px; }
@@ -380,30 +497,50 @@ html, body {
 </header>
 
 <div class="hero">
-  <div class="hero-eyebrow">SENSEIBAN · INTERACTIVE WHEEL</div>
+  <div class="hero-eyebrow">SENSEIBAN · 12 PALACES × 27 MANSIONS</div>
   <h1 class="hero-title">占星盤</h1>
   <p class="hero-sub">
-    内側のリングを指でドラッグして回し、<br>
-    好きな宿を「命」の位置に合わせて、27宿それぞれとの縁を確かめてみましょう。
+    12宮・守護惑星・27宿を重ねた盤。<br>
+    自分の本命宿を12時（命）に据えて、縁の配置を確かめてみましょう。
   </p>
 </div>
 
 <main class="main-wrap">
-  <div class="card moon-rune-intro-card">
+  <div class="card">
     <div class="card-title">使い方</div>
-    <p class="moon-rune-intro-text">
-      内側の運勢ワードのリングをドラッグすると回転します。リング中央上部（12時の位置）に重なった外側の宿が「基準（命）」になります。基準を変えると、下に表示される27宿それぞれとの関係が自動的に切り替わります。
+    <p class="intro-text">
+      外側は12宮と守護惑星、その内側に27宿と運気（命・栄・親…）が並びます。宿のリングをドラッグするか、下の宿ボタンを押すと基準が変わります。12時の位置にある宿が「基準（命）」です。
     </p>
+  </div>
+
+  <div class="me-banner" id="me-banner">
+    <div>
+      <div class="me-banner-label">MY HONMEI</div>
+      <div class="me-banner-name" id="me-banner-name">—</div>
+      <div class="me-banner-hint">登録した「わたし」の本命宿を12時にセットできます</div>
+    </div>
+    <button type="button" class="btn-me" id="btn-set-me">わたしの宿を12時に</button>
+  </div>
+  <div class="me-empty" id="me-empty">
+    マイページに「わたし」が未登録です。占い結果から保存するか、<a href="index.html#mypage">マイページ</a>で登録すると、ワンタップで本命宿を12時に据えられます。
   </div>
 
   <div class="senseiban-wheel-card">
     <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
     <div class="senseiban-base-label">
       基準（命）：<span id="senseiban-base-shuku">昴宿</span>
+      <span id="senseiban-base-palace" style="opacity:.7;font-size:13px;margin-left:8px;"></span>
     </div>
+    <div class="senseiban-drag-hint">宿の帯をドラッグして回転 · 27分割でスナップ</div>
   </div>
 
-  <div class="senseiban-relation-table-wrap">
+  <div class="card">
+    <div class="base-picker-title">基準の宿を選ぶ</div>
+    <div class="base-picker-grid" id="base-picker-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">基準から見た27宿の縁</div>
     <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
   </div>
 
@@ -478,167 +615,422 @@ const COMPAT_TABLE = [
   { key:"栄", score:78, name:"栄の関係",  color:"#2e7d32", text:"互いを輝かせる縁。相手の良い面を引き出し合う。",   pairName:"栄・親", pairYomi:"えいしん" },  // 26
 ];
 
+const PALACE_DATA = [
+  // 羊宮: 婁・胃・昴（SHUKUインデックス 25,26,0）
+  { name:"羊宮",  sym:"♈", planet:"火星",  planetSym:"♂",  element:"火", quality:"活動", keyphrase:"I am",      color:"#e85555", shukuIdx:[25,26,0]  },
+  // 牛宮: 昴・畢・觜（0,1,2）
+  { name:"牛宮",  sym:"♉", planet:"金星",  planetSym:"♀",  element:"地", quality:"不動", keyphrase:"I have",    color:"#c9a961", shukuIdx:[0,1,2]    },
+  // 夫妻宮: 觜・参・井（2,3,4）
+  { name:"夫妻宮",sym:"♊", planet:"水星",  planetSym:"☿",  element:"風", quality:"柔軟", keyphrase:"I think",   color:"#6db3f2", shukuIdx:[2,3,4]    },
+  // 蟹宮: 井・鬼・柳（4,5,6）
+  { name:"蟹宮",  sym:"♋", planet:"月",    planetSym:"☽",  element:"水", quality:"活動", keyphrase:"I feel",    color:"#a0c4ff", shukuIdx:[4,5,6]    },
+  // 獅子宮: 星・張・翼（7,8,9）
+  { name:"獅子宮",sym:"♌", planet:"太陽",  planetSym:"☀",  element:"火", quality:"不動", keyphrase:"I create",  color:"#e89555", shukuIdx:[7,8,9]    },
+  // 女宮: 翼・軫・角（9,10,11）
+  { name:"女宮",  sym:"♍", planet:"水星",  planetSym:"☿",  element:"地", quality:"柔軟", keyphrase:"I analyze", color:"#9de06e", shukuIdx:[9,10,11]  },
+  // 秤宮: 角・亢・底（11,12,13）
+  { name:"秤宮",  sym:"♎", planet:"金星",  planetSym:"♀",  element:"風", quality:"活動", keyphrase:"I balance", color:"#f9c6d0", shukuIdx:[11,12,13] },
+  // 蠍宮: 底・房・心（13,14,15）
+  { name:"蠍宮",  sym:"♏", planet:"冥王星",planetSym:"PL", element:"水", quality:"不動", keyphrase:"I desire",  color:"#9b59b6", shukuIdx:[13,14,15] },
+  // 弓宮: 尾・箕・斗（16,17,18）
+  { name:"弓宮",  sym:"♐", planet:"木星",  planetSym:"♃",  element:"火", quality:"柔軟", keyphrase:"I explora", color:"#e8d055", shukuIdx:[16,17,18] },
+  // 磨宮: 斗・女・虚（18,19,20）
+  { name:"磨宮",  sym:"♑", planet:"土星",  planetSym:"♄",  element:"地", quality:"活動", keyphrase:"I use",     color:"#8a8a8a", shukuIdx:[18,19,20] },
+  // 瓶宮: 虚・危・室（20,21,22）
+  { name:"瓶宮",  sym:"♒", planet:"天王星",planetSym:"⛢",  element:"風", quality:"不動", keyphrase:"I know",    color:"#5ec4e8", shukuIdx:[20,21,22] },
+  // 魚宮: 室・壁・奎（22,23,24）
+  { name:"魚宮",  sym:"♓", planet:"海王星",planetSym:"♆",  element:"水", quality:"柔軟", keyphrase:"I believe", color:"#7087f7", shukuIdx:[22,23,24] },
+];
+
+const SHUKU_TO_PALACE = (() => {
+  const map = {};
+  PALACE_DATA.forEach((p, pi) => {
+    p.shukuIdx.forEach(si => { if (!(si in map)) map[si] = pi; });
+  });
+  return map;
+})();
+
+const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+
+const _ICON_S = "#c9a961";
+const PALACE_ICONS = {
+  "♈": `<path d="M0,-7 Q-6,-1 0,4 Q6,-1 0,-7" stroke="${_ICON_S}" stroke-width="1.3" fill="none"/><line x1="0" y1="4" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.3"/>`,
+  "♉": `<path d="M-6,1 Q-6,7 0,7 Q6,7 6,1" stroke="${_ICON_S}" stroke-width="1.3" fill="none"/><path d="M-7,-4 Q0,1 7,-4" stroke="${_ICON_S}" stroke-width="1.3" fill="none"/>`,
+  "♊": `<line x1="-4" y1="-7" x2="-4" y2="7" stroke="${_ICON_S}" stroke-width="1.3"/><line x1="4" y1="-7" x2="4" y2="7" stroke="${_ICON_S}" stroke-width="1.3"/><line x1="-7" y1="-5" x2="7" y2="-5" stroke="${_ICON_S}" stroke-width="1.3"/><line x1="-7" y1="5" x2="7" y2="5" stroke="${_ICON_S}" stroke-width="1.3"/>`,
+  "♋": `<path d="M-7,0 Q-7,-6 0,-5 Q7,-6 7,0" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M7,0 Q7,6 0,5 Q-7,6 -7,0" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><circle cx="-8" cy="0" r="1.5" fill="${_ICON_S}"/><circle cx="8" cy="0" r="1.5" fill="${_ICON_S}"/>`,
+  "♌": `<path d="M-6,-3 Q-6,4 0,4 Q6,4 6,-1 Q6,-7 1,-7 Q-2,-7 -2,-3" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><circle cx="6" cy="6" r="2" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "♍": `<line x1="-6" y1="-7" x2="-6" y2="4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="0" y1="-7" x2="0" y2="4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="6" y1="-7" x2="6" y2="7" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-6,4 Q-3,8 0,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M0,4 Q3,8 6,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "♎": `<line x1="-7" y1="6" x2="7" y2="6" stroke="${_ICON_S}" stroke-width="1.3"/><path d="M-5,-2 Q0,-9 5,-2" stroke="${_ICON_S}" stroke-width="1.3" fill="none"/><line x1="-7" y1="2" x2="7" y2="2" stroke="${_ICON_S}" stroke-width="1.3"/>`,
+  "♏": `<line x1="-6" y1="-7" x2="-6" y2="4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="0" y1="-7" x2="0" y2="4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="6" y1="-7" x2="6" y2="1" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-6,4 Q-3,8 0,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M0,4 Q3,8 6,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M4,-2 L8,1 L4,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "♐": `<line x1="-6" y1="6" x2="6" y2="-6" stroke="${_ICON_S}" stroke-width="1.5"/><line x1="6" y1="-6" x2="1" y2="-6" stroke="${_ICON_S}" stroke-width="1.5"/><line x1="6" y1="-6" x2="6" y2="-1" stroke="${_ICON_S}" stroke-width="1.5"/>`,
+  "♑": `<path d="M-7,-6 Q-7,0 -3,2 Q0,4 0,7" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M-3,2 Q2,-2 6,-6" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M6,-6 Q9,0 6,4 Q3,7 0,7" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "♒": `<path d="M-7,-2 Q-3.5,-7 0,-2 Q3.5,3 7,-2" stroke="${_ICON_S}" stroke-width="1.4" fill="none"/><path d="M-7,4 Q-3.5,-1 0,4 Q3.5,9 7,4" stroke="${_ICON_S}" stroke-width="1.4" fill="none"/>`,
+  "♓": `<line x1="0" y1="-8" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-6,-4 Q0,-8 6,-4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><path d="M-6,4 Q0,8 6,4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+};
+const PLANET_ICONS = {
+  "♂":  `<circle cx="0" cy="-2" r="5" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="3" y1="-6" x2="7" y2="-7" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="7" y1="-7" x2="7" y2="-3" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="7" y1="-7" x2="3" y2="-3" stroke="${_ICON_S}" stroke-width="1.2"/>`,
+  "♀":  `<circle cx="0" cy="-2" r="5" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="0" y1="3" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-3" y1="6" x2="3" y2="6" stroke="${_ICON_S}" stroke-width="1.2"/>`,
+  "☿":  `<circle cx="0" cy="1" r="4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="0" y1="5" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-3" y1="7" x2="3" y2="7" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-4,-3 Q0,-8 4,-3" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "☽":  `<path d="M3,-7 Q-6,-4 -6,0 Q-6,4 3,7 Q-1,4 -1,0 Q-1,-4 3,-7" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "☀":  `<circle cx="0" cy="0" r="5" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><circle cx="0" cy="0" r="1.8" fill="${_ICON_S}"/>`,
+  "♃":  `<line x1="-4" y1="-7" x2="-4" y2="7" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-4,-1 Q1,-7 5,-1" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="-7" y1="3" x2="7" y2="3" stroke="${_ICON_S}" stroke-width="1.2"/>`,
+  "♄":  `<line x1="1" y1="-8" x2="1" y2="7" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-3" y1="7" x2="5" y2="7" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M1,-2 Q-5,-2 -5,2 Q-5,6 1,6" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/>`,
+  "⛢":  `<circle cx="0" cy="0" r="5" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="0" y1="-8" x2="0" y2="-5" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="0" y1="5" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-8" y1="0" x2="-5" y2="0" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="5" y1="0" x2="8" y2="0" stroke="${_ICON_S}" stroke-width="1.2"/><circle cx="0" cy="0" r="2" fill="${_ICON_S}"/>`,
+  "♆":  `<line x1="0" y1="-8" x2="0" y2="8" stroke="${_ICON_S}" stroke-width="1.2"/><path d="M-6,0 Q0,-7 6,0" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="-5" y1="5" x2="5" y2="5" stroke="${_ICON_S}" stroke-width="1.2"/>`,
+  "PL": `<circle cx="-1" cy="3" r="4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="-1" y1="-1" x2="-1" y2="-7" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-4" y1="-4" x2="2" y2="-4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="4" y1="-1" x2="7" y2="-7" stroke="${_ICON_S}" stroke-width="1.2"/>`,
+};
+
 function getRelation(idxA, idxB) {
-  // 【2026/6 再修正】kosei-do.co.jp(Takemoto-sensei公式サイト)の占星盤解説ページ
-  // (https://kosei-do.co.jp/details/senseiban.html) の実例データと27件全件照合した結果、
-  // diffの方向は (idxA - idxB) が正しいことが判明（従来は (idxB - idxA) で逆方向だった）
   const diff = ((idxA - idxB) % 27 + 27) % 27;
   return { ...COMPAT_TABLE[diff], diff };
 }
 
-let senseibanRotation = 0; // 現在の内側リング回転角度（度）
-let senseibanBaseIdx = 0;  // 現在の基準宿のSHUKUインデックス
+const BOOK_KEY = "sukuyo_people_v1";
+
+let senseibanBaseIdx = 0;
+let senseibanRotation = 0; // 宿リングの回転（度）
+let myShukuIdx = null;
+let myPerson = null;
+
+function loadMe() {
+  try {
+    const list = JSON.parse(localStorage.getItem(BOOK_KEY) || "[]");
+    myPerson = list.find(p => p.isMe) || null;
+    myShukuIdx = myPerson && Number.isInteger(myPerson.shukuIdx) ? myPerson.shukuIdx : null;
+  } catch (e) {
+    myPerson = null;
+    myShukuIdx = null;
+  }
+}
 
 function buildSenseibanSVG() {
-  const cx = 210, cy = 210;
-  const outerR = 185, innerR = 118;
-  const N = 27;
+  const cx = 220, cy = 220, vb = 440;
+  const N = 27, Np = 12;
+  const gold = "rgba(201,169,97,";
 
-  const relationRing = COMPAT_TABLE.map(r => r.key);
-  const outerNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+  const R0 = 214, R1 = 196, R2 = 164, R3 = 132, R4 = 108, R5 = 76, R6 = 44;
 
-  function ringText(items, radius, fontSize, extraClass, extraAttrs) {
+  function pt(r, deg) {
+    const rad = (deg - 90) * Math.PI / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function circle(r, stroke, sw, fill) {
+    return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${fill||'none'}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  function spoke(r1, r2, deg, stroke, sw) {
+    const p1 = pt(r1, deg), p2 = pt(r2, deg);
+    return `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${stroke}" stroke-width="${sw}"/>`;
+  }
+  function dualRing(syms, names, r, fontSize, labelColor, iconMap) {
+    const sc = fontSize / 16;
+    const iconOff = -(fontSize * 0.7);
+    const nameOff = fontSize * 0.85;
+    const nameSize = (fontSize * 0.75).toFixed(1);
+    return syms.map((sym, i) => {
+      const deg = (i / syms.length) * 360 + (180 / syms.length);
+      const p = pt(r, deg);
+      const iconPath = iconMap ? iconMap[sym] : null;
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
+        (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
+        `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
+        `</g>`;
+    }).join("");
+  }
+  function labelRing(items, r, fontSize, fillFn) {
     return items.map((label, i) => {
-      const angle = (i / N) * 360 - 90;
-      const rad = angle * Math.PI / 180;
-      const x = cx + radius * Math.cos(rad);
-      const y = cy + radius * Math.sin(rad);
-      const rot = angle + 90;
-      return `<text x="${x.toFixed(2)}" y="${y.toFixed(2)}" class="${extraClass}" font-size="${fontSize}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${x.toFixed(2)} ${y.toFixed(2)})" ${extraAttrs||""}>${label}</text>`;
+      const deg = (i / items.length) * 360 + (180 / items.length);
+      const p = pt(r, deg);
+      const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
     }).join("");
   }
 
+  // エレメント帯（薄い色セクター）
+  const degPerPalace = 360 / Np;
+  let elemSectors = "";
+  PALACE_DATA.forEach((p, i) => {
+    const aStart = i * degPerPalace;
+    const aEnd = aStart + degPerPalace;
+    const eColor = ELEM_COLOR[p.element] || "#555";
+    const o1 = pt(R0 - 2, aStart), o2 = pt(R0 - 2, aEnd);
+    const i1 = pt(R1, aStart), i2 = pt(R1, aEnd);
+    elemSectors += `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${R0-2},${R0-2} 0 0 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${R1},${R1} 0 0 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z" fill="${eColor}" opacity="0.22"/>`;
+  });
+
+  let ticks = "";
+  for (let i = 0; i < 120; i++) {
+    const deg = i * 3;
+    const isMain = i % 10 === 0;
+    ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
+  }
+
+  let spokes27 = "";
+  for (let i = 0; i < N; i++) {
+    spokes27 += spoke(R3, R4, i * (360 / N), `${gold}.18)`, 0.5);
+  }
+
+  const palaceSyms = PALACE_DATA.map(p => p.sym);
+  const palaceNames = PALACE_DATA.map(p => p.name);
+  const planetSyms = PALACE_DATA.map(p => p.planetSym);
+  const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+
+  // 固定の運気ラベル：12時=命。表示位置 i には COMPAT[(27-i)%27]
+  const compatDisplay = Array.from({ length: N }, (_, i) => {
+    const d = (27 - i) % 27;
+    return COMPAT_TABLE[d].key;
+  });
+  const compatFill = (i) => {
+    const d = (27 - i) % 27;
+    return COMPAT_TABLE[d].color || `${gold}.55)`;
+  };
+
+  const slotHalf = 180 / N;
+  const meiDeg = 0 * (360 / N) + slotHalf;
+  const gyoDeg = 9 * (360 / N) + slotHalf;
+  const taiDeg = 18 * (360 / N) + slotHalf;
+  const triR = R5;
+  const meiPt = pt(triR, meiDeg);
+  const gyoPt = pt(triR, gyoDeg);
+  const taiPt = pt(triR, taiDeg);
+  const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
+  const ringStroke = `${gold}.25)`;
+
+  // 12時マーカー（宿帯の外側）
+  const marker = `<polygon points="${cx-8},${cy-R3+2} ${cx+8},${cy-R3+2} ${cx},${cy-R4+6}" fill="#c9a961" opacity="0.95"/>`;
+
   return `
-<svg viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient id="senseibanBg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#fdfaf4"/>
-      <stop offset="100%" stop-color="#f3ecdd"/>
+    <radialGradient id="sbBg" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#1c1438"/>
+      <stop offset="100%" stop-color="#0d0920"/>
     </radialGradient>
   </defs>
-  <circle cx="${cx}" cy="${cy}" r="205" fill="url(#senseibanBg)" stroke="#c9a961" stroke-width="1.5"/>
+  <circle cx="${cx}" cy="${cy}" r="${R0+6}" fill="url(#sbBg)" stroke="${gold}.45)" stroke-width="1.2"/>
 
-  <!-- 外側リング：27宿（固定） -->
-  <g>
-    <circle cx="${cx}" cy="${cy}" r="${outerR}" fill="none" stroke="rgba(74,47,122,.25)" stroke-width="1"/>
-    <circle cx="${cx}" cy="${cy}" r="${outerR - 38}" fill="none" stroke="rgba(74,47,122,.18)" stroke-width="1"/>
-    <g fill="#241b3e">${ringText(outerNames, outerR - 19, 14, "senseiban-outer-text")}</g>
+  <!-- 固定：目盛り・エレメント・12宮・惑星 -->
+  <g id="sb-fixed">
+    ${elemSectors}
+    ${circle(R0, `${gold}.4)`, 1)}
+    ${ticks}
+    ${circle(R1, `${gold}.25)`, 0.6)}
+    ${circle(R2, `${gold}.2)`, 0.5)}
+    ${Array.from({length:Np}, (_,i) => spoke(R1, R2, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
+    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 12, `${gold}.75)`, PALACE_ICONS)}
+    ${circle(R3, `${gold}.2)`, 0.5)}
+    ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.15)`, 0.4)).join("")}
+    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 10, `${gold}.65)`, PLANET_ICONS)}
+    ${circle(R4, `${gold}.3)`, 0.8)}
+    ${spokes27}
   </g>
 
-  <!-- 内側リング：11分類の運勢ワード（ドラッグで回転） -->
-  <g class="senseiban-inner-ring-group" id="senseiban-inner-ring-group" transform="rotate(0 ${cx} ${cy})">
-    <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="#fff" stroke="rgba(201,169,97,.5)" stroke-width="1"/>
-    <circle cx="${cx}" cy="${cy}" r="${innerR - 36}" fill="none" stroke="rgba(201,169,97,.3)" stroke-width="1"/>
-    <g fill="#b8953a">${ringText(relationRing, innerR - 18, 15, "senseiban-inner-text")}</g>
+  <!-- 回転：27宿 -->
+  <g id="sb-shuku-ring" transform="rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})">
+    ${labelRing(shukuNames, (R3+R4)/2, 11, `${gold}.85)`)}
   </g>
 
-  <!-- 基準点マーカー（12時位置） -->
-  <polygon points="${cx-8},${cy-outerR-2} ${cx+8},${cy-outerR-2} ${cx},${cy-outerR+14}" fill="#c9a961"/>
+  <!-- 固定：運気ラベル（12時=命）＋命業胎三角形 -->
+  <g id="sb-compat-fixed">
+    ${circle(R5, ringStroke, 0.6)}
+    ${labelRing(compatDisplay, (R4+R5)/2, 11, (i) => compatFill(i))}
+    <polygon points="${triPts}" fill="none" stroke="${ringStroke}" stroke-width="0.6" stroke-linejoin="round"/>
+  </g>
 
-  <circle cx="${cx}" cy="${cy}" r="${innerR - 38}" fill="rgba(253,250,244,.9)" stroke="rgba(201,169,97,.4)" stroke-width="1"/>
-  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-size="28" fill="#4a3f8c">☽</text>
+  ${marker}
+  ${circle(R6, `${gold}.55)`, 1.3, "rgba(20,15,40,.95)")}
+  <text id="sb-center-kanji" x="${cx}" y="${cy-8}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="18" fill="#c9a961" font-weight="700">昴</text>
+  <text x="${cx}" y="${cy+12}" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Serif JP',serif" font-size="9" fill="rgba(201,169,97,.7)">命宿</text>
 </svg>`;
 }
 
-function renderSenseibanRelationTable() {
+function setBaseIdx(idx, { animate = true } = {}) {
+  const N = 27;
+  const deg = 360 / N;
+  senseibanBaseIdx = ((idx % N) + N) % N;
+  senseibanRotation = -senseibanBaseIdx * deg;
+  const group = document.getElementById("sb-shuku-ring");
+  if (group) {
+    if (animate) group.style.transition = "transform .35s ease";
+    else group.style.transition = "none";
+    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} 220 220)`);
+    if (animate) {
+      clearTimeout(setBaseIdx._t);
+      setBaseIdx._t = setTimeout(() => { group.style.transition = "none"; }, 380);
+    }
+  }
+  updateLabels();
+  renderRelationTable();
+  syncPicker();
+  syncMeButton();
+}
+
+function updateLabels() {
+  const s = SHUKU[senseibanBaseIdx];
+  document.getElementById("senseiban-base-shuku").textContent = s.kanji;
+  const palace = PALACE_DATA[SHUKU_TO_PALACE[senseibanBaseIdx]];
+  const palaceEl = document.getElementById("senseiban-base-palace");
+  if (palace) {
+    palaceEl.textContent = `／ ${palace.name} · ${palace.planet} · ${palace.element}`;
+  } else {
+    palaceEl.textContent = "";
+  }
+  const center = document.getElementById("sb-center-kanji");
+  if (center) center.textContent = s.kanji.replace("宿", "");
+}
+
+function renderRelationTable() {
   const table = document.getElementById("senseiban-relation-table");
   const baseIdx = senseibanBaseIdx;
-  const cells = SHUKU.map((s, idx) => {
+  table.innerHTML = SHUKU.map((s, idx) => {
     const rel = getRelation(baseIdx, idx);
     const isBase = idx === baseIdx;
+    const palace = PALACE_DATA[SHUKU_TO_PALACE[idx]];
+    const meta = palace ? `${palace.name} · ${palace.planet}` : "";
     return `
-      <div class="senseiban-relation-cell ${isBase ? "is-base" : ""}">
+      <div class="senseiban-relation-cell ${isBase ? "is-base" : ""}" data-idx="${idx}" role="button" tabindex="0">
         <div class="senseiban-relation-badge" style="background:${rel.color}22; color:${rel.color};">${rel.key}</div>
         <div>
           <div class="senseiban-relation-name">${s.kanji}（${s.yomi}）</div>
           <div class="senseiban-relation-rel">${isBase ? "基準（命）" : rel.name}</div>
+          <div class="senseiban-relation-meta">${meta}</div>
         </div>
       </div>`;
   }).join("");
-  table.innerHTML = cells;
+
+  table.querySelectorAll(".senseiban-relation-cell").forEach(cell => {
+    cell.addEventListener("click", () => {
+      const idx = parseInt(cell.dataset.idx, 10);
+      setBaseIdx(idx);
+    });
+  });
 }
 
-function updateSenseibanBase() {
-  // 内側リングの回転角度から、12時位置に来ている外側の宿（基準）を逆算する
-  // 内側リングが時計回りに回転すると、相対的に基準点は反時計回りに動く
-  const N = 27;
-  const anglePerSlot = 360 / N;
-  // senseibanRotationは「内側リングが何度回転したか」。0番目の宿（昴）が基準のとき回転0度。
-  const rawIdx = Math.round((-senseibanRotation / anglePerSlot)) % N;
-  const idx = ((rawIdx % N) + N) % N;
-  senseibanBaseIdx = idx;
-  document.getElementById("senseiban-base-shuku").textContent = SHUKU[idx].kanji;
-  renderSenseibanRelationTable();
+function renderPicker() {
+  const grid = document.getElementById("base-picker-grid");
+  grid.innerHTML = SHUKU.map((s, i) => {
+    const isMe = myShukuIdx === i;
+    return `<button type="button" class="base-picker-btn${isMe ? " is-me" : ""}" data-idx="${i}">
+      ${s.kanji.replace("宿","")}
+      <small>${isMe ? "わたし" : s.yomi}</small>
+    </button>`;
+  }).join("");
+  grid.querySelectorAll(".base-picker-btn").forEach(btn => {
+    btn.addEventListener("click", () => setBaseIdx(parseInt(btn.dataset.idx, 10)));
+  });
+  syncPicker();
 }
 
-function initSenseibanDrag() {
+function syncPicker() {
+  document.querySelectorAll(".base-picker-btn").forEach(btn => {
+    btn.classList.toggle("active", parseInt(btn.dataset.idx, 10) === senseibanBaseIdx);
+  });
+}
+
+function syncMeButton() {
+  const btn = document.getElementById("btn-set-me");
+  if (!btn) return;
+  const on = myShukuIdx !== null && senseibanBaseIdx === myShukuIdx;
+  btn.classList.toggle("active", on);
+  btn.textContent = on ? "わたしの宿（12時）" : "わたしの宿を12時に";
+}
+
+function renderMeUI() {
+  const banner = document.getElementById("me-banner");
+  const empty = document.getElementById("me-empty");
+  if (myShukuIdx !== null && myPerson) {
+    banner.classList.add("show");
+    empty.classList.remove("show");
+    const s = SHUKU[myShukuIdx];
+    const name = myPerson.name ? `${myPerson.name} · ` : "";
+    document.getElementById("me-banner-name").innerHTML =
+      `${name}<span>${s.kanji}</span>（${s.yomi}）`;
+  } else {
+    banner.classList.remove("show");
+    empty.classList.add("show");
+  }
+}
+
+function initDrag() {
   const holder = document.getElementById("senseiban-wheel-holder");
-  const group = document.getElementById("senseiban-inner-ring-group");
-  if (!holder || !group || holder.dataset.dragInit) return;
+  if (!holder || holder.dataset.dragInit) return;
   holder.dataset.dragInit = "true";
 
-  const svg = holder.querySelector("svg");
-  const cx = 210, cy = 210;
+  const cx = 220, cy = 220;
+  const N = 27;
+  const degPerSlot = 360 / N;
   let dragging = false;
   let startAngle = 0;
   let startRotation = 0;
 
   function getSvgPoint(clientX, clientY) {
+    const svg = holder.querySelector("svg");
     const rect = svg.getBoundingClientRect();
-    const scale = 420 / rect.width; // viewBoxは0 0 420 420
-    const x = (clientX - rect.left) * scale;
-    const y = (clientY - rect.top) * scale;
-    return { x, y };
+    const scale = 440 / rect.width;
+    return { x: (clientX - rect.left) * scale, y: (clientY - rect.top) * scale };
   }
-
   function angleAt(clientX, clientY) {
     const p = getSvgPoint(clientX, clientY);
     return Math.atan2(p.y - cy, p.x - cx) * 180 / Math.PI;
   }
 
-  function onPointerDown(e) {
+  function onDown(e) {
+    const pt = e.touches ? e.touches[0] : e;
     dragging = true;
-    group.classList.add("dragging");
-    const point = e.touches ? e.touches[0] : e;
-    startAngle = angleAt(point.clientX, point.clientY);
+    startAngle = angleAt(pt.clientX, pt.clientY);
     startRotation = senseibanRotation;
+    holder.classList.add("grabbing");
+    const group = document.getElementById("sb-shuku-ring");
+    if (group) group.style.transition = "none";
     e.preventDefault();
   }
-
-  function onPointerMove(e) {
+  function onMove(e) {
     if (!dragging) return;
-    const point = e.touches ? e.touches[0] : e;
-    const currentAngle = angleAt(point.clientX, point.clientY);
-    const delta = currentAngle - startAngle;
+    const pt = e.touches ? e.touches[0] : e;
+    const delta = angleAt(pt.clientX, pt.clientY) - startAngle;
     senseibanRotation = startRotation + delta;
-    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
+    const group = document.getElementById("sb-shuku-ring");
+    if (group) group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
+    // ライブで基準を更新
+    const raw = Math.round((-senseibanRotation / degPerSlot)) % N;
+    const idx = ((raw % N) + N) % N;
+    if (idx !== senseibanBaseIdx) {
+      senseibanBaseIdx = idx;
+      updateLabels();
+      syncPicker();
+      syncMeButton();
+    }
     e.preventDefault();
   }
-
-  function onPointerUp() {
+  function onUp() {
     if (!dragging) return;
     dragging = false;
-    group.classList.remove("dragging");
-    // 27分割の最も近い角度にスナップ
-    const anglePerSlot = 360 / 27;
-    const snapped = Math.round(senseibanRotation / anglePerSlot) * anglePerSlot;
-    senseibanRotation = snapped;
-    group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
-    updateSenseibanBase();
+    holder.classList.remove("grabbing");
+    const snapped = Math.round(senseibanRotation / degPerSlot) * degPerSlot;
+    setBaseIdx(Math.round((-snapped / degPerSlot) % N + N) % N, { animate: true });
   }
 
-  holder.addEventListener("mousedown", onPointerDown);
-  window.addEventListener("mousemove", onPointerMove);
-  window.addEventListener("mouseup", onPointerUp);
-  holder.addEventListener("touchstart", onPointerDown, { passive: false });
-  window.addEventListener("touchmove", onPointerMove, { passive: false });
-  window.addEventListener("touchend", onPointerUp);
+  holder.addEventListener("mousedown", onDown);
+  holder.addEventListener("touchstart", onDown, { passive: false });
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("touchmove", onMove, { passive: false });
+  window.addEventListener("mouseup", onUp);
+  window.addEventListener("touchend", onUp);
 }
 
-const holder = document.getElementById("senseiban-wheel-holder");
-holder.innerHTML = buildSenseibanSVG();
-initSenseibanDrag();
-renderSenseibanRelationTable();
+// ── boot ──
+loadMe();
+renderMeUI();
+document.getElementById("senseiban-wheel-holder").innerHTML = buildSenseibanSVG();
+initDrag();
+renderPicker();
+
+const initial = myShukuIdx !== null ? myShukuIdx : 0;
+setBaseIdx(initial, { animate: false });
+
+document.getElementById("btn-set-me").addEventListener("click", () => {
+  if (myShukuIdx === null) return;
+  setBaseIdx(myShukuIdx);
+});
 
 const navToggleBtn = document.getElementById("nav-toggle");
 const headerNavEl = document.getElementById("header-nav");
