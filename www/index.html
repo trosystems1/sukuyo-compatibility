@@ -4431,15 +4431,15 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const gold = "rgba(201,169,97,";
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 140;
-  const R_MEM_O = 140, R_MEM_I = 126;
-  const R4 = 106, R5 = 78, R6 = 46;
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 142;
+  const R_MEM_O = 142, R_MEM_I = 118;
+  const R4 = 104, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
   const R_SHUKU = (R_MEM_I + R4) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
   const R_POINTER = R_COMPAT - 15;
-  const rot = -baseIdx * (360 / N); // 外周を回して基準宿を12時（命）へ
+  const rot = -(baseIdx + 0.5) * (360 / N); // 基準宿の中央を12時（命）へ
 
   function slotDeg(i) { return (i / N) * 360; }
   function pt(r, deg) {
@@ -4517,30 +4517,35 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
   let shukuLabels = "";
   for (let i = 0; i < N; i++) {
-    const deg = slotDeg(i);
+    const deg = slotDeg(i) + degShuku / 2;
     const p = pt(R_SHUKU, deg);
     shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
   }
 
-  // 4足メモリ帯（占星盤ページと同じ・1宿=4目盛り）
+  // 4足メモリ帯：ストローク円で帯を塗り、各宿を4マスに罫線分割
   const degFoot = degShuku / 4;
+  const rMemMid = (R_MEM_O + R_MEM_I) / 2;
+  const memStroke = (R_MEM_O - R_MEM_I).toFixed(1);
   let ashiBand =
-    `<path fill="#c9a961" fill-opacity="0.38" fill-rule="evenodd" d="M${cx},${cy - R_MEM_O} A${R_MEM_O},${R_MEM_O} 0 1 1 ${cx - 0.01},${cy - R_MEM_O} Z M${cx},${cy - R_MEM_I} A${R_MEM_I},${R_MEM_I} 0 1 0 ${cx - 0.01},${cy - R_MEM_I} Z"/>` +
-    circle(R_MEM_O, `${gold}.7)`, 1.05) +
-    circle(R_MEM_I, `${gold}.55)`, 0.85);
+    `<circle cx="${cx}" cy="${cy}" r="${rMemMid.toFixed(1)}" fill="none" stroke="#c9a961" stroke-opacity="0.52" stroke-width="${memStroke}"/>` +
+    circle(R_MEM_O, `${gold}.85)`, 1.25) +
+    circle(R_MEM_I, `${gold}.75)`, 1.05);
   for (let si = 0; si < N; si++) {
     const feet = feetOfGroup(groupOfIdx(si));
-    const base = slotDeg(si);
+    const base = si * degShuku;
     feet.forEach((elem, fi) => {
       const a0 = base + fi * degFoot;
       const a1 = a0 + degFoot;
-      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.15)";
-      ashiBand += sectorPath(R_MEM_O - 0.5, R_MEM_I + 0.5, a0, a1).replace("/>", ` fill="${soft}"/>`);
+      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.18)";
+      const zebra = fi % 2 === 0 ? "rgba(253,246,220,.22)" : "rgba(48,34,12,.16)";
+      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${zebra}"/>`);
+      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${soft}"/>`);
     });
-    ashiBand += spoke(R_MEM_O, R_MEM_I, base, "rgba(72,52,24,.72)", 1.1);
     for (let fi = 1; fi < 4; fi++) {
-      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(90,68,32,.42)", 0.5);
+      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(253,246,220,.95)", 1.05);
     }
+    ashiBand += spoke(R_MEM_O + 0.5, R4, base, "rgba(253,246,220,.55)", 2.4);
+    ashiBand += spoke(R_MEM_O, R4, base, "rgba(40,28,10,.96)", 1.55);
   }
 
 

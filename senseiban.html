@@ -320,7 +320,6 @@ html, body {
   display: block;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 8px 28px rgba(18,12,36,.18));
 }
 .senseiban-base-label {
   font-family: 'Shippori Mincho', serif;
@@ -797,9 +796,9 @@ function buildSenseibanSVG() {
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
   // 外→内: 火地風水 / 惑星 / 宮 / 4足メモリ帯 / 27宿 / 運気
-  const R0 = 224, R1 = 200, R2 = 168, R3 = 140;
-  const R_MEM_O = 140, R_MEM_I = 126; // 黄の4足メモリ（1宿=4目盛り）
-  const R4 = 106, R5 = 78, R6 = 46;
+  const R0 = 224, R1 = 200, R2 = 168, R3 = 142;
+  const R_MEM_O = 142, R_MEM_I = 118; // 黄の4足メモリ（1宿=4マス・帯を太くして罫線を見やすく）
+  const R4 = 104, R5 = 78, R6 = 46;
   const R_ELEM = (R0 + R1) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_SHUKU = (R_MEM_I + R4) / 2;
@@ -834,7 +833,8 @@ function buildSenseibanSVG() {
   function labelRing(items, r, fontSize, fillFn, skipIdx) {
     return items.map((label, i) => {
       if (skipIdx && skipIdx.has(i)) return "";
-      const deg = slotDeg(i, items.length);
+      // 宿名は区画中央（始端+半スロット）に置く。運気も同様に中央。
+      const deg = slotDeg(i, items.length) + (360 / items.length) / 2;
       const p = pt(r, deg);
       const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
       return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
@@ -896,31 +896,35 @@ function buildSenseibanSVG() {
     ticks += spoke(R0 - (isMain ? 8 : 4), R0, deg, `${gold}${isMain ? ".55)" : ".22)"}`, isMain ? 0.8 : 0.4);
   }
 
-  let spokes27 = "";
-  for (let i = 0; i < N; i++) {
-    spokes27 += spoke(R_MEM_I, R4, slotDeg(i, N), `${gold}.22)`, 0.55);
-  }
-
-  // 4足メモリ帯：実物同様ゴールド基調。足の違いは淡いアクセント色で示す
+  // 4足メモリ帯：ストローク円で帯を塗り、各宿を4マスに罫線分割（evenodd全円アークは使わない）
   const degFoot = degShuku / 4;
+  const rMemMid = (R_MEM_O + R_MEM_I) / 2;
+  const memStroke = (R_MEM_O - R_MEM_I).toFixed(1);
   let ashiBand =
-    `<path fill="#c9a961" fill-opacity="0.38" fill-rule="evenodd" d="M${cx},${cy - R_MEM_O} A${R_MEM_O},${R_MEM_O} 0 1 1 ${cx - 0.01},${cy - R_MEM_O} Z M${cx},${cy - R_MEM_I} A${R_MEM_I},${R_MEM_I} 0 1 0 ${cx - 0.01},${cy - R_MEM_I} Z"/>` +
-    circle(R_MEM_O, `${gold}.7)`, 1.1) +
-    circle(R_MEM_I, `${gold}.55)`, 0.9);
+    `<circle cx="${cx}" cy="${cy}" r="${rMemMid.toFixed(1)}" fill="none" stroke="#c9a961" stroke-opacity="0.52" stroke-width="${memStroke}"/>` +
+    circle(R_MEM_O, `${gold}.85)`, 1.3) +
+    circle(R_MEM_I, `${gold}.75)`, 1.1);
+  let spokes27 = "";
   for (let si = 0; si < N; si++) {
     const feet = feetOfGroup(groupOfIdx(si));
-    const base = slotDeg(si, N);
+    const base = si * degShuku;
     feet.forEach((elem, fi) => {
       const a0 = base + fi * degFoot;
       const a1 = a0 + degFoot;
-      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.15)";
-      ashiBand += sectorPath(R_MEM_O - 0.5, R_MEM_I + 0.5, a0, a1).replace("/>", ` fill="${soft}"/>`);
+      const soft = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.18)";
+      // ゼブラ：同色4足でもマスが読める
+      const zebra = fi % 2 === 0 ? "rgba(253,246,220,.22)" : "rgba(48,34,12,.16)";
+      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${zebra}"/>`);
+      ashiBand += sectorPath(R_MEM_O - 0.3, R_MEM_I + 0.3, a0, a1).replace("/>", ` fill="${soft}"/>`);
     });
-    // 宿境界（太）＋足の目盛り（細）— 濃い金茶
-    ashiBand += spoke(R_MEM_O, R_MEM_I, base, "rgba(72,52,24,.72)", 1.15);
+    // 足の区切り（細・明色）
     for (let fi = 1; fi < 4; fi++) {
-      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(90,68,32,.42)", 0.55);
+      ashiBand += spoke(R_MEM_O, R_MEM_I, base + fi * degFoot, "rgba(253,246,220,.95)", 1.05);
     }
+    // 宿境界（太）— 帯の両端を白金で縁取りし、4マス単位が一目で分かる
+    ashiBand += spoke(R_MEM_O + 0.5, R4, base, "rgba(253,246,220,.55)", 2.4);
+    ashiBand += spoke(R_MEM_O, R4, base, "rgba(40,28,10,.96)", 1.55);
+    spokes27 += spoke(R_MEM_I, R4, base, `${gold}.3)`, 0.55);
   }
 
   const palaceMids = palaceAngles.map(a => a.aMid);
@@ -1011,8 +1015,8 @@ function setBaseIdx(idx, { animate = true } = {}) {
   const N = 27;
   const deg = 360 / N;
   senseibanBaseIdx = ((idx % N) + N) % N;
-  // 外周を回して宿 baseIdx を12時（命）へ
-  senseibanRotation = -senseibanBaseIdx * deg;
+  // 外周を回して宿 baseIdx の中央を12時（命）へ
+  senseibanRotation = -(senseibanBaseIdx + 0.5) * deg;
   const group = document.getElementById("sb-astro-ring");
   if (group) {
     if (animate) group.style.transition = "transform .35s ease";
@@ -1073,8 +1077,8 @@ function initDrag() {
     senseibanRotation = startRotation + delta;
     const group = document.getElementById("sb-astro-ring");
     if (group) group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
-    // 12時（命）に来ている宿を更新
-    const raw = Math.round((-senseibanRotation) / degPerSlot) % N;
+    // 12時（命）に中央が来ている宿を更新
+    const raw = Math.round(-senseibanRotation / degPerSlot - 0.5);
     const idx = ((raw % N) + N) % N;
     if (idx !== senseibanBaseIdx) {
       senseibanBaseIdx = idx;
@@ -1087,8 +1091,8 @@ function initDrag() {
     if (!dragging) return;
     dragging = false;
     holder.classList.remove("grabbing");
-    const snapped = Math.round(senseibanRotation / degPerSlot) * degPerSlot;
-    setBaseIdx(((Math.round((-snapped) / degPerSlot) % N) + N) % N, { animate: true });
+    const idx = ((Math.round(-senseibanRotation / degPerSlot - 0.5) % N) + N) % N;
+    setBaseIdx(idx, { animate: true });
   }
 
   holder.addEventListener("mousedown", onDown);
