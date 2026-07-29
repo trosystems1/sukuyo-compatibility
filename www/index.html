@@ -1883,7 +1883,7 @@ html, body {
       </div>
       <div id="mypage-senseiban-content">
         <p class="book-lead" style="margin-bottom:0;">
-          12時が常に「命」。中心の「わたし」から、保存した人物へ縁の色で線を引きます。視点を切り替えると、その人基準の配置に変わります。
+          外側の宿・宮・火地風水は固定。運気リングの「命」が基準人物の宿を指します。中心から保存人物へ縁の色で線を引きます。
         </p>
         <div class="mypage-senseiban-wrap">
           <div id="mypage-senseiban-holder"></div>
@@ -4387,6 +4387,8 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const R_SHUKU = (R3 + R4) / 2;
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
+  const R_POINTER = R_COMPAT - 15;
+  const rot = baseIdx * (360 / N); // 命を基準宿の角度へ
 
   function slotDeg(i) { return (i / N) * 360; }
   function pt(r, deg) {
@@ -4432,7 +4434,6 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
   });
 
-  const rot = -baseIdx * (360 / N);
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
   let shukuLabels = "";
   for (let i = 0; i < N; i++) {
@@ -4453,29 +4454,38 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   }
 
   const meiPt = pt(R_COMPAT, 0);
-  const gyoPt = pt(R_COMPAT, slotDeg(9));
-  const taiPt = pt(R_COMPAT, slotDeg(18));
+  const gyoPt = pt(R_COMPAT, 120);
+  const taiPt = pt(R_COMPAT, 240);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
   function badge(p, label) {
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
       `<circle r="11" fill="${violet}" stroke="#fff" stroke-width="1.4"/>` +
       `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="11" fill="#fff" font-weight="700">${label}</text></g>`;
   }
+  function pointerArm(deg) {
+    const tip = pt(R_POINTER, deg);
+    const L = pt(R6 + 2, deg - 14);
+    const R = pt(R6 + 2, deg + 14);
+    return `<polygon points="${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${L.x.toFixed(1)},${L.y.toFixed(1)} ${R.x.toFixed(1)},${R.y.toFixed(1)}" fill="#c9a961" stroke="#a88840" stroke-width="0.4"/>`;
+  }
+  const goldPointer = pointerArm(0) + pointerArm(120) + pointerArm(240) +
+    `<circle cx="${cx}" cy="${cy}" r="${R6 - 6}" fill="#c9a961" stroke="#a88840" stroke-width="1"/>` +
+    `<circle cx="${cx}" cy="${cy}" r="4.5" fill="#1c1438" stroke="#e0c785" stroke-width="1"/>`;
 
+  // 人物は外側固定の宿位置に配置。命の位置（基準宿の角度）から線を引く
   const slotCounts = {};
-  let lines = "";
-  let markers = "";
-  const baseAnchor = pt(R6 + 6, 0);
+  let lines = "", markers = "";
+  const meiAnchor = pt(R_PEOPLE, slotDeg(baseIdx));
 
   others.forEach((p) => {
     const rel = getRelation(baseIdx, p.shukuIdx);
-    const slot = ((p.shukuIdx - baseIdx) % N + N) % N;
+    const slot = p.shukuIdx;
     const n = slotCounts[slot] || 0;
     slotCounts[slot] = n + 1;
     const deg = slotDeg(slot);
     const r = R_PEOPLE - n * 10;
     const pos = pt(r, deg);
-    lines += `<line x1="${baseAnchor.x.toFixed(1)}" y1="${baseAnchor.y.toFixed(1)}" x2="${pos.x.toFixed(1)}" y2="${pos.y.toFixed(1)}" stroke="${rel.color}" stroke-width="1.6" stroke-opacity="0.75"/>`;
+    lines += `<line x1="${meiAnchor.x.toFixed(1)}" y1="${meiAnchor.y.toFixed(1)}" x2="${pos.x.toFixed(1)}" y2="${pos.y.toFixed(1)}" stroke="${rel.color}" stroke-width="1.6" stroke-opacity="0.75"/>`;
     const short = (p.name || "?").slice(0, 4);
     markers += `<g transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})">` +
       `<circle r="9" fill="${rel.color}" stroke="#fff" stroke-width="1.2"/>` +
@@ -4483,7 +4493,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       `</g>`;
   });
 
-  const mePos = pt(R_PEOPLE, 0);
+  const mePos = pt(R_PEOPLE, slotDeg(baseIdx));
   markers += `<g transform="translate(${mePos.x.toFixed(1)},${mePos.y.toFixed(1)})">` +
     `<circle r="11" fill="#c9a961" stroke="#fff" stroke-width="1.5"/>` +
     `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-size="10" fill="#120c24" font-family="'Shippori Mincho',serif" font-weight="700">命</text>` +
@@ -4510,31 +4520,33 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     </radialGradient>
   </defs>
   <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#mpSbBg)" stroke="${gold}.45)" stroke-width="1.2"/>
-  ${elemSectors}
-  ${elemLabels}
-  ${ticks}
-  ${circle(R0, `${gold}.4)`, 1)}
-  ${circle(R1, `${gold}.28)`, 0.6)}
-  ${circle(R2, `${gold}.22)`, 0.5)}
-  ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
-  ${circle(R3, `${gold}.22)`, 0.5)}
-  ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
-  ${circle(R4, `${gold}.3)`, 0.7)}
 
-  <g transform="rotate(${rot.toFixed(2)} ${cx} ${cy})">${shukuLabels}</g>
+  <g id="mp-astro-fixed">
+    ${elemSectors}
+    ${elemLabels}
+    ${ticks}
+    ${circle(R0, `${gold}.4)`, 1)}
+    ${circle(R1, `${gold}.28)`, 0.6)}
+    ${circle(R2, `${gold}.22)`, 0.5)}
+    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 11.5, `${gold}.75)`, PALACE_ICONS)}
+    ${circle(R3, `${gold}.22)`, 0.5)}
+    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 9.5, `${gold}.65)`, PLANET_ICONS)}
+    ${circle(R4, `${gold}.3)`, 0.7)}
+    ${shukuLabels}
+  </g>
 
-  ${circle(R5, `${gold}.22)`, 0.5)}
-  ${compatLabels}
-  <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.9"/>
-  ${badge(meiPt, "命")}${badge(gyoPt, "業")}${badge(taiPt, "胎")}
+  <g id="mp-compat-ring" transform="rotate(${rot.toFixed(2)} ${cx} ${cy})">
+    ${circle(R5, `${gold}.22)`, 0.5)}
+    ${compatLabels}
+    <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.9"/>
+    ${badge(meiPt, "命")}${badge(gyoPt, "業")}${badge(taiPt, "胎")}
+    ${goldPointer}
+  </g>
 
   <g id="mp-rel-lines">${lines}</g>
   <g id="mp-people">${markers}</g>
 
-  <polygon points="${cx-7},${cy-R3+2} ${cx+7},${cy-R3+2} ${cx},${cy-R4+5}" fill="#c9a961"/>
-  ${circle(R6, `${gold}.5)`, 1.2, "rgba(20,15,40,.95)")}
-  <text x="${cx}" y="${cy-6}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="16" fill="#c9a961" font-weight="700">${SHUKU[baseIdx].kanji.replace("宿","")}</text>
-  <text x="${cx}" y="${cy+11}" text-anchor="middle" font-family="'Noto Serif JP',serif" font-size="8" fill="rgba(201,169,97,.7)">命 · 12時</text>
+  <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="15" fill="#fdfaf4" font-weight="700" style="pointer-events:none">${SHUKU[baseIdx].kanji.replace("宿","")}</text>
 </svg>`;
 }
 
