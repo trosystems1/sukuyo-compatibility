@@ -1330,7 +1330,7 @@ html, body {
   margin-bottom: 16px;
 }
 .ep-lead {
-  font-size: 13px;
+  font-size: 14px;
   color: #4a3f5c;
   line-height: 2;
   max-width: 540px;
@@ -1358,6 +1358,14 @@ html, body {
   position: absolute;
   inset: 0;
   z-index: 0;
+}
+.es-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: block;
 }
 .es-hero-content {
   position: relative;
@@ -1426,7 +1434,7 @@ html, body {
   margin-bottom: 22px;
 }
 .es-tag {
-  font-size: 11.5px;
+  font-size: 13px;
   padding: 5px 13px;
   border-radius: 20px;
   border: 1px solid;
@@ -1457,26 +1465,26 @@ html, body {
 }
 .es-palace-quality {
   font-family: 'Cinzel', serif;
-  font-size: 8px;
+  font-size: 9px;
   letter-spacing: .2em;
   margin-bottom: 5px;
   opacity: .7;
 }
 .es-palace-name {
   font-family: 'Shippori Mincho', serif;
-  font-size: 17px;
+  font-size: 19px;
   font-weight: 700;
   margin-bottom: 4px;
 }
 .es-palace-planet {
-  font-size: 10.5px;
-  opacity: .65;
+  font-size: 12.5px;
+  opacity: .75;
   margin-bottom: 6px;
 }
 .es-palace-shuku {
-  font-size: 10px;
-  opacity: .55;
-  line-height: 1.6;
+  font-size: 12px;
+  opacity: .6;
+  line-height: 1.7;
   border-top: 1px solid;
   padding-top: 6px;
   margin-top: 4px;
@@ -1490,14 +1498,14 @@ html, body {
 }
 .es-workout-label {
   font-family: 'Cinzel', serif;
-  font-size: 8.5px;
+  font-size: 9px;
   letter-spacing: .28em;
   margin-bottom: 8px;
 }
 .es-workout-text {
-  font-size: 12.5px;
+  font-size: 14px;
   color: #3a3348;
-  line-height: 1.95;
+  line-height: 2;
 }
 
 /* 色定義 */
@@ -1518,10 +1526,10 @@ html, body {
 .es-name-en { color: rgba(255,255,255,.8); }
 
 /* ヒーロー背景（SVGアニメーション）*/
-.es-fire .es-hero-bg  { background: linear-gradient(145deg,#2a0a00 0%,#7a2810 40%,#c05020 100%); }
-.es-earth .es-hero-bg { background: linear-gradient(145deg,#0e0a04 0%,#3a2a10 40%,#6a5028 100%); }
-.es-wind  .es-hero-bg { background: linear-gradient(145deg,#020a14 0%,#0e2a48 40%,#1e4a78 100%); }
-.es-water .es-hero-bg { background: linear-gradient(145deg,#020810 0%,#0a2030 40%,#0e4060 100%); }
+.es-fire .es-hero-bg  { background: #0e0604; }
+.es-earth .es-hero-bg { background: #080604; }
+.es-wind  .es-hero-bg { background: #040810; }
+.es-water .es-hero-bg { background: #020608; }
 
 /* ヒーロービジュアル（SVGオーバーレイ） */
 .es-hero-visual {
@@ -1569,7 +1577,7 @@ html, body {
   margin-bottom: 4px;
 }
 .ep-group-shuku {
-  font-size: 10.5px;
+  font-size: 12px;
   font-family: 'Shippori Mincho', serif;
   color: var(--ink);
   margin-bottom: 6px;
@@ -1593,7 +1601,7 @@ html, body {
 .ep-foot-earth { background: rgba(138,112,64,.18); color: #4a3010; }
 .ep-foot-wind  { background: rgba(74,122,160,.18); color: #1a4870; }
 .ep-foot-water { background: rgba(46,124,138,.18); color: #0a4858; }
-.ep-group-desc { font-size: 10px; color: var(--muted); line-height: 1.65; }
+.ep-group-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
 
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
@@ -4536,20 +4544,7 @@ const EP_DATA = [
       { quality:"MUTABLE · 柔軟", name:"弓宮", planet:"木星",  shuku:"尾宿・箕宿・斗宿", keyphrase:"I explore" }
     ],
     workout: "太陽光を浴びる。炎や蝋燭を眺める。情熱を持てることに全力で向き合う。エネルギッシュな人・場所に身を置く。元気は飛び火する。",
-    heroBg: `<svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;position:absolute;inset:0;">
-      <defs>
-        <radialGradient id="fg1" cx="30%" cy="80%" r="70%"><stop offset="0%" stop-color="#ff6020" stop-opacity=".5"/><stop offset="100%" stop-color="#c03000" stop-opacity="0"/></radialGradient>
-        <radialGradient id="fg2" cx="70%" cy="60%" r="50%"><stop offset="0%" stop-color="#ffb040" stop-opacity=".35"/><stop offset="100%" stop-color="#ff4000" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="780" height="220" fill="url(#fg1)"/>
-      <rect width="780" height="220" fill="url(#fg2)"/>
-      <ellipse cx="390" cy="240" rx="340" ry="120" fill="#ff8030" fill-opacity=".12"/>
-      <line x1="390" y1="200" x2="390" y2="20" stroke="#ffb040" stroke-width="1" stroke-opacity=".2"/>
-      <line x1="390" y1="200" x2="260" y2="40" stroke="#ff8030" stroke-width="1" stroke-opacity=".15"/>
-      <line x1="390" y1="200" x2="520" y2="40" stroke="#ff8030" stroke-width="1" stroke-opacity=".15"/>
-      <line x1="390" y1="200" x2="180" y2="100" stroke="#ff6020" stroke-width="1" stroke-opacity=".1"/>
-      <line x1="390" y1="200" x2="600" y2="100" stroke="#ff6020" stroke-width="1" stroke-opacity=".1"/>
-    </svg>`
+    heroBg: `<canvas class="es-canvas" data-elem="fire"></canvas>`
   },
   {
     cls: "es-earth",
@@ -4565,19 +4560,7 @@ const EP_DATA = [
       { quality:"MUTABLE · 柔軟", name:"女宮", planet:"水星", shuku:"翼宿・軫宿・角宿", keyphrase:"I analyze" }
     ],
     workout: "土いじり・アーシング（裸足で大地に立つ）・料理。物を分けて整える。五感をフルに使って食を楽しむ。センタリングして重心を下ろす。",
-    heroBg: `<svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;position:absolute;inset:0;">
-      <defs>
-        <radialGradient id="eg1" cx="50%" cy="100%" r="80%"><stop offset="0%" stop-color="#a07830" stop-opacity=".6"/><stop offset="100%" stop-color="#3a2010" stop-opacity="0"/></radialGradient>
-        <radialGradient id="eg2" cx="50%" cy="50%" r="60%"><stop offset="0%" stop-color="#c8a050" stop-opacity=".2"/><stop offset="100%" stop-color="#604020" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="780" height="220" fill="url(#eg1)"/>
-      <rect width="780" height="220" fill="url(#eg2)"/>
-      <ellipse cx="390" cy="210" rx="350" ry="60" fill="#c89040" fill-opacity=".18"/>
-      <ellipse cx="390" cy="180" rx="260" ry="40" fill="#a07030" fill-opacity=".12"/>
-      <circle cx="390" cy="110" r="80" fill="none" stroke="#c09040" stroke-width="1" stroke-opacity=".15"/>
-      <circle cx="390" cy="110" r="130" fill="none" stroke="#a07030" stroke-width="1" stroke-opacity=".1"/>
-      <circle cx="390" cy="110" r="180" fill="none" stroke="#806020" stroke-width="1" stroke-opacity=".07"/>
-    </svg>`
+    heroBg: `<canvas class="es-canvas" data-elem="earth"></canvas>`
   },
   {
     cls: "es-wind",
@@ -4593,20 +4576,7 @@ const EP_DATA = [
       { quality:"MUTABLE · 柔軟", name:"夫妻宮", planet:"水星", shuku:"觜宿・参宿・井宿", keyphrase:"I think" }
     ],
     workout: "いつもと違う路線・乗り物・道を選ぶ。目的を持たずにバスに乗ってみる。最新のテクノロジーや新しいお店に触れる。見聞きしたことをSNSや会話で発信する。",
-    heroBg: `<svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;position:absolute;inset:0;">
-      <defs>
-        <linearGradient id="wg1" x1="0%" y1="50%" x2="100%" y2="50%"><stop offset="0%" stop-color="#1060a0" stop-opacity=".4"/><stop offset="100%" stop-color="#2080c0" stop-opacity=".15"/></linearGradient>
-      </defs>
-      <rect width="780" height="220" fill="url(#wg1)"/>
-      <path d="M0,80 Q130,60 260,90 T520,70 T780,80" fill="none" stroke="#60a8d0" stroke-width="1.5" stroke-opacity=".3"/>
-      <path d="M0,120 Q150,100 300,130 T600,110 T780,120" fill="none" stroke="#80c0e0" stroke-width="1" stroke-opacity=".2"/>
-      <path d="M0,150 Q100,135 200,155 T450,140 T780,150" fill="none" stroke="#60a0c8" stroke-width="1" stroke-opacity=".18"/>
-      <line x1="640" y1="30" x2="760" y2="30" stroke="#a0d0f0" stroke-width="1.5" stroke-opacity=".25"/>
-      <line x1="600" y1="50" x2="760" y2="50" stroke="#80b8e0" stroke-width="1" stroke-opacity=".18"/>
-      <line x1="660" y1="70" x2="760" y2="70" stroke="#80b8e0" stroke-width="1" stroke-opacity=".15"/>
-      <polygon points="755,28 770,30 755,32" fill="#a0d0f0" fill-opacity=".3"/>
-      <polygon points="755,48 770,50 755,52" fill="#80b8e0" fill-opacity=".2"/>
-    </svg>`
+    heroBg: `<canvas class="es-canvas" data-elem="wind"></canvas>`
   },
   {
     cls: "es-water",
@@ -4622,18 +4592,7 @@ const EP_DATA = [
       { quality:"MUTABLE · 柔軟", name:"魚宮", planet:"海王星", shuku:"室宿・壁宿・奎宿", keyphrase:"I believe" }
     ],
     workout: "音楽・絵・お茶・料理などの芸術で感情を消化する。渦巻きのように感情を外へ広げ、また中心へ戻す。執着に気づいたら、アテンションを未来と喜びの方へ向ける。",
-    heroBg: `<svg viewBox="0 0 780 220" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" style="width:100%;height:100%;position:absolute;inset:0;">
-      <defs>
-        <radialGradient id="wag1" cx="50%" cy="50%" r="70%"><stop offset="0%" stop-color="#2080a0" stop-opacity=".35"/><stop offset="100%" stop-color="#083050" stop-opacity="0"/></radialGradient>
-      </defs>
-      <rect width="780" height="220" fill="url(#wag1)"/>
-      <ellipse cx="390" cy="110" rx="30" ry="30" fill="none" stroke="#40a0c0" stroke-width="1" stroke-opacity=".4"/>
-      <ellipse cx="390" cy="110" rx="65" ry="55" fill="none" stroke="#3090b0" stroke-width="1" stroke-opacity=".3"/>
-      <ellipse cx="390" cy="110" rx="110" ry="85" fill="none" stroke="#2080a0" stroke-width="1" stroke-opacity=".22"/>
-      <ellipse cx="390" cy="110" rx="165" ry="118" fill="none" stroke="#1a6888" stroke-width="1" stroke-opacity=".16"/>
-      <ellipse cx="390" cy="110" rx="230" ry="155" fill="none" stroke="#145070" stroke-width="1" stroke-opacity=".1"/>
-      <ellipse cx="390" cy="110" rx="310" ry="200" fill="none" stroke="#0e3858" stroke-width="1" stroke-opacity=".07"/>
-    </svg>`
+    heroBg: `<canvas class="es-canvas" data-elem="water"></canvas>`
   }
 ];
 
@@ -4717,6 +4676,195 @@ function renderElementPage() {
 </div>`;
     }).join("");
   }
+
+  // Canvasアニメーション初期化（DOM挿入後）
+  setTimeout(initElemCanvases, 50);
+}
+
+/* ══════════════════════════════════════════════
+   エレメント Canvas アニメーション
+   ══════════════════════════════════════════════ */
+function initElemCanvases() {
+  document.querySelectorAll(".es-canvas").forEach(canvas => {
+    const type = canvas.dataset.elem;
+    const hero = canvas.closest(".es-hero");
+    if (!hero) return;
+    canvas.width  = hero.offsetWidth  || 780;
+    canvas.height = hero.offsetHeight || 220;
+    const ctx = canvas.getContext("2d");
+    if (type === "fire")  animFire(canvas, ctx);
+    if (type === "earth") animEarth(canvas, ctx);
+    if (type === "wind")  animWind(canvas, ctx);
+    if (type === "water") animWater(canvas, ctx);
+  });
+}
+
+/* 🔥 火：上昇する細い三角ライン群 */
+function animFire(canvas, ctx) {
+  const W = canvas.width, H = canvas.height;
+  const lines = Array.from({length: 18}, (_, i) => ({
+    x: W * (0.1 + 0.8 * (i / 17)),
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.008 + Math.random() * 0.006,
+    amp:   18 + Math.random() * 22,
+    height: 0.5 + Math.random() * 0.45,
+    alpha:  0.08 + Math.random() * 0.18
+  }));
+  // 背景グラデーション
+  const bg = ctx.createLinearGradient(0, H, 0, 0);
+  bg.addColorStop(0, "#1a0800");
+  bg.addColorStop(0.5, "#3a1204");
+  bg.addColorStop(1, "#0a0200");
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    lines.forEach(l => {
+      const sway = Math.sin(t * l.speed * 60 + l.phase) * l.amp;
+      const topY = H * (1 - l.height) + sway * 0.3;
+      const grad = ctx.createLinearGradient(l.x, H, l.x + sway * 0.5, topY);
+      grad.addColorStop(0,   `rgba(200,120,40,${l.alpha * 1.8})`);
+      grad.addColorStop(0.4, `rgba(220,80,20,${l.alpha})`);
+      grad.addColorStop(1,   `rgba(255,160,60,0)`);
+      ctx.beginPath();
+      ctx.moveTo(l.x, H);
+      ctx.quadraticCurveTo(l.x + sway, H * 0.6, l.x + sway * 0.5, topY);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    });
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* 🌿 地：中心から広がる同心四角 + ゆっくり回転するグリッド */
+function animEarth(canvas, ctx) {
+  const W = canvas.width, H = canvas.height;
+  const cx = W * 0.5, cy = H * 0.5;
+  const bg = ctx.createLinearGradient(0, H, 0, 0);
+  bg.addColorStop(0, "#0c0804");
+  bg.addColorStop(1, "#1a1408");
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    const pulse = Math.sin(t * 0.012) * 0.08 + 1;
+    for (let i = 1; i <= 8; i++) {
+      const r = (i / 8) * Math.min(W, H) * 0.72 * pulse;
+      const alpha = (1 - i / 9) * 0.22;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(t * 0.002 * (i % 2 === 0 ? 1 : -1));
+      ctx.strokeStyle = `rgba(180,140,60,${alpha})`;
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.rect(-r, -r * 0.6, r * 2, r * 1.2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // 中心点
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40);
+    glow.addColorStop(0, "rgba(200,160,60,0.25)");
+    glow.addColorStop(1, "rgba(200,160,60,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* 💨 風：左から右へ流れる水平ライン */
+function animWind(canvas, ctx) {
+  const W = canvas.width, H = canvas.height;
+  const bg = ctx.createLinearGradient(0, 0, W, 0);
+  bg.addColorStop(0, "#02060e");
+  bg.addColorStop(1, "#060c18");
+
+  const lines = Array.from({length: 14}, (_, i) => ({
+    y:     H * (0.08 + 0.84 * (i / 13)),
+    speed: 0.4 + Math.random() * 0.6,
+    len:   W * (0.15 + Math.random() * 0.35),
+    offset: Math.random() * W,
+    alpha:  0.06 + Math.random() * 0.16,
+    width:  0.5 + Math.random() * 0.8
+  }));
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    lines.forEach(l => {
+      const x = (l.offset + t * l.speed) % (W + l.len) - l.len;
+      const grad = ctx.createLinearGradient(x, l.y, x + l.len, l.y);
+      grad.addColorStop(0,   `rgba(120,180,220,0)`);
+      grad.addColorStop(0.3, `rgba(140,200,240,${l.alpha})`);
+      grad.addColorStop(0.7, `rgba(160,210,250,${l.alpha * 0.8})`);
+      grad.addColorStop(1,   `rgba(120,180,220,0)`);
+      ctx.beginPath();
+      ctx.moveTo(x, l.y);
+      ctx.lineTo(x + l.len, l.y);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = l.width;
+      ctx.stroke();
+    });
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* 💧 水：渦巻き状に広がる同心楕円 */
+function animWater(canvas, ctx) {
+  const W = canvas.width, H = canvas.height;
+  const cx = W * 0.5, cy = H * 0.52;
+  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.6);
+  bg.addColorStop(0, "#061018");
+  bg.addColorStop(1, "#010408");
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0; i < 9; i++) {
+      const phase = (t * 0.008) + i * 0.7;
+      const rx = (40 + i * 38) * (1 + Math.sin(phase) * 0.04);
+      const ry = (28 + i * 24) * (1 + Math.cos(phase * 0.7) * 0.04);
+      const alpha = (1 - i / 10) * 0.28 * (0.7 + Math.sin(phase * 1.3) * 0.3);
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(phase * 0.15);
+      ctx.strokeStyle = `rgba(60,160,190,${alpha})`;
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // 中心の光
+    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
+    glow.addColorStop(0, "rgba(80,180,210,0.18)");
+    glow.addColorStop(1, "rgba(80,180,210,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 function showElementPage() {
