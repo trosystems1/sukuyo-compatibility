@@ -4914,7 +4914,7 @@ function animWorld(canvas, ctx, W, H) {
     // 太陽は地平線にかかる（半分隠れている）
     const pulse = Math.sin(t * 0.007) * 0.03 + 1.0;
     const sunR  = Math.min(W, H) * 0.082 * pulse;
-    const sunY  = horizonY - sunR * 0.55;   // 半分だけ地平線より上
+    const sunY  = horizonY - sunR * 0.52;   // 半分だけ地平線より上（山の前に描画）
 
     // 地平線下の光（地面に差し込む）
     const underGlow = ctx.createRadialGradient(sunX, horizonY, 0, sunX, horizonY, W * 0.45);
@@ -4923,38 +4923,6 @@ function animWorld(canvas, ctx, W, H) {
     underGlow.addColorStop(1,   "rgba(200,80,0,0)");
     ctx.fillStyle = underGlow;
     ctx.fillRect(0, horizonY, W, H - horizonY);
-
-    // 光芒（地平線より上の部分のみ）
-    ctx.save(); ctx.beginPath();
-    ctx.rect(0, 0, W, horizonY);
-    ctx.clip();
-    rays.forEach(r => {
-      const b = Math.sin(t * r.speed + r.phase) * 0.18 + 0.82;
-      const len = Math.min(W, H) * r.lenF * b;
-      const x1 = sunX + Math.cos(r.angle) * sunR * 0.90;
-      const y1 = sunY + Math.sin(r.angle) * sunR * 0.90;
-      const x2 = sunX + Math.cos(r.angle) * (sunR + len);
-      const y2 = sunY + Math.sin(r.angle) * (sunR + len);
-      const g = ctx.createLinearGradient(x1, y1, x2, y2);
-      g.addColorStop(0,   `rgba(255,240,140,${r.alpha * b})`);
-      g.addColorStop(0.5, `rgba(255,180,50,${r.alpha * b * 0.5})`);
-      g.addColorStop(1,   `rgba(230,110,10,0)`);
-      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-      ctx.strokeStyle = g; ctx.lineWidth = r.width * b;
-      ctx.lineCap = "round"; ctx.stroke();
-    });
-    ctx.restore();
-
-    // 太陽本体（地平線でクリップ）
-    ctx.save();
-    const sGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
-    sGrad.addColorStop(0,    "rgba(255,252,220,1.0)");
-    sGrad.addColorStop(0.40, "rgba(255,220,80,0.95)");
-    sGrad.addColorStop(0.75, "rgba(255,150,20,0.75)");
-    sGrad.addColorStop(1,    "rgba(230,90,0,0)");
-    ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
-    ctx.fillStyle = sGrad; ctx.fill();
-    ctx.restore();
 
     // ── 風：気流線 ───────────────────────────
     windLines.forEach(l => {
@@ -4996,6 +4964,38 @@ function animWorld(canvas, ctx, W, H) {
       ctx.quadraticCurveTo(b.size * 0.5,  -b.size * 0.6 * Math.abs(flap), b.size, flap * b.size * 0.5);
       ctx.stroke(); ctx.restore();
     });
+
+    // 光芒（地平線より上の部分のみ）
+    ctx.save(); ctx.beginPath();
+    ctx.rect(0, 0, W, horizonY);
+    ctx.clip();
+    rays.forEach(r => {
+      const b = Math.sin(t * r.speed + r.phase) * 0.18 + 0.82;
+      const len = Math.min(W, H) * r.lenF * b;
+      const x1 = sunX + Math.cos(r.angle) * sunR * 0.90;
+      const y1 = sunY + Math.sin(r.angle) * sunR * 0.90;
+      const x2 = sunX + Math.cos(r.angle) * (sunR + len);
+      const y2 = sunY + Math.sin(r.angle) * (sunR + len);
+      const g = ctx.createLinearGradient(x1, y1, x2, y2);
+      g.addColorStop(0,   `rgba(255,240,140,${r.alpha * b})`);
+      g.addColorStop(0.5, `rgba(255,180,50,${r.alpha * b * 0.5})`);
+      g.addColorStop(1,   `rgba(230,110,10,0)`);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.strokeStyle = g; ctx.lineWidth = r.width * b;
+      ctx.lineCap = "round"; ctx.stroke();
+    });
+    ctx.restore();
+
+    // 太陽本体（地平線でクリップ）
+    ctx.save();
+    const sGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
+    sGrad.addColorStop(0,    "rgba(255,252,220,1.0)");
+    sGrad.addColorStop(0.40, "rgba(255,220,80,0.95)");
+    sGrad.addColorStop(0.75, "rgba(255,150,20,0.75)");
+    sGrad.addColorStop(1,    "rgba(230,90,0,0)");
+    ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+    ctx.fillStyle = sGrad; ctx.fill();
+    ctx.restore();
 
     // ── 山稜（朝の光を受けた色） ──────────────
     // 奥（霞・明るい青紫）
