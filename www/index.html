@@ -1577,44 +1577,62 @@ html, body {
 }
 @media (max-width: 480px) { .ep-group-grid { grid-template-columns: repeat(2,1fr); } }
 .ep-group-card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
+  padding: 16px 14px 14px;
   background: #fff;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(18,12,36,.05);
+}
+/* 上部のエレメントカラーバー */
+.ep-group-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  border-radius: 14px 14px 0 0;
 }
 .ep-group-num {
   font-family: 'Cinzel', serif;
-  font-size: 17px;
+  font-size: 20px;
   color: var(--gold);
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  margin-top: 4px;
 }
 .ep-group-shuku {
-  font-size: 12px;
+  font-size: 12.5px;
   font-family: 'Shippori Mincho', serif;
   color: var(--ink);
-  margin-bottom: 6px;
-  line-height: 1.65;
+  margin-bottom: 10px;
+  line-height: 1.7;
 }
 .ep-group-feet {
   display: flex;
-  gap: 3px;
+  gap: 5px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 .ep-foot {
-  width: 17px; height: 17px;
+  width: 28px; height: 28px;
   border-radius: 50%;
-  font-size: 8.5px;
+  font-size: 11px;
   display: flex; align-items: center; justify-content: center;
   font-weight: 700;
+  border: 1.5px solid;
 }
-.ep-foot-fire  { background: rgba(192,96,58,.18); color: #8a2a10; }
-.ep-foot-earth { background: rgba(138,112,64,.18); color: #4a3010; }
-.ep-foot-wind  { background: rgba(74,122,160,.18); color: #1a4870; }
-.ep-foot-water { background: rgba(46,124,138,.18); color: #0a4858; }
-.ep-group-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.ep-foot-fire  { background: rgba(192,96,58,.14); color: #8a2a10; border-color: rgba(192,96,58,.40); }
+.ep-foot-earth { background: rgba(138,112,64,.14); color: #4a3010; border-color: rgba(138,112,64,.40); }
+.ep-foot-wind  { background: rgba(74,122,160,.14); color: #1a4870; border-color: rgba(74,122,160,.40); }
+.ep-foot-water { background: rgba(46,124,138,.14); color: #0a4858; border-color: rgba(46,124,138,.40); }
+.ep-group-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.7;
+  border-top: 1px solid rgba(18,12,36,.06);
+  padding-top: 8px;
+}
 
 /* 解説カード（1枚絵の下） */
 .ep-desc-grid {
@@ -4778,7 +4796,24 @@ function renderElementPage() {
       for(const [elem,count] of Object.entries(elems)) for(let i=0;i<count;i++) feet.push(elem);
       const feetHtml = feet.map(f=>`<div class="ep-foot ${EP_FOOT_CLS[f]}">${f}</div>`).join("");
       const shukuList=(groups[g]||[]).join("・");
-      return `<div class="ep-group-card">
+      // エレメント構成に基づくカラー決定
+      const elemColors = {
+        "火": { bar: "#c0603a", border: "rgba(192,96,58,.30)" },
+        "地": { bar: "#8a7040", border: "rgba(138,112,64,.30)" },
+        "風": { bar: "#4a7aa0", border: "rgba(74,122,160,.30)" },
+        "水": { bar: "#2e7c8a", border: "rgba(46,124,138,.30)" },
+      };
+      // 主エレメント（最多足数）を特定
+      const dominantElem = Object.entries(elems).sort((a,b)=>b[1]-a[1])[0][0];
+      const dc = elemColors[dominantElem];
+      // カラーバーのグラデーション（足の割合に応じて）
+      const barColors = feet.map(f => elemColors[f].bar);
+      const barStyle = barColors.length === 4
+        ? `background: linear-gradient(to right, ${barColors.map((c,i)=>`${c} ${i*25}%, ${c} ${(i+1)*25}%`).join(', ')});`
+        : `background: ${dc.bar};`;
+
+      return `<div class="ep-group-card" style="border-color:${dc.border};">
+  <div class="ep-group-bar" style="${barStyle}"></div>
   <div class="ep-group-num">${g}</div>
   <div class="ep-group-shuku">${shukuList}</div>
   <div class="ep-group-feet">${feetHtml}</div>
