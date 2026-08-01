@@ -1579,19 +1579,19 @@ html, body {
 .ep-group-card {
   border: 1.5px solid var(--border);
   border-radius: 14px;
-  background: #fff;
   text-align: center;
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(18,12,36,.06);
+  /* 背景はヘッダー色（JSでインライン指定） */
 }
 /* ヘッダー：塗りつぶし */
 .ep-group-head {
-  padding: 14px 12px 12px;
+  padding: 10px 12px 8px;
   position: relative;
 }
 .ep-group-num {
   font-family: 'Cinzel', serif;
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 400;
   color: #fff;
   margin-bottom: 3px;
@@ -1609,14 +1609,15 @@ html, body {
 /* エレメント比率バー（太く・比率一目瞭然） */
 .ep-group-bar {
   display: flex;
-  height: 20px;
+  height: 12px;
 }
 .ep-group-bar-seg {
   flex: 1;
 }
-/* ボディ */
+/* ボディ：白背景で内側を覆う */
 .ep-group-body {
   padding: 12px 12px 14px;
+  background: #fff;
 }
 .ep-group-feet {
   display: flex;
@@ -1635,8 +1636,8 @@ html, body {
 }
 .ep-foot-fire  { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.50); }
 .ep-foot-earth { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.50); }
-.ep-foot-wind  { background: rgba(50,140,210,.16); color: #0a4880; border-color: rgba(50,140,210,.65); }
-.ep-foot-water { background: rgba(10,90,100,.16);  color: #03343c; border-color: rgba(10,90,100,.65); }
+.ep-foot-wind  { background: rgba(160,195,220,.12); color: #4a6878; border-color: rgba(160,195,220,.45); }
+.ep-foot-water { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
 .ep-group-desc {
   font-size: 12px;
   color: var(--muted);
@@ -4809,10 +4810,10 @@ function renderElementPage() {
       const shukuList=(groups[g]||[]).join("・");
       // エレメントカラー定義
       const EC = {
-        "火": { head: "linear-gradient(135deg,#b84a20,#d4703a)", bar: "#c0603a", border: "rgba(192,96,58,.35)" },
-        "地": { head: "linear-gradient(135deg,#6a5020,#8a7040)", bar: "#8a7040", border: "rgba(138,112,64,.35)" },
-        "風": { head: "linear-gradient(135deg,#2060b0,#3a8ed0)", bar: "#3a8ed0", border: "rgba(50,140,210,.42)" },
-        "水": { head: "linear-gradient(135deg,#084858,#0e6878)", bar: "#0e6878", border: "rgba(10,90,100,.42)" },
+        "火": { head: "linear-gradient(135deg,#b84a20,#d4703a)", bar: "#c0603a", solid: "#b84a20", border: "rgba(192,80,45,.35)" },
+        "地": { head: "linear-gradient(135deg,#6a5020,#8a7040)", bar: "#8a7040", solid: "#6a5020", border: "rgba(130,105,55,.35)" },
+        "風": { head: "linear-gradient(135deg,#7a9aaa,#9ab8c8)", bar: "#9ab8c8", solid: "#7a9aaa", border: "rgba(154,184,200,.38)" },
+        "水": { head: "linear-gradient(135deg,#1a5aa0,#3a8ed0)", bar: "#3a8ed0", solid: "#1a5aa0", border: "rgba(58,142,208,.40)" },
       };
       const dominantElem = Object.entries(elems).sort((a,b)=>b[1]-a[1])[0][0];
       const dc = EC[dominantElem];
@@ -4820,7 +4821,7 @@ function renderElementPage() {
       // 比率バーのセグメント（足の順番どおり）
       const barSegs = feet.map(f => `<div class="ep-group-bar-seg" style="background:${EC[f].bar};opacity:0.90;"></div>`).join("");
 
-      return `<div class="ep-group-card" style="border-color:${dc.border};">
+      return `<div class="ep-group-card" style="border-color:${dc.border};background:${dc.solid};">
   <div class="ep-group-head" style="background:${dc.head};">
     <div class="ep-group-num">${g}</div>
     <div class="ep-group-shuku">${shukuList}</div>
