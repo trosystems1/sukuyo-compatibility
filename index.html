@@ -1616,6 +1616,111 @@ html, body {
 .ep-foot-water { background: rgba(46,124,138,.18); color: #0a4858; }
 .ep-group-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
 
+/* 解説カード（1枚絵の下） */
+.ep-desc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+@media (max-width: 560px) {
+  .ep-desc-grid { grid-template-columns: 1fr; }
+}
+.ep-desc-card {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  overflow: hidden;
+}
+.ep-desc-card-head {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ep-desc-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ep-desc-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: .3em;
+}
+.ep-desc-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-left: auto;
+}
+.ep-desc-body {
+  padding: 0 16px 14px;
+  border-top: 1px solid rgba(18,12,36,.06);
+}
+.ep-desc-phrase {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  margin: 10px 0 6px;
+}
+.ep-desc-text {
+  font-size: 13px;
+  color: #3a3348;
+  line-height: 1.9;
+  margin-bottom: 10px;
+}
+.ep-desc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.ep-desc-tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.ep-desc-palaces {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 5px;
+}
+.ep-desc-palace {
+  border-radius: 8px;
+  padding: 7px 8px;
+  line-height: 1.6;
+}
+.ep-desc-palace-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.ep-desc-palace-sub { font-size: 10px; opacity: .65; }
+/* 色 */
+.ep-desc-card.ep-fire  { border-color: rgba(192,96,58,.25); }
+.ep-desc-card.ep-earth { border-color: rgba(138,112,64,.25); }
+.ep-desc-card.ep-wind  { border-color: rgba(74,122,160,.25); }
+.ep-desc-card.ep-water { border-color: rgba(46,124,138,.25); }
+.ep-desc-dot.ep-fire  { background:#c0603a; }
+.ep-desc-dot.ep-earth { background:#8a7040; }
+.ep-desc-dot.ep-wind  { background:#4a7aa0; }
+.ep-desc-dot.ep-water { background:#2e7c8a; }
+.ep-desc-label.ep-fire,.ep-desc-name.ep-fire,.ep-desc-phrase.ep-fire   { color:#9a3a18; }
+.ep-desc-label.ep-earth,.ep-desc-name.ep-earth,.ep-desc-phrase.ep-earth{ color:#5a4010; }
+.ep-desc-label.ep-wind,.ep-desc-name.ep-wind,.ep-desc-phrase.ep-wind   { color:#1a4870; }
+.ep-desc-label.ep-water,.ep-desc-name.ep-water,.ep-desc-phrase.ep-water{ color:#0a4858; }
+.ep-desc-tag.ep-fire  { background:rgba(192,96,58,.07); border-color:rgba(192,96,58,.22); color:#9a3a18; }
+.ep-desc-tag.ep-earth { background:rgba(138,112,64,.07); border-color:rgba(138,112,64,.22); color:#5a4010; }
+.ep-desc-tag.ep-wind  { background:rgba(74,122,160,.07); border-color:rgba(74,122,160,.22); color:#1a4870; }
+.ep-desc-tag.ep-water { background:rgba(46,124,138,.07); border-color:rgba(46,124,138,.22); color:#0a4858; }
+.ep-desc-palace.ep-fire  { background:rgba(192,96,58,.07); }
+.ep-desc-palace.ep-earth { background:rgba(138,112,64,.07); }
+.ep-desc-palace.ep-wind  { background:rgba(74,122,160,.07); }
+.ep-desc-palace.ep-water { background:rgba(46,124,138,.07); }
+
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 /* ── 12宮オラクル盤 ─────────────────────────────────────── */
@@ -2410,8 +2515,13 @@ html, body {
       </p>
     </div>
 
-    <!-- 4エレメントセクション（JS描画） -->
-    <div id="ep-sections"></div>
+    <!-- 世界観Canvas（1枚絵） -->
+    <div id="ep-world-wrap" style="border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18);margin-bottom:36px;">
+      <canvas id="ep-world-canvas" style="display:block;width:100%;"></canvas>
+    </div>
+
+    <!-- 4エレメント解説（横並び → 縦スクロール） -->
+    <div id="ep-descs"></div>
 
     <!-- 9グループ補足 -->
     <div class="ep-group-section">
@@ -4628,43 +4738,30 @@ function renderElementPage() {
   if (elementPageRendered) return;
   elementPageRendered = true;
 
-  // 4エレメントセクション
-  const sectionsEl = document.getElementById("ep-sections");
-  if (sectionsEl) {
-    sectionsEl.innerHTML = EP_DATA.map(e => `
-<section class="es-section ${e.cls}" style="margin-bottom:20px;">
-  <div class="es-hero">
-    ${e.heroBg}
-    <div class="es-kanji-bg">${e.name}</div>
-    <div class="es-hero-content">
-      <div class="es-hero-text">
-        <div class="es-name-en">${e.en}</div>
-        <div class="es-name-ja">${e.name}</div>
-        <div class="es-keyphrase">${e.keyphrase}</div>
-      </div>
-    </div>
+  // 解説カード（4枚グリッド）
+  const descsEl = document.getElementById("ep-descs");
+  if (descsEl) {
+    descsEl.innerHTML = `<div class="ep-desc-grid">${EP_DATA.map(e => {
+      const cls = e.cls.replace("es-","ep-");
+      return `<div class="ep-desc-card ${cls}">
+  <div class="ep-desc-card-head">
+    <div class="ep-desc-dot ${cls}"></div>
+    <div class="ep-desc-label ${cls}">${e.en}</div>
+    <div class="ep-desc-name ${cls}">${e.name}</div>
   </div>
-  <div class="es-body">
-    <p class="es-core">${e.core}</p>
-    <div class="es-tags">${e.tags.map(t=>`<span class="es-tag">${t}</span>`).join("")}</div>
-
-    <div class="es-palaces-label">PALACES · 12宮との対応</div>
-    <div class="es-palaces">
-      ${e.palaces.map(p=>`
-      <div class="es-palace-card">
-        <div class="es-palace-quality">${p.quality}</div>
-        <div class="es-palace-name">${p.name}</div>
-        <div class="es-palace-planet">守護星：${p.planet}　<strong style="font-family:'Cinzel',serif;letter-spacing:.05em;">${p.keyphrase}</strong></div>
-        <div class="es-palace-shuku">対応宿（補足）<br>${p.shuku}</div>
+  <div class="ep-desc-body">
+    <div class="ep-desc-phrase ${cls}">${e.keyphrase}</div>
+    <div class="ep-desc-text">${e.core}</div>
+    <div class="ep-desc-tags">${e.tags.slice(0,5).map(t=>`<span class="ep-desc-tag ${cls}">${t}</span>`).join("")}</div>
+    <div class="ep-desc-palaces">${e.palaces.map(p=>`
+      <div class="ep-desc-palace ${cls}">
+        <div class="ep-desc-palace-name">${p.name}</div>
+        <div class="ep-desc-palace-sub">${p.keyphrase}</div>
       </div>`).join("")}
     </div>
-
-    <div class="es-workout">
-      <div class="es-workout-label">WORKOUT · 日々の実践</div>
-      <div class="es-workout-text">${e.workout}</div>
-    </div>
   </div>
-</section>`).join("");
+</div>`;
+    }).join("")}</div>`;
   }
 
   // 9グループ補足
@@ -4690,26 +4787,270 @@ function renderElementPage() {
     }).join("");
   }
 
-  // Canvasアニメーション初期化（DOM挿入後）
-  setTimeout(initElemCanvases, 50);
+  // 1枚絵Canvas初期化
+  setTimeout(initWorldCanvas, 50);
 }
 
 /* ══════════════════════════════════════════════
-   エレメント Canvas アニメーション
+   1枚絵：火・地・風・水の世界循環
    ══════════════════════════════════════════════ */
-function initElemCanvases() {
-  document.querySelectorAll(".es-canvas").forEach(canvas => {
-    const type = canvas.dataset.elem;
-    const hero = canvas.closest(".es-hero");
-    if (!hero) return;
-    canvas.width  = hero.offsetWidth  || 780;
-    canvas.height = hero.offsetHeight || 220;
-    const ctx = canvas.getContext("2d");
-    if (type === "fire")  animFire(canvas, ctx);
-    if (type === "earth") animEarth(canvas, ctx);
-    if (type === "wind")  animWind(canvas, ctx);
-    if (type === "water") animWater(canvas, ctx);
-  });
+function initWorldCanvas() {
+  const wrap   = document.getElementById("ep-world-wrap");
+  const canvas = document.getElementById("ep-world-canvas");
+  if (!canvas || !wrap) return;
+  const W = wrap.offsetWidth || 780;
+  const H = Math.round(W * 0.62);   // 縦横比 8:5
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  animWorld(canvas, ctx, W, H);
+}
+
+function animWorld(canvas, ctx, W, H) {
+  // ── ゾーン境界 ──────────────────────────────
+  const sunCY    = H * 0.20;   // 太陽中心
+  const horizonY = H * 0.54;   // 地平線
+  const shoreY   = H * 0.76;   // 海岸線
+
+  // ── タンポポ種 ──────────────────────────────
+  function resetSeed(s) {
+    s.x  = Math.random() * W * 0.6;
+    s.y  = H * 0.18 + Math.random() * (horizonY - H*0.18 - 20);
+    s.vx = 0.5 + Math.random() * 1.2;
+    s.vy = (Math.random()-0.5)*0.4;
+    s.wobX = Math.random()*Math.PI*2;
+    s.wobY = Math.random()*Math.PI*2;
+    s.wobSp= 0.022+Math.random()*0.025;
+    s.stemLen=6+Math.random()*8;
+    s.hairN=5+Math.floor(Math.random()*3);
+    s.hairLen=8+Math.random()*10;
+    s.alpha=0.4+Math.random()*0.45;
+    s.size=0.7+Math.random()*0.8;
+    s.life=0; s.maxLife=160+Math.random()*140;
+    return s;
+  }
+  const seeds = Array.from({length:14},()=>resetSeed({}));
+  seeds.forEach(s=>{s.life=Math.random()*s.maxLife;});
+
+  // ── コロナ光線 ──────────────────────────────
+  const RAYS=22;
+  const rays=Array.from({length:RAYS},(_,i)=>({
+    angle:(i/RAYS)*Math.PI*2,
+    lenF:0.10+Math.random()*0.13,
+    phase:Math.random()*Math.PI*2,
+    speed:0.007+Math.random()*0.005,
+    width:0.7+Math.random()*1.2,
+    alpha:0.20+Math.random()*0.28
+  }));
+
+  // ── 山脈 ──────────────────────────────────
+  function makeMts(n,hMin,hMax,seed) {
+    return Array.from({length:n+1},(_,i)=>{
+      const x=(i/n)*W;
+      const h=hMin+Math.sin(i*seed+seed*2)*(hMax-hMin)*0.5
+             +Math.cos(i*seed*1.7)*(hMax-hMin)*0.3+(hMax-hMin)*0.5;
+      return {x,y:horizonY-Math.abs(h)};
+    });
+  }
+  const mts1=makeMts(20,H*0.06,H*0.16,1.3);
+  const mts2=makeMts(14,H*0.03,H*0.09,2.1);
+
+  // ── 波 ──────────────────────────────────
+  const waveLayers=[
+    {yOff:-H*0.055,amp:H*0.018,speed:0.022,phase:0,    alpha:0.30,w:1.2},
+    {yOff:-H*0.028,amp:H*0.013,speed:0.030,phase:1.4,  alpha:0.24,w:1.0},
+    {yOff:-H*0.008,amp:H*0.009,speed:0.040,phase:2.8,  alpha:0.20,w:0.8},
+    {yOff: H*0.005,amp:H*0.005,speed:0.055,phase:0.9,  alpha:0.16,w:0.6},
+  ];
+
+  // ── 水滴（大地へ） ──────────────────────────
+  function resetDrop(d){
+    d.x=Math.random()*W; d.y=shoreY+Math.random()*10;
+    d.vx=(Math.random()-0.5)*0.5; d.vy=0.5+Math.random()*0.9;
+    d.life=0; d.maxLife=35+Math.random()*40;
+    d.alpha=0.4+Math.random()*0.4; d.size=0.8+Math.random()*1.8;
+    return d;
+  }
+  const drops=Array.from({length:18},()=>resetDrop({}));
+  drops.forEach(d=>{d.life=Math.random()*d.maxLife;});
+
+  // ── 地面の光粒 ──────────────────────────────
+  const gdots=Array.from({length:16},()=>({
+    x:Math.random()*W, y:horizonY+Math.random()*(shoreY-horizonY)*0.85,
+    vy:-(0.12+Math.random()*0.2),
+    alpha:0.25+Math.random()*0.4, size:0.7+Math.random()*1.4
+  }));
+
+  // ── ラベル位置 ──────────────────────────────
+  const labels=[
+    {txt:"火  FIRE",  x:W*0.82, y:H*0.08,  col:"rgba(255,180,60,0.75)"},
+    {txt:"地  EARTH", x:W*0.82, y:horizonY-H*0.04, col:"rgba(190,155,60,0.75)"},
+    {txt:"風  WIND",  x:W*0.82, y:H*0.36,  col:"rgba(140,210,250,0.75)"},
+    {txt:"水  WATER", x:W*0.82, y:shoreY+H*0.06,   col:"rgba(70,180,230,0.75)"},
+  ];
+
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+
+    // ── 背景グラデーション（空→地→海） ──────
+    const skyGrad=ctx.createLinearGradient(0,0,0,H);
+    skyGrad.addColorStop(0,    "#03010a");
+    skyGrad.addColorStop(0.10, "#0e0502");
+    skyGrad.addColorStop(0.35, "#060c18");
+    skyGrad.addColorStop(horizonY/H-0.02, "#0c1208");
+    skyGrad.addColorStop(horizonY/H+0.02, "#081828");
+    skyGrad.addColorStop(shoreY/H,  "#061020");
+    skyGrad.addColorStop(1,    "#040c08");
+    ctx.fillStyle=skyGrad;
+    ctx.fillRect(0,0,W,H);
+
+    // ── 太陽コロナ光線 ──────────────────────
+    const pulse=Math.sin(t*0.018)*0.10+1;
+    const sunR=Math.min(W,H)*0.09*pulse;
+    rays.forEach(r=>{
+      const breathe=Math.sin(t*r.speed+r.phase)*0.22+0.78;
+      const len=Math.min(W,H)*r.lenF*breathe;
+      const x1=W*0.5+Math.cos(r.angle)*sunR*0.88;
+      const y1=sunCY+Math.sin(r.angle)*sunR*0.88;
+      const x2=W*0.5+Math.cos(r.angle)*(sunR+len);
+      const y2=sunCY+Math.sin(r.angle)*(sunR+len);
+      const g=ctx.createLinearGradient(x1,y1,x2,y2);
+      g.addColorStop(0,`rgba(255,200,80,${r.alpha*breathe})`);
+      g.addColorStop(0.5,`rgba(255,130,30,${r.alpha*breathe*0.55})`);
+      g.addColorStop(1,`rgba(220,70,10,0)`);
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.strokeStyle=g; ctx.lineWidth=r.width*breathe; ctx.lineCap="round"; ctx.stroke();
+    });
+    // 太陽本体
+    const sGrad=ctx.createRadialGradient(W*0.5,sunCY,0,W*0.5,sunCY,sunR);
+    sGrad.addColorStop(0,"rgba(255,245,160,0.98)");
+    sGrad.addColorStop(0.4,"rgba(255,180,50,0.90)");
+    sGrad.addColorStop(0.8,"rgba(255,100,20,0.70)");
+    sGrad.addColorStop(1,"rgba(200,60,0,0)");
+    ctx.beginPath(); ctx.arc(W*0.5,sunCY,sunR,0,Math.PI*2);
+    ctx.fillStyle=sGrad; ctx.fill();
+    // 外周グロー
+    const oGlow=ctx.createRadialGradient(W*0.5,sunCY,sunR,W*0.5,sunCY,sunR*3.2);
+    oGlow.addColorStop(0,"rgba(255,110,20,0.14)");
+    oGlow.addColorStop(1,"rgba(200,50,0,0)");
+    ctx.fillStyle=oGlow; ctx.fillRect(0,0,W,H);
+
+    // ── タンポポ ───────────────────────────
+    seeds.forEach(s=>{
+      s.life++;
+      if(s.life>s.maxLife) resetSeed(s);
+      s.x+=s.vx+Math.sin(t*s.wobSp+s.wobX)*0.5;
+      s.y+=s.vy+Math.sin(t*s.wobSp*0.7+s.wobY)*0.6;
+      if(s.x>W+20||s.y<0||s.y>horizonY) resetSeed(s);
+      const frac=s.life/s.maxLife;
+      const alpha=s.alpha*Math.min(frac*8,1)*(1-Math.max((frac-0.8)*5,0));
+      ctx.save(); ctx.translate(s.x,s.y);
+      ctx.rotate(Math.atan2(s.vy,s.vx)*0.4);
+      ctx.globalAlpha=alpha;
+      ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(0,s.stemLen*s.size);
+      ctx.strokeStyle="rgba(190,220,245,0.9)"; ctx.lineWidth=0.7*s.size; ctx.stroke();
+      for(let i=0;i<s.hairN;i++){
+        const ang=-Math.PI*0.5+(i/(s.hairN-1)-0.5)*Math.PI*1.1;
+        const hx=Math.cos(ang)*s.hairLen*s.size;
+        const hy=Math.sin(ang)*s.hairLen*s.size;
+        ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(hx,hy);
+        ctx.strokeStyle="rgba(210,230,255,0.85)"; ctx.lineWidth=0.55*s.size; ctx.stroke();
+        ctx.beginPath(); ctx.arc(hx,hy,1.1*s.size,0,Math.PI*2);
+        ctx.fillStyle="rgba(230,245,255,0.95)"; ctx.fill();
+      }
+      ctx.globalAlpha=1; ctx.restore();
+    });
+
+    // ── 地平線グロー ────────────────────────
+    const hGlow=ctx.createLinearGradient(0,horizonY-25,0,horizonY+40);
+    hGlow.addColorStop(0,"rgba(170,145,50,0)");
+    hGlow.addColorStop(0.4,`rgba(170,145,50,${0.16+Math.sin(t*0.012)*0.05})`);
+    hGlow.addColorStop(1,"rgba(130,105,30,0)");
+    ctx.fillStyle=hGlow; ctx.fillRect(0,horizonY-25,W,65);
+
+    // ── 山脈（奥） ──────────────────────────
+    ctx.beginPath(); ctx.moveTo(0,horizonY);
+    mts2.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.lineTo(W,horizonY); ctx.closePath();
+    ctx.fillStyle="rgba(55,65,28,0.55)"; ctx.fill();
+    // 山脈（手前）
+    ctx.beginPath(); ctx.moveTo(0,horizonY);
+    mts1.forEach(p=>ctx.lineTo(p.x,p.y));
+    ctx.lineTo(W,horizonY); ctx.closePath();
+    ctx.fillStyle="rgba(38,48,18,0.82)"; ctx.fill();
+
+    // ── 地面 ────────────────────────────────
+    const gGrad=ctx.createLinearGradient(0,horizonY,0,shoreY);
+    gGrad.addColorStop(0,"rgba(70,58,18,0.75)");
+    gGrad.addColorStop(0.5,"rgba(48,38,10,0.88)");
+    gGrad.addColorStop(1,"rgba(28,22,6,0.95)");
+    ctx.fillStyle=gGrad; ctx.fillRect(0,horizonY,W,shoreY-horizonY);
+    // 地層ライン
+    [0.62,0.70,0.78].forEach((f,i)=>{
+      const y=horizonY+(shoreY-horizonY)*((f-0.54)/0.22);
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.strokeStyle=`rgba(150,120,40,${0.08+i*0.03})`; ctx.lineWidth=0.6; ctx.stroke();
+    });
+    // 地面の光粒（地平線へ）
+    gdots.forEach(d=>{
+      d.y+=d.vy;
+      if(d.y<horizonY){d.y=horizonY+(shoreY-horizonY)*0.85; d.x=Math.random()*W;}
+      const fade=1-(horizonY-d.y)/(shoreY-horizonY)*(-1);
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.size,0,Math.PI*2);
+      ctx.fillStyle=`rgba(195,160,55,${d.alpha*0.7})`; ctx.fill();
+    });
+
+    // ── 海 ──────────────────────────────────
+    waveLayers.forEach(wl=>{
+      const yBase=shoreY+wl.yOff;
+      ctx.beginPath();
+      ctx.moveTo(0,yBase+Math.sin(t*wl.speed+wl.phase)*wl.amp);
+      for(let x=0;x<=W;x+=3){
+        const y=yBase+Math.sin(x*0.010+t*wl.speed+wl.phase)*wl.amp
+                     +Math.sin(x*0.017+t*wl.speed*1.4+wl.phase+1)*wl.amp*0.38;
+        ctx.lineTo(x,y);
+      }
+      ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+      const sg=ctx.createLinearGradient(0,yBase-wl.amp,0,H);
+      sg.addColorStop(0,`rgba(40,130,180,${wl.alpha*0.5})`);
+      sg.addColorStop(0.3,`rgba(35,110,165,${wl.alpha})`);
+      sg.addColorStop(1,`rgba(20,70,110,${wl.alpha*1.3})`);
+      ctx.fillStyle=sg; ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(0,yBase+Math.sin(t*wl.speed+wl.phase)*wl.amp);
+      for(let x=0;x<=W;x+=3){
+        const y=yBase+Math.sin(x*0.010+t*wl.speed+wl.phase)*wl.amp
+                     +Math.sin(x*0.017+t*wl.speed*1.4+wl.phase+1)*wl.amp*0.38;
+        ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=`rgba(70,175,225,${wl.alpha*1.6})`; ctx.lineWidth=wl.w; ctx.stroke();
+    });
+    // 水滴（大地へ吸収）
+    drops.forEach(d=>{
+      d.life++; if(d.life>d.maxLife) resetDrop(d);
+      d.x+=d.vx; d.y+=d.vy; d.vy*=1.025;
+      if(d.y>shoreY+H*0.15) resetDrop(d);
+      const frac=d.life/d.maxLife;
+      const a=d.alpha*(1-Math.pow(frac,1.4));
+      ctx.beginPath(); ctx.arc(d.x,d.y,d.size*(1-frac*0.5),0,Math.PI*2);
+      ctx.fillStyle=`rgba(65,170,220,${a})`; ctx.fill();
+    });
+
+    // ── エレメントラベル ────────────────────
+    ctx.save();
+    ctx.font=`${Math.round(W*0.016)}px 'Cinzel', serif`;
+    ctx.textAlign="left";
+    labels.forEach(l=>{
+      ctx.fillStyle=l.col;
+      ctx.fillText(l.txt, l.x>W*0.75?W-ctx.measureText(l.txt).width-W*0.03:l.x, l.y);
+    });
+    ctx.restore();
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
 }
 
 /* 🔥 火：中心から外へ放射する矢印（花火・拡散） */
