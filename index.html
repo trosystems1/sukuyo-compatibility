@@ -1614,10 +1614,12 @@ html, body {
 .ep-group-bar-seg {
   flex: 1;
 }
-/* ボディ：白背景で内側を覆う */
+/* ボディ：白背景で内側を確実に覆う */
 .ep-group-body {
   padding: 12px 12px 14px;
   background: #fff;
+  min-height: 60px;
+  position: relative;
 }
 .ep-group-feet {
   display: flex;
@@ -1663,26 +1665,32 @@ html, body {
   overflow: hidden;
 }
 .ep-desc-card-head {
-  padding: 14px 16px 10px;
+  padding: 14px 16px 12px;
   display: flex;
   align-items: center;
   gap: 10px;
+  margin: -1px -1px 0;
+  border-radius: 13px 13px 0 0;
+  /* 背景はJS側でインライン指定 */
 }
 .ep-desc-dot {
   width: 9px; height: 9px;
   border-radius: 50%;
+  background: rgba(255,255,255,0.70);
   flex-shrink: 0;
 }
 .ep-desc-label {
   font-family: 'Cinzel', serif;
   font-size: 8px;
   letter-spacing: .3em;
+  color: rgba(255,255,255,0.75);
 }
 .ep-desc-name {
   font-family: 'Shippori Mincho', serif;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
   margin-left: auto;
+  color: #fff;
 }
 .ep-desc-body {
   padding: 0 16px 14px;
@@ -4773,11 +4781,17 @@ function renderElementPage() {
   if (descsEl) {
     descsEl.innerHTML = `<div class="ep-desc-grid">${EP_DATA.map(e => {
       const cls = e.cls.replace("es-","ep-");
+      const descHeadBg = {
+        "ep-fire":  "linear-gradient(135deg,#b84a20,#d4703a)",
+        "ep-earth": "linear-gradient(135deg,#6a5020,#8a7040)",
+        "ep-wind":  "linear-gradient(135deg,#7a9aaa,#9ab8c8)",
+        "ep-water": "linear-gradient(135deg,#1a5aa0,#3a8ed0)",
+      }[cls] || "#888";
       return `<div class="ep-desc-card ${cls}">
-  <div class="ep-desc-card-head">
-    <div class="ep-desc-dot ${cls}"></div>
-    <div class="ep-desc-label ${cls}">${e.en}</div>
-    <div class="ep-desc-name ${cls}">${e.name}</div>
+  <div class="ep-desc-card-head" style="background:${descHeadBg};">
+    <div class="ep-desc-dot"></div>
+    <div class="ep-desc-label">${e.en}</div>
+    <div class="ep-desc-name">${e.name}</div>
   </div>
   <div class="ep-desc-body">
     <div class="ep-desc-phrase ${cls}">${e.keyphrase}</div>
@@ -4821,8 +4835,8 @@ function renderElementPage() {
       // 比率バーのセグメント（足の順番どおり）
       const barSegs = feet.map(f => `<div class="ep-group-bar-seg" style="background:${EC[f].bar};opacity:0.90;"></div>`).join("");
 
-      return `<div class="ep-group-card" style="border-color:${dc.border};background:${dc.solid};">
-  <div class="ep-group-head" style="background:${dc.head};">
+      return `<div class="ep-group-card" style="border-color:${dc.border};background:#fff;">
+  <div class="ep-group-head" style="background:${dc.head};margin:-1px -1px 0;border-radius:13px 13px 0 0;">
     <div class="ep-group-num">${g}</div>
     <div class="ep-group-shuku">${shukuList}</div>
   </div>
