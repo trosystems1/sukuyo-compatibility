@@ -1606,10 +1606,10 @@ html, body {
   position: relative;
   z-index: 1;
 }
-/* エレメント比率バー（ヘッダー下端） */
+/* エレメント比率バー（太く・比率一目瞭然） */
 .ep-group-bar {
   display: flex;
-  height: 6px;
+  height: 20px;
 }
 .ep-group-bar-seg {
   flex: 1;
@@ -1635,8 +1635,8 @@ html, body {
 }
 .ep-foot-fire  { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.50); }
 .ep-foot-earth { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.50); }
-.ep-foot-wind  { background: rgba(40,100,160,.16); color: #0a3868; border-color: rgba(40,100,160,.55); }
-.ep-foot-water { background: rgba(20,110,130,.16); color: #064858; border-color: rgba(20,110,130,.55); }
+.ep-foot-wind  { background: rgba(50,140,210,.16); color: #0a4880; border-color: rgba(50,140,210,.65); }
+.ep-foot-water { background: rgba(10,90,100,.16);  color: #03343c; border-color: rgba(10,90,100,.65); }
 .ep-group-desc {
   font-size: 12px;
   color: var(--muted);
@@ -4811,14 +4811,14 @@ function renderElementPage() {
       const EC = {
         "火": { head: "linear-gradient(135deg,#b84a20,#d4703a)", bar: "#c0603a", border: "rgba(192,96,58,.35)" },
         "地": { head: "linear-gradient(135deg,#6a5020,#8a7040)", bar: "#8a7040", border: "rgba(138,112,64,.35)" },
-        "風": { head: "linear-gradient(135deg,#1a4878,#2a6aa8)", bar: "#2a6aa8", border: "rgba(40,100,160,.38)" },
-        "水": { head: "linear-gradient(135deg,#0a5868,#167898)", bar: "#167898", border: "rgba(20,110,130,.38)" },
+        "風": { head: "linear-gradient(135deg,#2060b0,#3a8ed0)", bar: "#3a8ed0", border: "rgba(50,140,210,.42)" },
+        "水": { head: "linear-gradient(135deg,#084858,#0e6878)", bar: "#0e6878", border: "rgba(10,90,100,.42)" },
       };
       const dominantElem = Object.entries(elems).sort((a,b)=>b[1]-a[1])[0][0];
       const dc = EC[dominantElem];
 
       // 比率バーのセグメント（足の順番どおり）
-      const barSegs = feet.map(f => `<div class="ep-group-bar-seg" style="background:${EC[f].bar};opacity:0.75;"></div>`).join("");
+      const barSegs = feet.map(f => `<div class="ep-group-bar-seg" style="background:${EC[f].bar};opacity:0.90;"></div>`).join("");
 
       return `<div class="ep-group-card" style="border-color:${dc.border};">
   <div class="ep-group-head" style="background:${dc.head};">
