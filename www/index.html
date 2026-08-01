@@ -4808,8 +4808,8 @@ function initWorldCanvas() {
 
 function animWorld(canvas, ctx, W, H) {
   // ── ゾーン ──────────────────────────────
-  const sunX     = W * 0.50;
-  const sunCY    = H * 0.72;   // 地平線から昇りかけ
+  const sunX     = W * 0.28;   // 左寄り・平野から昇る
+  const sunCY    = H * 0.48;
   const horizonY = H * 0.56;
   const waterY   = H * 0.72;
 
@@ -4847,10 +4847,12 @@ function animWorld(canvas, ctx, W, H) {
   }));
 
   // ── 山稜（朝の光を受けた緑の山） ─────────
-  function makeSil(n, hMin, hMax, seed) {
+  function makeSil(n, hMin, hMax, seed, xStart) {
+    // xStart: 山が始まるX位置（0〜1）、左側は地平線の高さで平野
     const pts = [{x: 0, y: horizonY}];
-    for (let i = 1; i < n; i++) {
-      const x = (i / n) * W;
+    pts.push({x: xStart * W, y: horizonY}); // 左は平野
+    for (let i = 1; i <= n; i++) {
+      const x = xStart * W + (1 - xStart) * W * (i / n);
       const h = hMin
         + (Math.sin(i * seed) * 0.5 + 0.5) * (hMax - hMin)
         + Math.cos(i * seed * 1.618) * (hMax - hMin) * 0.28;
@@ -4859,9 +4861,10 @@ function animWorld(canvas, ctx, W, H) {
     pts.push({x: W, y: horizonY});
     return pts;
   }
-  const sil1 = makeSil(28, H*0.10, H*0.26, 1.41);
-  const sil2 = makeSil(20, H*0.05, H*0.15, 2.72);
-  const sil3 = makeSil(14, H*0.02, H*0.09, 3.89);
+  // 山は右45%から始まる
+  const sil1 = makeSil(16, H*0.06, H*0.20, 1.41, 0.44);
+  const sil2 = makeSil(12, H*0.03, H*0.12, 2.72, 0.50);
+  const sil3 = makeSil( 8, H*0.01, H*0.07, 3.89, 0.54);
 
   // ── 川・水面の波 ─────────────────────────
   const waveLayers = [
@@ -4914,7 +4917,7 @@ function animWorld(canvas, ctx, W, H) {
     // 太陽は地平線にかかる（半分隠れている）
     const pulse = Math.sin(t * 0.007) * 0.03 + 1.0;
     const sunR  = Math.min(W, H) * 0.082 * pulse;
-    const sunY  = horizonY - sunR * 0.52;   // 半分だけ地平線より上（山の前に描画）
+    const sunY  = horizonY - sunR * 0.5;   // 地平線から半分だけ上に出た朝日
 
     // 地平線下の光（地面に差し込む）
     const underGlow = ctx.createRadialGradient(sunX, horizonY, 0, sunX, horizonY, W * 0.45);
@@ -4965,10 +4968,8 @@ function animWorld(canvas, ctx, W, H) {
       ctx.stroke(); ctx.restore();
     });
 
-    // 光芒（地平線より上の部分のみ）
-    ctx.save(); ctx.beginPath();
-    ctx.rect(0, 0, W, horizonY);
-    ctx.clip();
+    // ── 太陽（山の直前に描画・クリップなし） ─────
+    // 光芒
     rays.forEach(r => {
       const b = Math.sin(t * r.speed + r.phase) * 0.18 + 0.82;
       const len = Math.min(W, H) * r.lenF * b;
@@ -4984,18 +4985,20 @@ function animWorld(canvas, ctx, W, H) {
       ctx.strokeStyle = g; ctx.lineWidth = r.width * b;
       ctx.lineCap = "round"; ctx.stroke();
     });
-    ctx.restore();
-
-    // 太陽本体（地平線でクリップ）
-    ctx.save();
+    // 外周グロー
+    const sunAura = ctx.createRadialGradient(sunX, sunY, sunR * 0.8, sunX, sunY, sunR * 4);
+    sunAura.addColorStop(0,   "rgba(255,200,60,0.20)");
+    sunAura.addColorStop(0.5, "rgba(255,150,20,0.07)");
+    sunAura.addColorStop(1,   "rgba(220,80,0,0)");
+    ctx.fillStyle = sunAura; ctx.fillRect(0, 0, W, H);
+    // 太陽本体
     const sGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
     sGrad.addColorStop(0,    "rgba(255,252,220,1.0)");
-    sGrad.addColorStop(0.40, "rgba(255,220,80,0.95)");
-    sGrad.addColorStop(0.75, "rgba(255,150,20,0.75)");
-    sGrad.addColorStop(1,    "rgba(230,90,0,0)");
+    sGrad.addColorStop(0.40, "rgba(255,225,90,0.96)");
+    sGrad.addColorStop(0.75, "rgba(255,160,25,0.80)");
+    sGrad.addColorStop(1,    "rgba(235,95,0,0)");
     ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
     ctx.fillStyle = sGrad; ctx.fill();
-    ctx.restore();
 
     // ── 山稜（朝の光を受けた色） ──────────────
     // 奥（霞・明るい青紫）
