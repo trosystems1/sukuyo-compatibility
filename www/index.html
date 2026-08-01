@@ -4808,281 +4808,260 @@ function initWorldCanvas() {
 
 function animWorld(canvas, ctx, W, H) {
   // ── ゾーン境界 ──────────────────────────────
-  const sunX     = W * 0.16;   // 太陽 左上
-  const sunCY    = H * 0.18;
-  const horizonY = H * 0.56;   // 地平線
-  const shoreY   = H * 0.72;   // 海岸線
+  const horizonY = H * 0.58;
+  const waterY   = H * 0.70;
 
-  // ── 雲パーティクル（風の表現） ────────────────
-  function resetCloud(c) {
-    c.x     = -W * 0.25;
-    c.y     = H * (0.06 + Math.random() * 0.28);
-    c.vx    = 0.18 + Math.random() * 0.22;
-    c.w     = W * (0.08 + Math.random() * 0.12);
-    c.h     = H * (0.025 + Math.random() * 0.03);
-    c.alpha = 0.22 + Math.random() * 0.28;
-    c.life  = 0;
-    c.maxLife = (W / c.vx) * 1.1;
-    return c;
-  }
-  const clouds = Array.from({length: 9}, (_, i) => {
-    const c = resetCloud({});
-    c.x = Math.random() * W;
-    c.life = Math.random() * c.maxLife;
-    return c;
-  });
+  // ── 星 ────────────────────────────────────
+  const stars = Array.from({length: 120}, () => ({
+    x:     Math.random() * W,
+    y:     Math.random() * horizonY * 0.85,
+    r:     0.4 + Math.random() * 1.1,
+    alpha: 0.3 + Math.random() * 0.65,
+    phase: Math.random() * Math.PI * 2,
+    speed: 0.008 + Math.random() * 0.012
+  }));
 
-  // ── コロナ光線（細く・少なく） ────────────────
-  const RAYS = 18;
+  // ── 火：光の核（中央上部）＋放射する光芒 ──
+  const coreX = W * 0.50, coreY = H * 0.18;
+  const RAYS = 28;
   const rays = Array.from({length: RAYS}, (_, i) => ({
     angle: (i / RAYS) * Math.PI * 2,
-    lenF:  0.06 + Math.random() * 0.08,
+    lenF:  0.08 + Math.random() * 0.14,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.003 + Math.random() * 0.003,  // ゆっくり
-    width: 0.6 + Math.random() * 0.9,
-    alpha: 0.18 + Math.random() * 0.22
+    speed: 0.004 + Math.random() * 0.004,
+    width: 0.5 + Math.random() * 1.0,
+    alpha: 0.12 + Math.random() * 0.20
   }));
 
-  // ── 山脈 ──────────────────────────────────
-  function makeMts(n, hMin, hMax, seed) {
-    return Array.from({length: n + 1}, (_, i) => {
-      const x = (i / n) * W;
-      const h = hMin
-        + Math.sin(i * seed + seed * 2) * (hMax - hMin) * 0.5
-        + Math.cos(i * seed * 1.7)      * (hMax - hMin) * 0.3
-        + (hMax - hMin) * 0.5;
-      return { x, y: horizonY - Math.abs(h) };
-    });
+  // ── 風：光の粒子が横に流れる ──────────────
+  function resetParticle(p) {
+    p.x     = -10;
+    p.y     = H * (0.05 + Math.random() * 0.52);
+    p.vx    = 0.4 + Math.random() * 1.0;
+    p.vy    = (Math.random() - 0.5) * 0.18;
+    p.wobY  = Math.random() * Math.PI * 2;
+    p.wobSp = 0.015 + Math.random() * 0.020;
+    p.alpha = 0.25 + Math.random() * 0.50;
+    p.size  = 0.8 + Math.random() * 1.8;
+    p.trail = 18 + Math.floor(Math.random() * 22);
+    p.hist  = [];
+    p.life  = 0;
+    p.maxLife = (W + 20) / p.vx;
+    return p;
   }
-  const mts1 = makeMts(20, H * 0.10, H * 0.22, 1.3);
-  const mts2 = makeMts(14, H * 0.05, H * 0.13, 2.1);
+  const particles = Array.from({length: 22}, () => {
+    const p = resetParticle({});
+    p.x = Math.random() * W;
+    p.life = Math.random() * p.maxLife;
+    return p;
+  });
 
-  // ── 木（森林） ────────────────────────────
-  const trees = Array.from({length: 22}, (_, i) => ({
-    x:    W * (0.02 + 0.96 * (i / 21)),
-    h:    H * (0.055 + Math.random() * 0.065),
-    w:    W * (0.018 + Math.random() * 0.014),
-    sway: Math.random() * Math.PI * 2,
-    swaySpeed: 0.008 + Math.random() * 0.006,
-    green: `hsl(${105 + Math.floor(Math.random() * 30)},${55 + Math.floor(Math.random()*20)}%,${28 + Math.floor(Math.random()*14)}%)`
+  // ── 地：水墨風シルエット（複数層） ─────────
+  function makeSilhouette(n, yMin, yMax, seed) {
+    const pts = [{x: 0, y: horizonY}];
+    for (let i = 1; i < n; i++) {
+      const x = (i / n) * W;
+      const h = yMin + (Math.sin(i * seed) * 0.5 + 0.5) * (yMax - yMin)
+                     + Math.cos(i * seed * 1.618) * (yMax - yMin) * 0.3;
+      pts.push({x, y: horizonY - Math.abs(h)});
+    }
+    pts.push({x: W, y: horizonY});
+    return pts;
+  }
+  const sil1 = makeSilhouette(32, H*0.08, H*0.28, 1.41);
+  const sil2 = makeSilhouette(24, H*0.04, H*0.16, 2.72);
+  const sil3 = makeSilhouette(18, H*0.02, H*0.09, 3.14);
+
+  // ── 水：波紋リング ─────────────────────────
+  const ripples = Array.from({length: 5}, (_, i) => ({
+    x:      W * (0.15 + i * 0.17 + Math.random() * 0.06),
+    phase:  (i / 5) * Math.PI * 2,
+    speed:  0.012 + Math.random() * 0.008,
+    maxR:   W * (0.05 + Math.random() * 0.06),
+    alpha:  0.20 + Math.random() * 0.22
   }));
-
-  // ── 川（地面を流れる） ────────────────────
-  const riverY = horizonY + (shoreY - horizonY) * 0.45;
-
-  // ── 波 ──────────────────────────────────
-  const waveLayers = [
-    { yOff: -H*0.040, amp: H*0.012, speed: 0.018, phase: 0.0, alpha: 0.55, w: 1.2 },
-    { yOff: -H*0.018, amp: H*0.009, speed: 0.026, phase: 1.6, alpha: 0.45, w: 1.0 },
-    { yOff:  H*0.002, amp: H*0.006, speed: 0.036, phase: 3.0, alpha: 0.38, w: 0.7 },
-  ];
 
   // ── ラベル ────────────────────────────────
-  const labelSize = Math.max(13, Math.round(W * 0.022));
+  const lblSize = Math.max(14, Math.round(W * 0.024));
   const labels = [
-    { txt: "火  FIRE",  x: W * 0.84, y: H * 0.10, col: "rgba(255,160,40,0.92)"  },
-    { txt: "風  WIND",  x: W * 0.84, y: H * 0.32, col: "rgba(200,230,255,0.92)" },
-    { txt: "地  EARTH", x: W * 0.84, y: H * 0.58, col: "rgba(120,200,80,0.92)"  },
-    { txt: "水  WATER", x: W * 0.84, y: H * 0.82, col: "rgba(80,200,240,0.92)"  },
+    { txt: "火  FIRE",  x: W*0.88, y: H*0.10, col: "rgba(255,200,80,0.88)"  },
+    { txt: "風  WIND",  x: W*0.88, y: H*0.36, col: "rgba(180,210,255,0.82)" },
+    { txt: "地  EARTH", x: W*0.88, y: H*0.62, col: "rgba(160,185,130,0.82)" },
+    { txt: "水  WATER", x: W*0.88, y: H*0.86, col: "rgba(100,190,220,0.85)" },
   ];
 
   let t = 0;
   function draw() {
     ctx.clearRect(0, 0, W, H);
 
-    // ── 空（青空グラデーション） ──────────────
-    const sky = ctx.createLinearGradient(0, 0, 0, horizonY);
-    sky.addColorStop(0,    "#1a4a8a");
-    sky.addColorStop(0.35, "#2e6ab8");
-    sky.addColorStop(0.75, "#6aaee0");
-    sky.addColorStop(1,    "#a8d4f0");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, horizonY);
+    // ── 背景：深い夜のグラデーション ──────────
+    const bg = ctx.createLinearGradient(0, 0, 0, H);
+    bg.addColorStop(0,    "#0a0818");
+    bg.addColorStop(0.30, "#120c28");
+    bg.addColorStop(0.55, "#0e1020");
+    bg.addColorStop(0.70, "#080c14");
+    bg.addColorStop(1,    "#040810");
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
 
-    // 地平線付近のホワイトグロー
-    const haze = ctx.createLinearGradient(0, horizonY - H*0.08, 0, horizonY);
-    haze.addColorStop(0, "rgba(255,255,255,0)");
-    haze.addColorStop(1, "rgba(255,255,240,0.18)");
-    ctx.fillStyle = haze;
-    ctx.fillRect(0, horizonY - H*0.08, W, H*0.08);
+    // ── 星 ──────────────────────────────────
+    stars.forEach(s => {
+      const tw = Math.sin(t * s.speed + s.phase) * 0.35 + 0.65;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r * tw, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(220,215,255,${s.alpha * tw})`;
+      ctx.fill();
+    });
 
-    // ── 太陽（左上・ゆっくり） ───────────────
-    const pulse = Math.sin(t * 0.008) * 0.04 + 1;  // 動きごくわずか
-    const sunR  = Math.min(W, H) * 0.085 * pulse;
+    // ── 火：光の核 ───────────────────────────
+    const pulse = Math.sin(t * 0.010) * 0.06 + 1.0; // ごく微かに脈打つ
+    const coreR = Math.min(W, H) * 0.065 * pulse;
     // 光芒
     rays.forEach(r => {
-      const breathe = Math.sin(t * r.speed + r.phase) * 0.15 + 0.85;
-      const len = Math.min(W, H) * r.lenF * breathe;
-      const x1 = sunX + Math.cos(r.angle) * sunR * 0.92;
-      const y1 = sunCY + Math.sin(r.angle) * sunR * 0.92;
-      const x2 = sunX + Math.cos(r.angle) * (sunR + len);
-      const y2 = sunCY + Math.sin(r.angle) * (sunR + len);
+      const b = Math.sin(t * r.speed + r.phase) * 0.18 + 0.82;
+      const len = Math.min(W, H) * r.lenF * b;
+      const x1 = coreX + Math.cos(r.angle) * coreR * 0.9;
+      const y1 = coreY + Math.sin(r.angle) * coreR * 0.9;
+      const x2 = coreX + Math.cos(r.angle) * (coreR + len);
+      const y2 = coreY + Math.sin(r.angle) * (coreR + len);
       const g = ctx.createLinearGradient(x1, y1, x2, y2);
-      g.addColorStop(0, `rgba(255,230,120,${r.alpha * breathe})`);
-      g.addColorStop(1, `rgba(255,200,60,0)`);
+      g.addColorStop(0, `rgba(255,220,100,${r.alpha * b})`);
+      g.addColorStop(0.5, `rgba(255,170,40,${r.alpha * b * 0.5})`);
+      g.addColorStop(1, `rgba(200,100,20,0)`);
       ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-      ctx.strokeStyle = g; ctx.lineWidth = r.width; ctx.lineCap = "round"; ctx.stroke();
+      ctx.strokeStyle = g; ctx.lineWidth = r.width * b;
+      ctx.lineCap = "round"; ctx.stroke();
     });
-    // 太陽本体
-    const sGrad = ctx.createRadialGradient(sunX, sunCY, 0, sunX, sunCY, sunR);
-    sGrad.addColorStop(0,    "rgba(255,252,200,1.0)");
-    sGrad.addColorStop(0.45, "rgba(255,220,80,0.95)");
-    sGrad.addColorStop(0.80, "rgba(255,170,30,0.80)");
-    sGrad.addColorStop(1,    "rgba(255,140,0,0)");
-    ctx.beginPath(); ctx.arc(sunX, sunCY, sunR, 0, Math.PI * 2);
-    ctx.fillStyle = sGrad; ctx.fill();
-    // 外周グロー（空に溶け込む）
-    const oGlow = ctx.createRadialGradient(sunX, sunCY, sunR * 0.9, sunX, sunCY, sunR * 3.0);
-    oGlow.addColorStop(0, "rgba(255,210,80,0.18)");
-    oGlow.addColorStop(1, "rgba(255,180,40,0)");
-    ctx.fillStyle = oGlow; ctx.fillRect(0, 0, W, horizonY);
+    // 核本体
+    const cGrad = ctx.createRadialGradient(coreX, coreY, 0, coreX, coreY, coreR);
+    cGrad.addColorStop(0,    "rgba(255,248,200,1.0)");
+    cGrad.addColorStop(0.35, "rgba(255,210,80,0.92)");
+    cGrad.addColorStop(0.70, "rgba(220,130,20,0.65)");
+    cGrad.addColorStop(1,    "rgba(180,70,0,0)");
+    ctx.beginPath(); ctx.arc(coreX, coreY, coreR, 0, Math.PI * 2);
+    ctx.fillStyle = cGrad; ctx.fill();
+    // 外周オーラ
+    const aura = ctx.createRadialGradient(coreX, coreY, coreR * 0.8, coreX, coreY, coreR * 4.5);
+    aura.addColorStop(0, "rgba(255,160,40,0.14)");
+    aura.addColorStop(0.5, "rgba(200,80,10,0.05)");
+    aura.addColorStop(1, "rgba(150,40,0,0)");
+    ctx.fillStyle = aura; ctx.fillRect(0, 0, W, horizonY * 1.1);
 
-    // ── 雲（自然な風の表現） ─────────────────
-    clouds.forEach(c => {
-      c.life++;
-      if (c.life > c.maxLife) resetCloud(c);
-      c.x += c.vx;
-      ctx.save();
-      ctx.globalAlpha = c.alpha;
-      // 雲の形（楕円の重ね合わせ）
-      const cx2 = c.x, cy2 = c.y;
-      const grd = ctx.createRadialGradient(cx2, cy2, 0, cx2, cy2, c.w * 0.55);
-      grd.addColorStop(0, "rgba(255,255,255,0.95)");
-      grd.addColorStop(0.6, "rgba(240,248,255,0.70)");
-      grd.addColorStop(1, "rgba(220,235,255,0)");
+    // ── 風：流れる光の粒子＋トレイル ─────────
+    particles.forEach(p => {
+      p.life++;
+      if (p.x > W + 20 || p.life > p.maxLife) resetParticle(p);
+      p.x += p.vx;
+      p.y += p.vy + Math.sin(t * p.wobSp + p.wobY) * 0.5;
+      p.hist.unshift({x: p.x, y: p.y});
+      if (p.hist.length > p.trail) p.hist.pop();
+
+      const frac    = p.life / p.maxLife;
+      const fadeIn  = Math.min(frac * 6, 1);
+      const fadeOut = 1 - Math.max((frac - 0.75) * 4, 0);
+      const baseA   = p.alpha * fadeIn * fadeOut;
+
+      // トレイル
+      p.hist.forEach((h, hi) => {
+        const tf = 1 - hi / p.hist.length;
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, p.size * tf * 0.55, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(160,210,255,${baseA * tf * 0.45})`;
+        ctx.fill();
+      });
+      // 本体
       ctx.beginPath();
-      ctx.ellipse(cx2,          cy2,           c.w * 0.55, c.h * 0.9,  0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(cx2 + c.w*0.28, cy2 + c.h*0.08, c.w * 0.38, c.h * 0.75, 0, 0, Math.PI * 2);
-      ctx.fillStyle = grd; ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(cx2 - c.w*0.25, cy2 + c.h*0.10, c.w * 0.32, c.h * 0.65, 0, 0, Math.PI * 2);
-      ctx.fillStyle = grd; ctx.fill();
-      ctx.globalAlpha = 1;
-      ctx.restore();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200,230,255,${baseA * 0.90})`;
+      ctx.fill();
     });
 
-    // ── 山脈（奥・緑） ───────────────────────
+    // ── 地：水墨シルエット（3層） ─────────────
+    // 奥の霞んだ山（薄く）
     ctx.beginPath(); ctx.moveTo(0, horizonY);
-    mts2.forEach(p => ctx.lineTo(p.x, p.y));
+    sil3.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.lineTo(W, horizonY); ctx.closePath();
-    ctx.fillStyle = "#4a7a2a"; ctx.fill();
-    // 山脈（手前・濃い緑）
+    ctx.fillStyle = "rgba(80,70,120,0.28)"; ctx.fill();
+    // 中の山
     ctx.beginPath(); ctx.moveTo(0, horizonY);
-    mts1.forEach(p => ctx.lineTo(p.x, p.y));
+    sil2.forEach(p => ctx.lineTo(p.x, p.y));
     ctx.lineTo(W, horizonY); ctx.closePath();
-    const mtGrad = ctx.createLinearGradient(0, horizonY - H*0.22, 0, horizonY);
-    mtGrad.addColorStop(0, "#2e5a18");
-    mtGrad.addColorStop(1, "#3a6e20");
-    ctx.fillStyle = mtGrad; ctx.fill();
+    ctx.fillStyle = "rgba(50,45,80,0.55)"; ctx.fill();
+    // 手前の山（濃い）
+    ctx.beginPath(); ctx.moveTo(0, horizonY);
+    sil1.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(W, horizonY); ctx.closePath();
+    const silGrad = ctx.createLinearGradient(0, horizonY - H*0.28, 0, horizonY);
+    silGrad.addColorStop(0, "rgba(30,25,50,0.82)");
+    silGrad.addColorStop(1, "rgba(20,18,35,0.95)");
+    ctx.fillStyle = silGrad; ctx.fill();
 
-    // ── 木（揺れる森林） ─────────────────────
-    trees.forEach(tr => {
-      const sway = Math.sin(t * tr.swaySpeed + tr.sway) * 2.5;
-      const baseY = horizonY - 2;
-      // 幹
-      ctx.fillStyle = "#3a2a10";
-      ctx.fillRect(tr.x - tr.w * 0.08, baseY - tr.h * 0.35, tr.w * 0.16, tr.h * 0.38);
-      // 葉（三角形 + 楕円）
-      ctx.save(); ctx.translate(tr.x + sway * 0.4, baseY - tr.h * 0.35);
-      const leafGrad = ctx.createRadialGradient(0, -tr.h * 0.32, 0, 0, -tr.h * 0.32, tr.w * 0.55);
-      leafGrad.addColorStop(0, "#5aaa28");
-      leafGrad.addColorStop(1, tr.green);
+    // 地平線グロー
+    const hGlow = ctx.createLinearGradient(0, horizonY - H*0.04, 0, horizonY + H*0.04);
+    hGlow.addColorStop(0, "rgba(180,150,80,0)");
+    hGlow.addColorStop(0.5, `rgba(180,150,80,${0.10 + Math.sin(t*0.008)*0.04})`);
+    hGlow.addColorStop(1, "rgba(140,110,50,0)");
+    ctx.fillStyle = hGlow; ctx.fillRect(0, horizonY - H*0.04, W, H*0.08);
+
+    // 地面
+    const gnd = ctx.createLinearGradient(0, horizonY, 0, waterY);
+    gnd.addColorStop(0, "rgba(18,15,32,0.96)");
+    gnd.addColorStop(1, "rgba(10,10,22,0.98)");
+    ctx.fillStyle = gnd; ctx.fillRect(0, horizonY, W, waterY - horizonY);
+
+    // ── 水：静謐な水面＋波紋 ─────────────────
+    // 水面ベース
+    const waterGrad = ctx.createLinearGradient(0, waterY, 0, H);
+    waterGrad.addColorStop(0,   "rgba(30,80,130,0.75)");
+    waterGrad.addColorStop(0.3, "rgba(20,60,110,0.88)");
+    waterGrad.addColorStop(1,   "rgba(8,30,70,0.95)");
+    ctx.fillStyle = waterGrad; ctx.fillRect(0, waterY, W, H - waterY);
+
+    // 水面の揺らぎ（3本の細い横線）
+    for (let li = 0; li < 3; li++) {
+      const ly = waterY + (H - waterY) * (0.06 + li * 0.12);
       ctx.beginPath();
-      ctx.moveTo(0, -tr.h);
-      ctx.lineTo(-tr.w * 0.5, 0);
-      ctx.lineTo(tr.w * 0.5, 0);
-      ctx.closePath();
-      ctx.fillStyle = leafGrad; ctx.fill();
-      ctx.beginPath();
-      ctx.ellipse(0, -tr.h * 0.55, tr.w * 0.42, tr.h * 0.38, 0, 0, Math.PI * 2);
-      ctx.fillStyle = "#4a9820"; ctx.fill();
-      ctx.restore();
-    });
-
-    // ── 大地 ─────────────────────────────────
-    const groundGrad = ctx.createLinearGradient(0, horizonY, 0, shoreY);
-    groundGrad.addColorStop(0, "#5a8a28");
-    groundGrad.addColorStop(0.4, "#4a7018");
-    groundGrad.addColorStop(1, "#3a5810");
-    ctx.fillStyle = groundGrad;
-    ctx.fillRect(0, horizonY, W, shoreY - horizonY);
-    // 地層ライン（淡く）
-    [0.3, 0.6, 0.85].forEach((f, i) => {
-      const y = horizonY + (shoreY - horizonY) * f;
-      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y);
-      ctx.strokeStyle = `rgba(80,120,30,${0.15 + i * 0.08})`; ctx.lineWidth = 0.7; ctx.stroke();
-    });
-
-    // ── 川（大地を流れる） ───────────────────
-    const riverAmp = H * 0.008;
-    ctx.beginPath();
-    ctx.moveTo(0, riverY);
-    for (let x = 0; x <= W; x += 4) {
-      const y = riverY + Math.sin(x * 0.018 + t * 0.025) * riverAmp;
-      ctx.lineTo(x, y);
-    }
-    ctx.lineTo(W, riverY + riverAmp * 2);
-    ctx.lineTo(0, riverY + riverAmp * 2);
-    ctx.closePath();
-    const riverGrad = ctx.createLinearGradient(0, riverY - riverAmp, 0, riverY + riverAmp * 3);
-    riverGrad.addColorStop(0, "rgba(100,200,240,0.7)");
-    riverGrad.addColorStop(1, "rgba(60,160,220,0.5)");
-    ctx.fillStyle = riverGrad; ctx.fill();
-    // 川面の光
-    ctx.beginPath();
-    for (let x = 0; x <= W; x += 4) {
-      const y = riverY + Math.sin(x * 0.018 + t * 0.025) * riverAmp;
-      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = "rgba(180,235,255,0.6)"; ctx.lineWidth = 1.2; ctx.stroke();
-
-    // ── 海（明るいターコイズ） ───────────────
-    waveLayers.forEach(wl => {
-      const yBase = shoreY + wl.yOff;
-      ctx.beginPath();
-      ctx.moveTo(0, yBase + Math.sin(t * wl.speed + wl.phase) * wl.amp);
       for (let x = 0; x <= W; x += 3) {
-        const y = yBase
-          + Math.sin(x * 0.010 + t * wl.speed + wl.phase) * wl.amp
-          + Math.sin(x * 0.018 + t * wl.speed * 1.4 + wl.phase + 1) * wl.amp * 0.35;
-        ctx.lineTo(x, y);
+        const y = ly + Math.sin(x * 0.012 + t * 0.018 + li * 1.2) * H * 0.006
+                     + Math.sin(x * 0.020 + t * 0.025 + li * 0.8) * H * 0.003;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
-      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
-      const sg = ctx.createLinearGradient(0, yBase, 0, H);
-      sg.addColorStop(0, `rgba(60,190,220,${wl.alpha * 0.7})`);
-      sg.addColorStop(0.4, `rgba(30,155,200,${wl.alpha})`);
-      sg.addColorStop(1, `rgba(10,100,160,${wl.alpha * 1.2})`);
-      ctx.fillStyle = sg; ctx.fill();
-      // 波頭
-      ctx.beginPath();
-      ctx.moveTo(0, yBase + Math.sin(t * wl.speed + wl.phase) * wl.amp);
-      for (let x = 0; x <= W; x += 3) {
-        const y = yBase
-          + Math.sin(x * 0.010 + t * wl.speed + wl.phase) * wl.amp
-          + Math.sin(x * 0.018 + t * wl.speed * 1.4 + wl.phase + 1) * wl.amp * 0.35;
-        ctx.lineTo(x, y);
-      }
-      ctx.strokeStyle = `rgba(160,230,255,${wl.alpha * 1.4})`; ctx.lineWidth = wl.w; ctx.stroke();
-    });
-    // 海面の輝き
-    const seaShine = ctx.createLinearGradient(0, shoreY, 0, H);
-    seaShine.addColorStop(0, "rgba(120,220,250,0.12)");
-    seaShine.addColorStop(0.3, "rgba(80,190,230,0.06)");
-    seaShine.addColorStop(1, "rgba(20,100,160,0)");
-    ctx.fillStyle = seaShine; ctx.fillRect(0, shoreY, W, H - shoreY);
+      ctx.strokeStyle = `rgba(80,160,210,${0.22 - li * 0.05})`; ctx.lineWidth = 0.8; ctx.stroke();
+    }
 
-    // ── ラベル（大きく） ─────────────────────
+    // 月の映り込み（縦に揺れる光の帯）
+    const moonReflX = coreX;
+    const reflGrad = ctx.createLinearGradient(moonReflX - 30, waterY, moonReflX + 30, waterY);
+    reflGrad.addColorStop(0, "rgba(255,230,120,0)");
+    reflGrad.addColorStop(0.5, `rgba(255,230,120,${0.12 + Math.sin(t*0.015)*0.04})`);
+    reflGrad.addColorStop(1, "rgba(255,230,120,0)");
+    ctx.fillStyle = reflGrad;
+    ctx.fillRect(moonReflX - 30, waterY, 60, H - waterY);
+
+    // 波紋
+    ripples.forEach(r => {
+      const rPhase = (t * r.speed + r.phase) % (Math.PI * 2);
+      const frac   = rPhase / (Math.PI * 2);
+      const radius = frac * r.maxR;
+      const alpha  = r.alpha * (1 - frac);
+      const ry     = waterY + (H - waterY) * 0.25;
+      ctx.beginPath();
+      ctx.ellipse(r.x, ry, radius, radius * 0.22, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(100,190,230,${alpha})`;
+      ctx.lineWidth = 0.8; ctx.stroke();
+    });
+
+    // ── ラベル ───────────────────────────────
     ctx.save();
-    ctx.font = `${labelSize}px 'Cinzel', serif`;
+    ctx.font = `${lblSize}px 'Cinzel', serif`;
     ctx.textAlign = "right";
+    ctx.letterSpacing = "0.15em";
     labels.forEach(l => {
-      // 影
-      ctx.fillStyle = "rgba(0,0,0,0.35)";
-      ctx.fillText(l.txt, l.x + 1, l.y + 1);
-      ctx.fillStyle = l.col;
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur  = 8;
+      ctx.fillStyle   = l.col;
       ctx.fillText(l.txt, l.x, l.y);
     });
+    ctx.shadowBlur = 0;
     ctx.restore();
 
     t++;
