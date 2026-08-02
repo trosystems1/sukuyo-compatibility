@@ -4114,6 +4114,7 @@ let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m,
 let lastCompatB = null;        // 相性占いのB側入力日付 { y, m, d } | null
 let bookViewpointId = null;    // 盤の視点になっている人物ID
 let inputMode = { self: "date", a: "date", b: "date", book: "date" }; // "date" | "shuku"
+let saveSelectedTag = null;    // 結果ページ保存UIで選択中のタグ（早期宣言）
 
 const DATE_SELECT_PREFIXES = ["self", "a", "b", "book"];
 const YEAR_MIN = 1900, YEAR_MAX = 2099, YEAR_DEFAULT = 1980;
@@ -5090,19 +5091,22 @@ function closeShukuPanel() {
   document.body.style.overflow = "";
 }
 
-// 戻るボタン
-document.getElementById("sdp-back").addEventListener("click", closeShukuPanel);
+// 戻るボタン＆スワイプ（DOMが確実に存在してから登録）
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.getElementById("sdp-back");
+  if (backBtn) backBtn.addEventListener("click", closeShukuPanel);
 
-// スワイプで閉じる（右→左スワイプは無視、左→右スワイプで閉じる）
-(function(){
-  let startX = 0;
+  // スワイプで閉じる（左端から右スワイプで閉じる）
   const panel = document.getElementById("shuku-detail-panel");
-  panel.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
-  panel.addEventListener("touchend", e => {
-    const dx = e.changedTouches[0].clientX - startX;
-    if (dx > 60 && e.changedTouches[0].clientX < 80) closeShukuPanel();
-  }, { passive: true });
-})();
+  if (panel) {
+    let startX = 0;
+    panel.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+    panel.addEventListener("touchend", e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx > 60 && e.changedTouches[0].clientX < 80) closeShukuPanel();
+    }, { passive: true });
+  }
+});
 
 function renderAstrologyPage() {
   renderAstroPalaceGrid("all");
@@ -5898,7 +5902,7 @@ document.getElementById("btn-back-from-mypage").addEventListener("click", () => 
 const PERSON_TAGS = { family: "家族", work: "仕事", private: "プライベート" };
 let bookTagFilter = "all";   // 盤・リストの絞り込み
 let bookAddTag = null;       // 追加フォームで選択中のタグ
-let saveSelectedTag = null;  // 結果ページ保存UIで選択中のタグ
+// saveSelectedTag は上部で宣言済み
 
 function tagLabel(p) { return PERSON_TAGS[p.tag] || null; }
 
