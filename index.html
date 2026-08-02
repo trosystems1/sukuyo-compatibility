@@ -1030,6 +1030,136 @@ html, body {
   margin-bottom: 16px;
 }
 
+/* ── 宿詳細パネル タブ ───────────────────────────────── */
+.sdp-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--deep);
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+}
+.sdp-tab {
+  flex: 1;
+  padding: 12px 4px;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: rgba(232,224,245,.45);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  text-align: center;
+}
+.sdp-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.sdp-tab-content { display: none; }
+.sdp-tab-content.active { display: block; }
+
+/* 今日の運勢タブ */
+.sdp-today-hero {
+  padding: 28px 20px 20px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--deep2) 0%, #0e0820 100%);
+  border-bottom: 1px solid var(--border);
+}
+.sdp-today-date {
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: rgba(232,224,245,.4);
+  margin-bottom: 8px;
+}
+.sdp-today-rel-badge {
+  display: inline-block;
+  font-size: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  padding: 6px 20px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.sdp-today-rel-name {
+  font-size: 13px;
+  color: rgba(232,224,245,.7);
+  margin-bottom: 4px;
+}
+.sdp-today-shuku-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(232,224,245,.6);
+}
+.sdp-today-shuku-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 26px;
+  color: var(--moon);
+}
+.sdp-today-rel-text {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: rgba(232,224,245,.78);
+  padding: 20px;
+}
+/* 宿命タブ */
+.sdp-sanze-wrap {
+  padding: 24px 20px;
+}
+.sdp-sanze-node {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,.03);
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.sdp-sanze-node:active { transform: scale(.98); }
+.sdp-sanze-node.highlight {
+  border-color: var(--gold);
+  background: rgba(201,169,97,.07);
+}
+.sdp-sanze-tag {
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+.sdp-sanze-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 24px;
+  color: var(--moon);
+  line-height: 1;
+}
+.sdp-sanze-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.sdp-sanze-desc {
+  font-size: 12px;
+  line-height: 1.75;
+  color: rgba(232,224,245,.6);
+  margin-left: auto;
+  max-width: 160px;
+  text-align: right;
+}
+.sdp-sanze-intro {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.7);
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
 .compat-grade {
   flex: 1;
   min-width: 160px;
@@ -4408,6 +4538,11 @@ function showSelfResult(shukuA, year, month, day) {
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // 本命宿の詳細パネルを自動オープン（少し遅延してスクロール後に開く）
+  setTimeout(() => {
+    openShukuPanel(shukuA.kanji, "命 · PURPOSE", selfIdx);
+  }, 400);
 }
 
 /* ── 命業胎トライアングル描画 ─────────────────────────────── */
@@ -4434,12 +4569,11 @@ function showSanzeDetail(pos) {
   if (!currentSanze) return;
   const s = SHUKU[currentSanze[pos]];
   const p = SANZE_POSITION[pos];
-  // アクティブ状態だけ更新（既存の視覚フィードバックを維持）
   ["mei", "gyo", "tai"].forEach(x =>
     document.getElementById(`sanze-node-${x}`).classList.toggle("active", x === pos));
-  // 全画面パネルを開く（posLabelに命業胎の役割を表示）
-  const posLabel = `${p.label} · ${p.en}`;
-  openShukuPanel(s.kanji, posLabel);
+  // sanzeIdxを渡して宿命タブでトライアングルが表示されるようにする
+  const sanzeRootIdx = currentSanze["mei"]; // 命（本命宿）のインデックス
+  openShukuPanel(s.kanji, `${p.label} · ${p.en}`, sanzeRootIdx);
 }
 
 ["mei", "gyo", "tai"].forEach(pos => {
@@ -4949,40 +5083,43 @@ const GROUP_ELEM_TEXT = {
 };
 
 /* ── 宿詳細パネルを開く ──────────────────────────────── */
-function openShukuPanel(kanji, posLabel) {
+// 現在パネルで表示中の宿kanji（タブ切り替え時に参照）
+let _sdpCurrentKanji = null;
+let _sdpCurrentSanzeIdx = null; // 命業胎トライアングルの本命宿インデックス
+
+function openShukuPanel(kanji, posLabel, sanzeIdx) {
   const panel = document.getElementById("shuku-detail-panel");
   const body  = document.getElementById("sdp-body");
   const s = SHUKU.find(x => x.kanji === kanji);
   if (!s) return;
+  _sdpCurrentKanji   = kanji;
+  _sdpCurrentSanzeIdx = (sanzeIdx !== undefined) ? sanzeIdx : null;
+
   const idx = SHUKU.indexOf(s);
   const oracle = SHUKU_ORACLE[kanji] || {};
   const palaceIdx = SHUKU_TO_PALACE[idx];
   const pd = PALACE_DATA[palaceIdx] || {};
-  const element = oracle.element || pd.element || "";
-  const quality = oracle.quality || pd.quality || "";
-  const palace  = oracle.palace  || pd.name   || "";
-  const planet  = oracle.planet  || pd.planet  || "";
+  const element   = oracle.element   || pd.element   || "";
+  const quality   = oracle.quality   || pd.quality   || "";
+  const palace    = oracle.palace    || pd.name      || "";
+  const planet    = oracle.planet    || pd.planet    || "";
   const keyphrase = oracle.keyphrase || pd.keyphrase || "";
-  const palaceSym  = pd.sym || "";
+  const palaceSym = pd.sym || "";
   const palaceColor = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" }[element] || "var(--gold)";
 
-  // グループ番号（数字根）
-  const groupNum = ((idx % 9) + 1);
-  const grpInfo  = GROUP_ELEM_TEXT[groupNum] || {};
+  const groupNum   = ((idx % 9) + 1);
+  const grpInfo    = GROUP_ELEM_TEXT[groupNum] || {};
   const elemDetail = ELEM_PANEL_DETAIL[element] || {};
   const planetDetail = PLANET_DETAIL[planet] || {};
   const qualityDetail = QUALITY_DETAIL.find(q =>
     q.name.includes(quality.replace(/（.*）/,"")) ) || {};
 
-  // ヘッダー更新
+  // ── ヘッダー
   document.getElementById("sdp-header-title").textContent = `${kanji} の読み解き`;
   document.getElementById("sdp-header-badge").textContent = posLabel || "";
 
-  // 本文 HTML 生成
-  let html = "";
-
-  // ─ ヒーロー
-  html += `<div class="sdp-hero">
+  // ── ヒーロー（タブ外・常時表示）
+  let heroHtml = `<div class="sdp-hero">
     <div class="sdp-hero-eyebrow">YOUR SHUKU · ${palace}</div>
     <div class="sdp-hero-kanji">${kanji}</div>
     <div class="sdp-hero-yomi">${s.yomi || ""}</div>
@@ -4995,20 +5132,24 @@ function openShukuPanel(kanji, posLabel) {
     </div>
   </div>`;
 
-  // ─ キーワード
+  // ── タブバー
+  let tabsHtml = `<div class="sdp-tabs" id="sdp-tabs">
+    <button class="sdp-tab active" data-tab="reading">読み解き</button>
+    <button class="sdp-tab" data-tab="sanze">宿命</button>
+    <button class="sdp-tab" data-tab="today">今日の運勢</button>
+  </div>`;
+
+  // ── 読み解きタブ
+  let readingHtml = `<div class="sdp-tab-content active" data-content="reading">`;
   const kws = oracle.keywords || s.keywords || [];
   if (kws.length) {
-    html += `<div class="sdp-section">
+    readingHtml += `<div class="sdp-section">
       <div class="sdp-section-label">KEY WORDS</div>
-      <div class="sdp-kw-list">
-        ${kws.map(k => `<span class="sdp-kw">${k}</span>`).join("")}
-      </div>
+      <div class="sdp-kw-list">${kws.map(k => `<span class="sdp-kw">${k}</span>`).join("")}</div>
     </div>`;
   }
-
-  // ─ エレメント
   if (element) {
-    html += `<div class="sdp-section">
+    readingHtml += `<div class="sdp-section">
       <div class="sdp-section-label">ELEMENT · エレメント</div>
       <div class="sdp-elem-bar">
         <div class="sdp-elem-icon">${elemDetail.emoji || ""}</div>
@@ -5031,10 +5172,8 @@ function openShukuPanel(kanji, posLabel) {
       </div>` : ""}
     </div>`;
   }
-
-  // ─ 守護惑星
   if (planet && planetDetail.desc) {
-    html += `<div class="sdp-section">
+    readingHtml += `<div class="sdp-section">
       <div class="sdp-section-label">GUARDIAN PLANET · 守護惑星</div>
       <div class="sdp-planet-card">
         <div class="sdp-planet-sym">${planetDetail.sym || ""}</div>
@@ -5046,10 +5185,8 @@ function openShukuPanel(kanji, posLabel) {
       </div>
     </div>`;
   }
-
-  // ─ 十二宮
   if (palace && pd.name) {
-    html += `<div class="sdp-section">
+    readingHtml += `<div class="sdp-section">
       <div class="sdp-section-label">PALACE · 十二宮</div>
       <div class="sdp-palace-card">
         <div class="sdp-palace-head">
@@ -5061,28 +5198,112 @@ function openShukuPanel(kanji, posLabel) {
           ${element}の${quality}宮。守護惑星${planet}のエネルギーを${element}の性質で${
             quality === "活動" ? "力強く起動する" :
             quality === "不動" ? "深く蓄積し維持する" : "柔軟に変容させ広げる"
-          }、${palace}は
-          ${pd.keyphrase ? `「${pd.keyphrase}」` : ""}
-          の問いを一生かけて深める宮です。
+          }、${palace}は${pd.keyphrase ? `「${pd.keyphrase}」` : ""}の問いを一生かけて深める宮です。
         </div>
       </div>
     </div>`;
   }
-
-  // ─ 著名人
   if (oracle.famous) {
-    html += `<div class="sdp-section" style="padding-top:16px;padding-bottom:20px;">
+    readingHtml += `<div class="sdp-section" style="padding-top:16px;padding-bottom:20px;">
       <div class="sdp-section-label">FAMOUS · この宿の著名人</div>
       <div class="sdp-famous" style="text-align:left;font-size:13px;color:rgba(232,224,245,.65);">✦ ${oracle.famous}</div>
     </div>`;
   }
+  readingHtml += `</div>`;
 
-  body.innerHTML = html;
+  // ── 宿命タブ（命業胎トライアングル）
+  let sanzeHtml = `<div class="sdp-tab-content" data-content="sanze">
+    <div class="sdp-sanze-wrap">
+      <div class="sdp-section-label" style="margin-bottom:16px;">DESTINY TRIANGLE · 宿命のトライアングル</div>
+      <p class="sdp-sanze-intro">命（パーパス）・業（カルマ）・胎（ビジョン）── あなたの人生の三層構造。それぞれの宿をタップすると詳細に入れます。</p>`;
+
+  if (_sdpCurrentSanzeIdx !== null) {
+    const tri = sanzeOf(_sdpCurrentSanzeIdx);
+    const positions = [
+      { pos: "mei", label: "命 · PURPOSE",  en: "PURPOSE", desc: "今世の使命・役割" },
+      { pos: "gyo", label: "業 · KARMA",    en: "KARMA",   desc: "前世からの課題" },
+      { pos: "tai", label: "胎 · VISION",   en: "VISION",  desc: "未来への青写真" },
+    ];
+    positions.forEach(({ pos, label, desc }) => {
+      const ts = SHUKU[tri[pos]];
+      const to = SHUKU_ORACLE[ts.kanji] || {};
+      const isThis = ts.kanji === kanji;
+      sanzeHtml += `<div class="sdp-sanze-node${isThis ? " highlight" : ""}"
+        onclick="openShukuPanel('${ts.kanji}', '${label}', ${_sdpCurrentSanzeIdx}); sdpSwitchTab('reading');">
+        <div>
+          <div class="sdp-sanze-tag">${label}</div>
+          <div class="sdp-sanze-kanji">${ts.kanji}</div>
+          <div class="sdp-sanze-meta">${to.palace || ""} × ${to.planet || ""}</div>
+        </div>
+        <div class="sdp-sanze-desc">${desc}</div>
+        <div style="color:var(--gold);font-size:18px;margin-left:8px;">›</div>
+      </div>`;
+    });
+  } else {
+    sanzeHtml += `<div style="font-size:13px;color:var(--muted);text-align:center;padding:24px 0;">
+      生年月日から計算した場合に命業胎が表示されます
+    </div>`;
+  }
+  sanzeHtml += `</div></div>`;
+
+  // ── 今日の運勢タブ
+  const now = new Date();
+  const ty = now.getFullYear(), tm = now.getMonth() + 1, td = now.getDate();
+  const todayIdx  = calcShukuIndex(ty, tm, td);
+  const todayS    = SHUKU[todayIdx];
+  const rel       = getRelation(idx, todayIdx);
+  const relColor  = rel.color || "var(--gold)";
+  const dateStr   = `${ty}年${tm}月${td}日（今日）`;
+
+  let todayHtml = `<div class="sdp-tab-content" data-content="today">
+    <div class="sdp-today-hero">
+      <div class="sdp-today-date">${dateStr}</div>
+      <div class="sdp-today-rel-badge" style="background:${relColor}22;color:${relColor};border:1px solid ${relColor}66;">
+        ${rel.key || "—"}
+      </div>
+      <div class="sdp-today-rel-name">${rel.name || ""}</div>
+      <div class="sdp-today-shuku-row">
+        <span>${kanji}</span>
+        <span style="color:var(--border);">×</span>
+        <span class="sdp-today-shuku-kanji">${todayS.kanji}</span>
+        <span style="font-size:11px;color:var(--muted);">今日の宿</span>
+      </div>
+    </div>
+    <div class="sdp-today-rel-text">${rel.text || ""}</div>
+    <div class="sdp-section" style="padding-top:4px;">
+      <div class="sdp-section-label">TODAY'S SHUKU · 今日の宿</div>
+      <div class="sdp-planet-card" style="cursor:pointer;" onclick="openShukuPanel('${todayS.kanji}', '今日の宿');">
+        <div class="sdp-planet-sym" style="font-family:'Shippori Mincho',serif;font-size:22px;">${todayS.kanji}</div>
+        <div class="sdp-planet-info">
+          <div class="sdp-planet-name">${todayS.kanji}（${todayS.yomi || ""}）</div>
+          <div class="sdp-planet-en">${(SHUKU_ORACLE[todayS.kanji] || {}).palace || ""} · ${(SHUKU_ORACLE[todayS.kanji] || {}).planet || ""}</div>
+          <div class="sdp-planet-text" style="margin-top:4px;">${(SHUKU_ORACLE[todayS.kanji] || {}).oracle || todayS.desc || ""}</div>
+        </div>
+        <div style="color:var(--gold);font-size:18px;margin-left:8px;flex-shrink:0;">›</div>
+      </div>
+    </div>
+  </div>`;
+
+  // ── 組み立て
+  body.innerHTML = heroHtml + tabsHtml + readingHtml + sanzeHtml + todayHtml;
   body.scrollTop = 0;
 
-  // 開く
+  // タブ切り替えイベント
+  body.querySelectorAll(".sdp-tab").forEach(btn => {
+    btn.addEventListener("click", () => sdpSwitchTab(btn.dataset.tab));
+  });
+
   panel.classList.add("open");
   document.body.style.overflow = "hidden";
+}
+
+function sdpSwitchTab(tabName) {
+  const body = document.getElementById("sdp-body");
+  body.querySelectorAll(".sdp-tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === tabName));
+  body.querySelectorAll(".sdp-tab-content").forEach(c =>
+    c.classList.toggle("active", c.dataset.content === tabName));
+  body.scrollTop = 0;
 }
 
 function closeShukuPanel() {
