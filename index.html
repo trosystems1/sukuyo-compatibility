@@ -729,6 +729,307 @@ html, body {
 .sanze-kw { font-size: 11.5px; padding: 4px 10px; border: 1px solid var(--line, rgba(184,149,58,.35)); border-radius: 999px; color: var(--ink, #e8e0cf); }
 .sanze-note { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 10px; }
 
+/* ── 宿詳細スライドインパネル ─────────────────────────── */
+#shuku-detail-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--deep);
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.32,.72,0,1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+#shuku-detail-panel.open {
+  transform: translateX(0);
+}
+.sdp-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sdp-back {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px 4px 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.sdp-header-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--moon);
+  letter-spacing: .06em;
+  flex: 1;
+}
+.sdp-header-badge {
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--gold);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.sdp-body {
+  padding: 0 0 calc(48px + env(safe-area-inset-bottom));
+}
+/* ヒーロー部 */
+.sdp-hero {
+  background: linear-gradient(160deg, var(--deep2) 0%, #0e0820 100%);
+  padding: 36px 24px 32px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.sdp-hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: .18em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.sdp-hero-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 56px;
+  color: var(--moon);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.sdp-hero-yomi {
+  font-size: 13px;
+  letter-spacing: .14em;
+  color: rgba(232,224,245,.5);
+  margin-bottom: 16px;
+}
+.sdp-hero-desc {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: rgba(232,224,245,.82);
+  max-width: 340px;
+  margin: 0 auto;
+}
+.sdp-hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.sdp-meta-chip {
+  font-size: 11px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--moon);
+  background: rgba(255,255,255,.04);
+  letter-spacing: .06em;
+}
+.sdp-meta-chip.gold {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,169,97,.08);
+}
+/* キーワード */
+.sdp-kw-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.sdp-kw {
+  font-size: 12px;
+  padding: 5px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: rgba(232,224,245,.85);
+  background: rgba(255,255,255,.03);
+}
+/* セクション共通 */
+.sdp-section {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(201,169,97,.12);
+}
+.sdp-section:last-child { border-bottom: none; }
+.sdp-section-label {
+  font-size: 9.5px;
+  letter-spacing: .18em;
+  color: var(--gold);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sdp-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.sdp-section-heading {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  color: var(--moon);
+  margin-bottom: 6px;
+}
+.sdp-section-sub {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .06em;
+  margin-bottom: 12px;
+}
+.sdp-section-text {
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: rgba(232,224,245,.82);
+}
+/* エレメント・クオリティ バー */
+.sdp-elem-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.sdp-elem-icon {
+  font-size: 22px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sdp-elem-info { flex: 1; }
+.sdp-elem-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.sdp-elem-en {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--gold);
+}
+/* 9グループバッジ */
+.sdp-group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,169,97,.1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.sdp-group-num {
+  font-size: 28px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  line-height: 1;
+}
+.sdp-group-label {
+  font-size: 11px;
+  color: rgba(232,224,245,.7);
+  line-height: 1.5;
+}
+/* 守護星カード */
+.sdp-planet-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.sdp-planet-sym {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+.sdp-planet-info { flex: 1; }
+.sdp-planet-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--moon);
+  margin-bottom: 4px;
+}
+.sdp-planet-en {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.sdp-planet-text {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.78);
+}
+/* 宮カード */
+.sdp-palace-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.sdp-palace-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.sdp-palace-sym {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.sdp-palace-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17px;
+  color: var(--moon);
+}
+.sdp-palace-keyphrase {
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: var(--gold);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.sdp-palace-text {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.78);
+}
+/* 著名人 */
+.sdp-famous {
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(232,224,245,.5);
+  text-align: right;
+  letter-spacing: .04em;
+}
+/* 命業胎ポジション表示 */
+.sdp-pos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 3px 12px 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: rgba(201,169,97,.08);
+  margin-bottom: 16px;
+}
+
 .compat-grade {
   flex: 1;
   min-width: 160px;
@@ -2202,7 +2503,7 @@ html, body {
         </button>
       </div>
       <div class="sanze-detail" id="sanze-detail"></div>
-      <div class="sanze-note">それぞれの宿をタップすると詳しい読み解きが表示されます</div>
+      <div class="sanze-note">各宿をタップすると詳しい読み解きページが開きます</div>
     </div>
 
     <!-- 視点切り替えタブ（同じ宿ペアのまま見方だけ変える） -->
@@ -3398,21 +3699,8 @@ function initPalaceWheelDrag(honmeiIdx, todayIdx) {
     if (!sector) return;
     const idx = parseInt(sector.dataset.shukuIdx, 10);
     const s = SHUKU[idx];
-    const oracle = SHUKU_ORACLE[s.kanji] || {};
-    const palace = oracle.palace || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).name || "—";
-    const planet = oracle.planet || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).planet || "—";
-    const keyphrase = oracle.keyphrase || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).keyphrase || "";
-    const elem = oracle.element || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).element || "";
-    const quality = oracle.quality || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).quality || "";
-    const kws = oracle.keywords || s.keywords || [];
-    const panel = document.getElementById("palace-info-panel");
-    document.getElementById("palace-info-shuku").textContent = s.kanji;
-    document.getElementById("palace-info-palace").textContent = palace;
-    document.getElementById("palace-info-planet").textContent = `守護：${planet}`;
-    document.getElementById("palace-info-keyphrase").textContent = keyphrase;
-    document.getElementById("palace-info-keywords").textContent = kws.join("　／　");
-    document.getElementById("palace-info-element").textContent = elem && quality ? `${elem}・${quality}` : "";
-    panel.style.display = "block";
+    if (!s) return;
+    openShukuPanel(s.kanji, "");
   });
 }
 
@@ -4144,21 +4432,13 @@ function renderSanze(idx) {
 function showSanzeDetail(pos) {
   if (!currentSanze) return;
   const s = SHUKU[currentSanze[pos]];
-  const o = SHUKU_ORACLE[s.kanji];
   const p = SANZE_POSITION[pos];
+  // アクティブ状態だけ更新（既存の視覚フィードバックを維持）
   ["mei", "gyo", "tai"].forEach(x =>
     document.getElementById(`sanze-node-${x}`).classList.toggle("active", x === pos));
-  const detail = document.getElementById("sanze-detail");
-  let html = `<div class="sanze-detail-title">${p.label}【${s.kanji}】── ${p.title}</div>`;
-  html += `<div class="sanze-detail-text">${p.text}</div>`;
-  if (o) {
-    html += `<div class="sanze-detail-kws">${o.keywords.map(k => `<span class="sanze-kw">${k}</span>`).join("")}</div>`;
-    html += `<div class="sanze-detail-text">${o.oracle}${o.famous ? `\n\nこの宿の著名人：${o.famous}` : ""}</div>`;
-  } else {
-    html += `<div class="sanze-detail-text" style="color:var(--muted);font-size:12px;">※ ${s.kanji}の宮・天体による詳しい読み解きは順次公開予定です。</div>`;
-  }
-  detail.innerHTML = html;
-  detail.classList.add("show");
+  // 全画面パネルを開く（posLabelに命業胎の役割を表示）
+  const posLabel = `${p.label} · ${p.en}`;
+  openShukuPanel(s.kanji, posLabel);
 }
 
 ["mei", "gyo", "tai"].forEach(pos => {
@@ -4568,6 +4848,261 @@ const QUALITY_DETAIL = [
     desc:"物事を「変容・広げる」力。サイクルの橋渡しをし、柔軟に適応しながら次の段階へ移行させる。",
     palaces:["夫妻宮","女宮","弓宮","魚宮"], keywords:["適応","変容","普及","多様性"] },
 ];
+
+/* ── 守護惑星 詳細テキスト ─────────────────────────────── */
+const PLANET_DETAIL = {
+  "太陽": {
+    sym: "☀", en: "THE SUN",
+    desc: "自己表現・創造・意志・誇り・生命力のエネルギーを司ります。太陽の守護を受けた宿は、オリジナルな才能を輝かせ、舞台の中心で存在感を放つ力を持ちます。自らが光源となって周囲を照らす、リーダーシップと創造性の星。",
+    keywords: ["自己表現","創造力","誇り","存在感","生命力"]
+  },
+  "月": {
+    sym: "☽", en: "THE MOON",
+    desc: "感情・記憶・直感・無意識・家族・仲間へのケアを司ります。月の守護を受けた宿は、豊かな感受性と共感力を持ち、周囲の感情の変化を敏感にキャッチします。感じることが行動の源泉となり、仲間や家族への深い献身が力となります。",
+    keywords: ["感受性","共感","記憶","直感","献身"]
+  },
+  "水星": {
+    sym: "☿", en: "MERCURY",
+    desc: "知性・言語・コミュニケーション・情報処理・移動を司ります。水星の守護を受けた宿は、鋭い分析力と言語の才を持ち、情報を素早く収集・整理・発信します。多芸多才で適応力が高く、言葉と知識を駆使して人と人・概念と概念をつなぎます。",
+    keywords: ["知性","言語","分析","情報収集","多芸多才"]
+  },
+  "金星": {
+    sym: "♀", en: "VENUS",
+    desc: "美・調和・愛・価値・豊かさを司ります。金星の守護を受けた宿は、美意識と社交性に優れ、人間関係を心地よく調律する力を持ちます。美しいものへの愛着と、価値あるものを見極める眼が強みです。愛と美のエネルギーで豊かさを引き寄せます。",
+    keywords: ["美意識","調和","愛","価値","豊かさ"]
+  },
+  "火星": {
+    sym: "♂", en: "MARS",
+    desc: "行動力・意欲・競争心・開拓・勝利への意志を司ります。火星の守護を受けた宿は、エネルギッシュで瞬発力があり、先陣を切る開拓者の気質を持ちます。「I am」を宣言し、自らの意志で道を切り拓く力。困難に立ち向かう戦士の精神が宿ります。",
+    keywords: ["行動力","競争心","開拓","意欲","瞬発力"]
+  },
+  "木星": {
+    sym: "♃", en: "JUPITER",
+    desc: "拡大・発展・知恵・哲学・海外・幸運を司ります。木星の守護を受けた宿は、スケールの大きな視野と楽観性を持ち、知恵と経験を広く世界に伝える力があります。「もっと大きく」「もっと遠くへ」というエネルギーが、豊かな成長と冒険を引き寄せます。",
+    keywords: ["拡大","発展","知恵","幸運","海外"]
+  },
+  "土星": {
+    sym: "♄", en: "SATURN",
+    desc: "規律・構造・責任・時間・試練・成熟を司ります。土星の守護を受けた宿は、時間をかけて着実に積み上げる力と、社会的責任への意識が強く出ます。試練を通じて本物の実力を磨き、長期的な視点で堅固な基盤を築きます。成熟と権威の星。",
+    keywords: ["規律","責任","構造","忍耐","成熟"]
+  },
+  "天王星": {
+    sym: "⛢", en: "URANUS",
+    desc: "革新・自由・先進技術・反既成概念・覚醒を司ります。天王星の守護を受けた宿は、時代の先を読む先見性と、既存の枠を超えるエネルギーを持ちます。まだ誰も手をつけていない領域でこそ輝き、研究→開発→発明の3ステップで世界を刷新します。",
+    keywords: ["革新","自由","先進技術","先見性","覚醒"]
+  },
+  "冥王星": {
+    sym: "PL", en: "PLUTO",
+    desc: "変容・死と再生・深層心理・執着・権力を司ります。冥王星の守護を受けた宿は、物事の核心まで迫る圧倒的な集中力と、表面では見えない深みへの探求力を持ちます。妥協を許さないプロ意識と、一度決めたら最後まで追い続ける不屈の執着心が特徴です。",
+    keywords: ["変容","深層","執着","再生","探求"]
+  },
+  "海王星": {
+    sym: "♆", en: "NEPTUNE",
+    desc: "霊性・夢・幻想・芸術・直感・癒し・境界の溶解を司ります。海王星の守護を受けた宿は、目に見えない世界への深い感受性と、芸術・音楽・スピリチュアルな領域での才能を持ちます。信じる力が現実を創り出し、普遍的な愛と美で周囲を癒します。",
+    keywords: ["霊性","芸術","直感","夢","癒し"]
+  },
+};
+
+/* ── エレメント詳細マップ（openShukuPanel用） ────────────── */
+const ELEM_PANEL_DETAIL = {
+  火: { emoji:"🔥", en:"FIRE", color:"#b8785c",
+    desc:"創造・行動・情熱のエネルギー。直感で動き、先陣を切る力。始まりと照らすことを象徴します。",
+    groupDesc: {
+      pure: "火×4足の純粋なエネルギー。情熱的で瞬発力に優れ、オリジナルな自己表現を持つ。",
+      mixed1: "火×1足・地×3足の2面性。普段は落ち着いて見えるが、スイッチが入ると誰も止められない底力を発揮する。"
+    }
+  },
+  地: { emoji:"🌿", en:"EARTH", color:"#a89058",
+    desc:"現実・安定・物質のエネルギー。時間をかけて積み上げ、確かな価値を生む力を持ちます。",
+    groupDesc: {
+      pure: "地×4足の純粋なエネルギー。堅実で着実、価値を蓄積し豊かさを育てる。",
+      mixed3: "地×2足・風×2足の2面性。理想と現実の間で葛藤しやすいが、その張力が傑出した才能を生む（例：大谷翔平）。"
+    }
+  },
+  風: { emoji:"💨", en:"AIR", color:"#8a9eaa",
+    desc:"知性・言語・コミュニケーションのエネルギー。情報を結び、関係を調律し、概念を拡げます。",
+    groupDesc: {
+      pure: "風×4足の純粋なエネルギー。知性と社交性に優れ、情報を自在に扱うコミュニケーターの資質。",
+      mixed5: "風×3足・水×1足の2面性。クールに見えて内側に熱い感情を持つ、いわゆるツンデレ気質。"
+    }
+  },
+  水: { emoji:"💧", en:"WATER", color:"#7a9aa6",
+    desc:"感情・直感・記憶・霊性のエネルギー。目に見えないものを感じ取り、癒し、つながる力。",
+    groupDesc: {
+      pure: "水×4足の純粋なエネルギー。共感力と霊的感受性が高く、感じることが行動の源泉となる。"
+    }
+  },
+};
+
+/* ── 9グループ構成テキスト ───────────────────────────── */
+const GROUP_ELEM_TEXT = {
+  1: { label:"火1足・地3足", type:"2面性", note:"普段は穏やかだが、怒ると手がつけられない" },
+  2: { label:"地4足",       type:"純粋",  note:"安定・蓄積・豊かさの純粋なエネルギー" },
+  3: { label:"地2足・風2足", type:"2面性", note:"理想と現実の葛藤から傑出した才能が生まれる" },
+  4: { label:"風4足",       type:"純粋",  note:"知性・社交・コミュニケーションの純粋なエネルギー" },
+  5: { label:"風3足・水1足", type:"2面性", note:"ツンデレ気質。クールな外見と内なる情熱" },
+  6: { label:"水4足",       type:"純粋",  note:"感情・共感・霊性の純粋なエネルギー" },
+  7: { label:"水4足",       type:"純粋",  note:"感情・共感・霊性の純粋なエネルギー" },
+  8: { label:"火4足",       type:"純粋",  note:"情熱・行動・自己表現の純粋なエネルギー" },
+  9: { label:"火4足",       type:"純粋",  note:"情熱・行動・自己表現の純粋なエネルギー" },
+};
+
+/* ── 宿詳細パネルを開く ──────────────────────────────── */
+function openShukuPanel(kanji, posLabel) {
+  const panel = document.getElementById("shuku-detail-panel");
+  const body  = document.getElementById("sdp-body");
+  const s = SHUKU.find(x => x.kanji === kanji);
+  if (!s) return;
+  const idx = SHUKU.indexOf(s);
+  const oracle = SHUKU_ORACLE[kanji] || {};
+  const palaceIdx = SHUKU_TO_PALACE[idx];
+  const pd = PALACE_DATA[palaceIdx] || {};
+  const element = oracle.element || pd.element || "";
+  const quality = oracle.quality || pd.quality || "";
+  const palace  = oracle.palace  || pd.name   || "";
+  const planet  = oracle.planet  || pd.planet  || "";
+  const keyphrase = oracle.keyphrase || pd.keyphrase || "";
+  const palaceSym  = pd.sym || "";
+  const palaceColor = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" }[element] || "var(--gold)";
+
+  // グループ番号（数字根）
+  const groupNum = ((idx % 9) + 1);
+  const grpInfo  = GROUP_ELEM_TEXT[groupNum] || {};
+  const elemDetail = ELEM_PANEL_DETAIL[element] || {};
+  const planetDetail = PLANET_DETAIL[planet] || {};
+  const qualityDetail = QUALITY_DETAIL.find(q =>
+    q.name.includes(quality.replace(/（.*）/,"")) ) || {};
+
+  // ヘッダー更新
+  document.getElementById("sdp-header-title").textContent = `${kanji} の読み解き`;
+  document.getElementById("sdp-header-badge").textContent = posLabel || "";
+
+  // 本文 HTML 生成
+  let html = "";
+
+  // ─ ヒーロー
+  html += `<div class="sdp-hero">
+    <div class="sdp-hero-eyebrow">YOUR SHUKU · ${palace}</div>
+    <div class="sdp-hero-kanji">${kanji}</div>
+    <div class="sdp-hero-yomi">${s.yomi || ""}</div>
+    ${oracle.oracle ? `<div class="sdp-hero-desc">${oracle.oracle}</div>` : ""}
+    <div class="sdp-hero-meta">
+      <span class="sdp-meta-chip gold">${keyphrase}</span>
+      <span class="sdp-meta-chip">${element} · ${quality}</span>
+      <span class="sdp-meta-chip">${palace}</span>
+      <span class="sdp-meta-chip">守護：${planet}</span>
+    </div>
+  </div>`;
+
+  // ─ キーワード
+  const kws = oracle.keywords || s.keywords || [];
+  if (kws.length) {
+    html += `<div class="sdp-section">
+      <div class="sdp-section-label">KEY WORDS</div>
+      <div class="sdp-kw-list">
+        ${kws.map(k => `<span class="sdp-kw">${k}</span>`).join("")}
+      </div>
+    </div>`;
+  }
+
+  // ─ エレメント
+  if (element) {
+    html += `<div class="sdp-section">
+      <div class="sdp-section-label">ELEMENT · エレメント</div>
+      <div class="sdp-elem-bar">
+        <div class="sdp-elem-icon">${elemDetail.emoji || ""}</div>
+        <div class="sdp-elem-info">
+          <div class="sdp-elem-name" style="color:${palaceColor};">${element}（${elemDetail.en || ""}）</div>
+          <div class="sdp-elem-en">${quality}・グループ ${groupNum}</div>
+        </div>
+      </div>
+      ${elemDetail.desc ? `<div class="sdp-section-text" style="margin-bottom:14px;">${elemDetail.desc}</div>` : ""}
+      <div class="sdp-group-badge">
+        <div class="sdp-group-num">${groupNum}</div>
+        <div class="sdp-group-label">
+          <div style="font-weight:600;color:var(--moon);font-size:12px;">${grpInfo.label || ""}（${grpInfo.type || ""}）</div>
+          <div>${grpInfo.note || ""}</div>
+        </div>
+      </div>
+      ${qualityDetail.desc ? `<div class="sdp-section-text" style="margin-top:12px;">
+        <span style="color:var(--gold);font-size:12px;font-weight:600;">${qualityDetail.name || ""}</span>
+        ── ${qualityDetail.desc}
+      </div>` : ""}
+    </div>`;
+  }
+
+  // ─ 守護惑星
+  if (planet && planetDetail.desc) {
+    html += `<div class="sdp-section">
+      <div class="sdp-section-label">GUARDIAN PLANET · 守護惑星</div>
+      <div class="sdp-planet-card">
+        <div class="sdp-planet-sym">${planetDetail.sym || ""}</div>
+        <div class="sdp-planet-info">
+          <div class="sdp-planet-name">${planet}</div>
+          <div class="sdp-planet-en">${planetDetail.en || ""}</div>
+          <div class="sdp-planet-text">${planetDetail.desc}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─ 十二宮
+  if (palace && pd.name) {
+    html += `<div class="sdp-section">
+      <div class="sdp-section-label">PALACE · 十二宮</div>
+      <div class="sdp-palace-card">
+        <div class="sdp-palace-head">
+          <div class="sdp-palace-sym">${palaceSym}</div>
+          <div class="sdp-palace-name">${palace}</div>
+          <div class="sdp-palace-keyphrase">${keyphrase}</div>
+        </div>
+        <div class="sdp-palace-text">
+          ${element}の${quality}宮。守護惑星${planet}のエネルギーを${element}の性質で${
+            quality === "活動" ? "力強く起動する" :
+            quality === "不動" ? "深く蓄積し維持する" : "柔軟に変容させ広げる"
+          }、${palace}は
+          ${pd.keyphrase ? `「${pd.keyphrase}」` : ""}
+          の問いを一生かけて深める宮です。
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ─ 著名人
+  if (oracle.famous) {
+    html += `<div class="sdp-section" style="padding-top:16px;padding-bottom:20px;">
+      <div class="sdp-section-label">FAMOUS · この宿の著名人</div>
+      <div class="sdp-famous" style="text-align:left;font-size:13px;color:rgba(232,224,245,.65);">✦ ${oracle.famous}</div>
+    </div>`;
+  }
+
+  body.innerHTML = html;
+  body.scrollTop = 0;
+
+  // 開く
+  panel.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function closeShukuPanel() {
+  const panel = document.getElementById("shuku-detail-panel");
+  panel.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// 戻るボタン
+document.getElementById("sdp-back").addEventListener("click", closeShukuPanel);
+
+// スワイプで閉じる（右→左スワイプは無視、左→右スワイプで閉じる）
+(function(){
+  let startX = 0;
+  const panel = document.getElementById("shuku-detail-panel");
+  panel.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+  panel.addEventListener("touchend", e => {
+    const dx = e.changedTouches[0].clientX - startX;
+    if (dx > 60 && e.changedTouches[0].clientX < 80) closeShukuPanel();
+  }, { passive: true });
+})();
 
 function renderAstrologyPage() {
   renderAstroPalaceGrid("all");
@@ -5969,5 +6504,17 @@ window.addEventListener("hashchange", applyLocationHash);
 if (location.hash) applyLocationHash();
 
 </script>
+<!-- ── 宿詳細スライドインパネル ────────────────────────── -->
+<div id="shuku-detail-panel" role="dialog" aria-modal="true" aria-label="宿の詳細">
+  <div class="sdp-header">
+    <button class="sdp-back" id="sdp-back" aria-label="戻る">←</button>
+    <div class="sdp-header-title" id="sdp-header-title">宿の読み解き</div>
+    <div class="sdp-header-badge" id="sdp-header-badge"></div>
+  </div>
+  <div class="sdp-body" id="sdp-body">
+    <!-- JS で動的に描画 -->
+  </div>
+</div>
+
 </body>
 </html>
