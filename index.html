@@ -4322,10 +4322,17 @@ function getDateSelectValue(prefix) {
 
 // 宿セレクトの選択肢を生成（self・A・B共通）
 (function populateShukuSelect() {
+  // ドロップダウンは伝統的な順番（昴宿スタート）で表示
+  // SHUKU配列は盤の描画順（胃宿スタート）のため、別途ソート
+  const TRADITIONAL_ORDER = ["昴","畢","觜","参","井","鬼","柳","星","張","翼","軫","角","亢","底","房","心","尾","箕","斗","女","虚","危","室","壁","奎","婁","胃"];
+  const shukuByTraditional = TRADITIONAL_ORDER.map(k =>
+    ({ s: SHUKU.find(x => x.kanji === k+"宿"), idx: SHUKU.findIndex(x => x.kanji === k+"宿") })
+  ).filter(x => x.s);
+
   ["shuku-self-select", "shuku-a-select", "shuku-b-select", "shuku-book-select"].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
-    SHUKU.forEach((s, idx) => {
+    shukuByTraditional.forEach(({ s, idx }) => {
       const opt = document.createElement("option");
       opt.value = idx;
       opt.textContent = `${s.kanji}（${s.yomi}）`;
