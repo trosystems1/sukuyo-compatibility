@@ -729,6 +729,437 @@ html, body {
 .sanze-kw { font-size: 11.5px; padding: 4px 10px; border: 1px solid var(--line, rgba(184,149,58,.35)); border-radius: 999px; color: var(--ink, #e8e0cf); }
 .sanze-note { font-size: 10.5px; color: var(--muted); text-align: center; margin-top: 10px; }
 
+/* ── 宿詳細スライドインパネル ─────────────────────────── */
+#shuku-detail-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: var(--deep);
+  transform: translateX(100%);
+  transition: transform .32s cubic-bezier(.32,.72,0,1);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+#shuku-detail-panel.open {
+  transform: translateX(0);
+}
+.sdp-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--deep);
+  border-bottom: 1px solid var(--border);
+  padding: calc(14px + env(safe-area-inset-top)) 20px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sdp-back {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px 4px 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.sdp-header-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--moon);
+  letter-spacing: .06em;
+  flex: 1;
+}
+.sdp-header-badge {
+  font-size: 10px;
+  letter-spacing: .1em;
+  color: var(--gold);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+.sdp-body {
+  padding: 0 0 calc(48px + env(safe-area-inset-bottom));
+}
+/* ヒーロー部 */
+.sdp-hero {
+  background: linear-gradient(160deg, var(--deep2) 0%, #0e0820 100%);
+  padding: 36px 24px 32px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.sdp-hero-eyebrow {
+  font-size: 10px;
+  letter-spacing: .18em;
+  color: var(--gold);
+  margin-bottom: 12px;
+}
+.sdp-hero-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 56px;
+  color: var(--moon);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.sdp-hero-yomi {
+  font-size: 13px;
+  letter-spacing: .14em;
+  color: rgba(232,224,245,.5);
+  margin-bottom: 16px;
+}
+.sdp-hero-desc {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: rgba(232,224,245,.82);
+  max-width: 340px;
+  margin: 0 auto;
+}
+.sdp-hero-meta {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+.sdp-meta-chip {
+  font-size: 11px;
+  padding: 4px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--moon);
+  background: rgba(255,255,255,.04);
+  letter-spacing: .06em;
+}
+.sdp-meta-chip.gold {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,169,97,.08);
+}
+/* キーワード */
+.sdp-kw-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+}
+.sdp-kw {
+  font-size: 12px;
+  padding: 5px 13px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: rgba(232,224,245,.85);
+  background: rgba(255,255,255,.03);
+}
+/* セクション共通 */
+.sdp-section {
+  padding: 24px 20px;
+  border-bottom: 1px solid rgba(201,169,97,.12);
+}
+.sdp-section:last-child { border-bottom: none; }
+.sdp-section-label {
+  font-size: 9.5px;
+  letter-spacing: .18em;
+  color: var(--gold);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sdp-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.sdp-section-heading {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 18px;
+  color: var(--moon);
+  margin-bottom: 6px;
+}
+.sdp-section-sub {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: .06em;
+  margin-bottom: 12px;
+}
+.sdp-section-text {
+  font-size: 13.5px;
+  line-height: 1.95;
+  color: rgba(232,224,245,.82);
+}
+/* エレメント・クオリティ バー */
+.sdp-elem-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.sdp-elem-icon {
+  font-size: 22px;
+  width: 36px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.sdp-elem-info { flex: 1; }
+.sdp-elem-name {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.sdp-elem-en {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--gold);
+}
+/* 9グループバッジ */
+.sdp-group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(201,169,97,.1);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+}
+.sdp-group-num {
+  font-size: 28px;
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  line-height: 1;
+}
+.sdp-group-label {
+  font-size: 11px;
+  color: rgba(232,224,245,.7);
+  line-height: 1.5;
+}
+/* 守護星カード */
+.sdp-planet-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.sdp-planet-sym {
+  font-size: 28px;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+.sdp-planet-info { flex: 1; }
+.sdp-planet-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--moon);
+  margin-bottom: 4px;
+}
+.sdp-planet-en {
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.sdp-planet-text {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.78);
+}
+/* 宮カード */
+.sdp-palace-card {
+  background: rgba(255,255,255,.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.sdp-palace-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.sdp-palace-sym {
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.sdp-palace-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 17px;
+  color: var(--moon);
+}
+.sdp-palace-keyphrase {
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: var(--gold);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.sdp-palace-text {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.78);
+}
+/* 著名人 */
+.sdp-famous {
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(232,224,245,.5);
+  text-align: right;
+  letter-spacing: .04em;
+}
+/* 命業胎ポジション表示 */
+.sdp-pos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 3px 12px 3px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  background: rgba(201,169,97,.08);
+  margin-bottom: 16px;
+}
+
+/* ── 宿詳細パネル タブ ───────────────────────────────── */
+.sdp-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  background: var(--deep);
+  position: sticky;
+  top: 60px;
+  z-index: 9;
+}
+.sdp-tab {
+  flex: 1;
+  padding: 12px 4px;
+  font-size: 12px;
+  letter-spacing: .06em;
+  color: rgba(232,224,245,.45);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  text-align: center;
+}
+.sdp-tab.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.sdp-tab-content { display: none; }
+.sdp-tab-content.active { display: block; }
+
+/* 今日の運勢タブ */
+.sdp-today-hero {
+  padding: 28px 20px 20px;
+  text-align: center;
+  background: linear-gradient(160deg, var(--deep2) 0%, #0e0820 100%);
+  border-bottom: 1px solid var(--border);
+}
+.sdp-today-date {
+  font-size: 11px;
+  letter-spacing: .14em;
+  color: rgba(232,224,245,.4);
+  margin-bottom: 8px;
+}
+.sdp-today-rel-badge {
+  display: inline-block;
+  font-size: 22px;
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 700;
+  padding: 6px 20px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.sdp-today-rel-name {
+  font-size: 13px;
+  color: rgba(232,224,245,.7);
+  margin-bottom: 4px;
+}
+.sdp-today-shuku-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+  font-size: 13px;
+  color: rgba(232,224,245,.6);
+}
+.sdp-today-shuku-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 26px;
+  color: var(--moon);
+}
+.sdp-today-rel-text {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: rgba(232,224,245,.78);
+  padding: 20px;
+}
+/* 宿命タブ */
+.sdp-sanze-wrap {
+  padding: 24px 20px;
+}
+.sdp-sanze-node {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: rgba(255,255,255,.03);
+  cursor: pointer;
+  transition: border-color .2s;
+}
+.sdp-sanze-node:active { transform: scale(.98); }
+.sdp-sanze-node.highlight {
+  border-color: var(--gold);
+  background: rgba(201,169,97,.07);
+}
+.sdp-sanze-tag {
+  font-size: 9.5px;
+  letter-spacing: .14em;
+  color: var(--gold);
+  margin-bottom: 2px;
+}
+.sdp-sanze-kanji {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 24px;
+  color: var(--moon);
+  line-height: 1;
+}
+.sdp-sanze-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.sdp-sanze-desc {
+  font-size: 12px;
+  line-height: 1.75;
+  color: rgba(232,224,245,.6);
+  margin-left: auto;
+  max-width: 160px;
+  text-align: right;
+}
+.sdp-sanze-intro {
+  font-size: 13px;
+  line-height: 1.85;
+  color: rgba(232,224,245,.7);
+  margin-bottom: 20px;
+  padding: 0 4px;
+}
+
 .compat-grade {
   flex: 1;
   min-width: 160px;
@@ -1372,36 +1803,49 @@ html, body {
   z-index: 1;
   display: flex;
   align-items: flex-end;
-  gap: 28px;
+  justify-content: space-between;
   width: 100%;
 }
-.es-symbol {
-  font-size: 72px;
+/* 絵文字廃止 → 漢字を巨大シンボルとして右背景に配置 */
+.es-kanji-bg {
+  position: absolute;
+  right: -10px;
+  bottom: -20px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(140px, 22vw, 200px);
+  font-weight: 700;
   line-height: 1;
-  filter: drop-shadow(0 4px 16px rgba(0,0,0,.25));
-  flex-shrink: 0;
+  color: rgba(255,255,255,0.04);
+  letter-spacing: 0;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
-.es-hero-text {}
+.es-hero-text {
+  position: relative;
+  z-index: 1;
+}
 .es-keyphrase {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(26px, 6vw, 40px);
-  font-weight: 400;
-  letter-spacing: .08em;
-  line-height: 1;
-  margin-bottom: 8px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(28px, 5.5vw, 44px);
+  font-weight: 700;
+  letter-spacing: .06em;
+  line-height: 1.1;
+  margin-bottom: 10px;
 }
 .es-name-en {
   font-family: 'Cinzel', serif;
-  font-size: 10px;
-  letter-spacing: .4em;
-  opacity: .7;
-  margin-bottom: 4px;
+  font-size: 9px;
+  letter-spacing: .45em;
+  opacity: .5;
+  margin-bottom: 6px;
 }
 .es-name-ja {
   font-family: 'Shippori Mincho', serif;
-  font-size: 22px;
-  font-weight: 700;
-  letter-spacing: .1em;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: .2em;
+  opacity: .7;
 }
 
 /* ボディ */
@@ -1411,7 +1855,7 @@ html, body {
 }
 @media (max-width: 600px) {
   .es-hero { padding: 32px 20px 28px; min-height: 180px; }
-  .es-symbol { font-size: 52px; }
+  .es-kanji-bg { font-size: 120px; }
   .es-body { padding: 20px 18px 24px; }
 }
 
@@ -1564,44 +2008,187 @@ html, body {
 }
 @media (max-width: 480px) { .ep-group-grid { grid-template-columns: repeat(2,1fr); } }
 .ep-group-card {
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 11px 12px;
-  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 14px;
   text-align: center;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(18,12,36,.06);
+  /* 背景はヘッダー色（JSでインライン指定） */
+}
+/* ヘッダー：塗りつぶし */
+.ep-group-head {
+  padding: 10px 12px 8px;
+  position: relative;
 }
 .ep-group-num {
   font-family: 'Cinzel', serif;
-  font-size: 17px;
-  color: var(--gold);
-  margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #fff;
+  margin-bottom: 3px;
+  position: relative;
+  z-index: 1;
 }
 .ep-group-shuku {
   font-size: 12px;
   font-family: 'Shippori Mincho', serif;
-  color: var(--ink);
-  margin-bottom: 6px;
+  color: rgba(255,255,255,0.82);
   line-height: 1.65;
+  position: relative;
+  z-index: 1;
+}
+/* エレメント比率バー（太く・比率一目瞭然） */
+.ep-group-bar {
+  display: flex;
+  height: 12px;
+}
+.ep-group-bar-seg {
+  flex: 1;
+}
+/* ボディ：白背景で内側を確実に覆う */
+.ep-group-body {
+  padding: 12px 12px 14px;
+  background: #fff;
+  min-height: 60px;
+  position: relative;
 }
 .ep-group-feet {
   display: flex;
-  gap: 3px;
+  gap: 5px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 .ep-foot {
-  width: 17px; height: 17px;
+  width: 30px; height: 30px;
   border-radius: 50%;
-  font-size: 8.5px;
+  font-size: 11.5px;
   display: flex; align-items: center; justify-content: center;
   font-weight: 700;
+  border: 2px solid;
 }
-.ep-foot-fire  { background: rgba(192,96,58,.18); color: #8a2a10; }
-.ep-foot-earth { background: rgba(138,112,64,.18); color: #4a3010; }
-.ep-foot-wind  { background: rgba(74,122,160,.18); color: #1a4870; }
-.ep-foot-water { background: rgba(46,124,138,.18); color: #0a4858; }
-.ep-group-desc { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.ep-foot-fire  { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.50); }
+.ep-foot-earth { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.50); }
+.ep-foot-wind  { background: rgba(160,195,220,.12); color: #4a6878; border-color: rgba(160,195,220,.45); }
+.ep-foot-water { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
+.ep-group-desc {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+  border-top: 1px solid rgba(18,12,36,.07);
+  padding-top: 9px;
+}
+
+/* 解説カード（1枚絵の下） */
+.ep-desc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+@media (max-width: 560px) {
+  .ep-desc-grid { grid-template-columns: 1fr; }
+}
+.ep-desc-card {
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  overflow: hidden;
+}
+.ep-desc-card-head {
+  padding: 14px 16px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: -1px -1px 0;
+  border-radius: 13px 13px 0 0;
+  /* 背景はJS側でインライン指定 */
+}
+.ep-desc-dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.70);
+  flex-shrink: 0;
+}
+.ep-desc-label {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: .3em;
+  color: rgba(255,255,255,0.75);
+}
+.ep-desc-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 20px;
+  font-weight: 700;
+  margin-left: auto;
+  color: #fff;
+}
+.ep-desc-body {
+  padding: 0 16px 14px;
+  border-top: 1px solid rgba(18,12,36,.06);
+}
+.ep-desc-phrase {
+  font-family: 'Cinzel', serif;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  margin: 10px 0 6px;
+}
+.ep-desc-text {
+  font-size: 13px;
+  color: #3a3348;
+  line-height: 1.9;
+  margin-bottom: 10px;
+}
+.ep-desc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.ep-desc-tag {
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.ep-desc-palaces {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 5px;
+}
+.ep-desc-palace {
+  border-radius: 8px;
+  padding: 7px 8px;
+  line-height: 1.6;
+}
+.ep-desc-palace-name {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.ep-desc-palace-sub { font-size: 10px; opacity: .65; }
+/* 色 */
+.ep-desc-card.ep-fire  { border-color: rgba(192,96,58,.25); }
+.ep-desc-card.ep-earth { border-color: rgba(138,112,64,.25); }
+.ep-desc-card.ep-wind  { border-color: rgba(74,122,160,.25); }
+.ep-desc-card.ep-water { border-color: rgba(46,124,138,.25); }
+.ep-desc-dot.ep-fire  { background:#c0603a; }
+.ep-desc-dot.ep-earth { background:#8a7040; }
+.ep-desc-dot.ep-wind  { background:#4a7aa0; }
+.ep-desc-dot.ep-water { background:#2e7c8a; }
+.ep-desc-label.ep-fire,.ep-desc-name.ep-fire,.ep-desc-phrase.ep-fire   { color:#9a3a18; }
+.ep-desc-label.ep-earth,.ep-desc-name.ep-earth,.ep-desc-phrase.ep-earth{ color:#5a4010; }
+.ep-desc-label.ep-wind,.ep-desc-name.ep-wind,.ep-desc-phrase.ep-wind   { color:#1a4870; }
+.ep-desc-label.ep-water,.ep-desc-name.ep-water,.ep-desc-phrase.ep-water{ color:#0a4858; }
+.ep-desc-tag.ep-fire  { background:rgba(192,96,58,.07); border-color:rgba(192,96,58,.22); color:#9a3a18; }
+.ep-desc-tag.ep-earth { background:rgba(138,112,64,.07); border-color:rgba(138,112,64,.22); color:#5a4010; }
+.ep-desc-tag.ep-wind  { background:rgba(74,122,160,.07); border-color:rgba(74,122,160,.22); color:#1a4870; }
+.ep-desc-tag.ep-water { background:rgba(46,124,138,.07); border-color:rgba(46,124,138,.22); color:#0a4858; }
+.ep-desc-palace.ep-fire  { background:rgba(192,96,58,.07); }
+.ep-desc-palace.ep-earth { background:rgba(138,112,64,.07); }
+.ep-desc-palace.ep-wind  { background:rgba(74,122,160,.07); }
+.ep-desc-palace.ep-water { background:rgba(46,124,138,.07); }
 
 /* ── Utility ──────────────────────────────────────────── */
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
@@ -2046,7 +2633,7 @@ html, body {
         </button>
       </div>
       <div class="sanze-detail" id="sanze-detail"></div>
-      <div class="sanze-note">それぞれの宿をタップすると詳しい読み解きが表示されます</div>
+      <div class="sanze-note">各宿をタップすると詳しい読み解きページが開きます</div>
     </div>
 
     <!-- 視点切り替えタブ（同じ宿ペアのまま見方だけ変える） -->
@@ -2397,8 +2984,13 @@ html, body {
       </p>
     </div>
 
-    <!-- 4エレメントセクション（JS描画） -->
-    <div id="ep-sections"></div>
+    <!-- 世界観Canvas（1枚絵） -->
+    <div id="ep-world-wrap" style="border-radius:18px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.18);margin-bottom:36px;">
+      <canvas id="ep-world-canvas" style="display:block;width:100%;"></canvas>
+    </div>
+
+    <!-- 4エレメント解説（横並び → 縦スクロール） -->
+    <div id="ep-descs"></div>
 
     <!-- 9グループ補足 -->
     <div class="ep-group-section">
@@ -3237,21 +3829,8 @@ function initPalaceWheelDrag(honmeiIdx, todayIdx) {
     if (!sector) return;
     const idx = parseInt(sector.dataset.shukuIdx, 10);
     const s = SHUKU[idx];
-    const oracle = SHUKU_ORACLE[s.kanji] || {};
-    const palace = oracle.palace || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).name || "—";
-    const planet = oracle.planet || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).planet || "—";
-    const keyphrase = oracle.keyphrase || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).keyphrase || "";
-    const elem = oracle.element || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).element || "";
-    const quality = oracle.quality || (PALACE_DATA[SHUKU_TO_PALACE[idx]] || {}).quality || "";
-    const kws = oracle.keywords || s.keywords || [];
-    const panel = document.getElementById("palace-info-panel");
-    document.getElementById("palace-info-shuku").textContent = s.kanji;
-    document.getElementById("palace-info-palace").textContent = palace;
-    document.getElementById("palace-info-planet").textContent = `守護：${planet}`;
-    document.getElementById("palace-info-keyphrase").textContent = keyphrase;
-    document.getElementById("palace-info-keywords").textContent = kws.join("　／　");
-    document.getElementById("palace-info-element").textContent = elem && quality ? `${elem}・${quality}` : "";
-    panel.style.display = "block";
+    if (!s) return;
+    openShukuPanel(s.kanji, "");
   });
 }
 
@@ -3665,6 +4244,7 @@ let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m,
 let lastCompatB = null;        // 相性占いのB側入力日付 { y, m, d } | null
 let bookViewpointId = null;    // 盤の視点になっている人物ID
 let inputMode = { self: "date", a: "date", b: "date", book: "date" }; // "date" | "shuku"
+let saveSelectedTag = null;    // 結果ページ保存UIで選択中のタグ（早期宣言）
 
 const DATE_SELECT_PREFIXES = ["self", "a", "b", "book"];
 const YEAR_MIN = 1900, YEAR_MAX = 2099, YEAR_DEFAULT = 1980;
@@ -3958,6 +4538,10 @@ function showSelfResult(shukuA, year, month, day) {
   const resultEl = document.getElementById("result");
   resultEl.classList.add("show");
   resultEl.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  // 本命宿の詳細パネルを即座にオープン（背面の三角は非表示にしてチラつき防止）
+  document.getElementById("sanze-section").classList.remove("show");
+  openShukuPanel(shukuA.kanji, "命 · PURPOSE", selfIdx);
 }
 
 /* ── 命業胎トライアングル描画 ─────────────────────────────── */
@@ -3983,21 +4567,12 @@ function renderSanze(idx) {
 function showSanzeDetail(pos) {
   if (!currentSanze) return;
   const s = SHUKU[currentSanze[pos]];
-  const o = SHUKU_ORACLE[s.kanji];
   const p = SANZE_POSITION[pos];
   ["mei", "gyo", "tai"].forEach(x =>
     document.getElementById(`sanze-node-${x}`).classList.toggle("active", x === pos));
-  const detail = document.getElementById("sanze-detail");
-  let html = `<div class="sanze-detail-title">${p.label}【${s.kanji}】── ${p.title}</div>`;
-  html += `<div class="sanze-detail-text">${p.text}</div>`;
-  if (o) {
-    html += `<div class="sanze-detail-kws">${o.keywords.map(k => `<span class="sanze-kw">${k}</span>`).join("")}</div>`;
-    html += `<div class="sanze-detail-text">${o.oracle}${o.famous ? `\n\nこの宿の著名人：${o.famous}` : ""}</div>`;
-  } else {
-    html += `<div class="sanze-detail-text" style="color:var(--muted);font-size:12px;">※ ${s.kanji}の宮・天体による詳しい読み解きは順次公開予定です。</div>`;
-  }
-  detail.innerHTML = html;
-  detail.classList.add("show");
+  // sanzeIdxを渡して宿命タブでトライアングルが表示されるようにする
+  const sanzeRootIdx = currentSanze["mei"]; // 命（本命宿）のインデックス
+  openShukuPanel(s.kanji, `${p.label} · ${p.en}`, sanzeRootIdx);
 }
 
 ["mei", "gyo", "tai"].forEach(pos => {
@@ -4408,6 +4983,370 @@ const QUALITY_DETAIL = [
     palaces:["夫妻宮","女宮","弓宮","魚宮"], keywords:["適応","変容","普及","多様性"] },
 ];
 
+/* ── 守護惑星 詳細テキスト ─────────────────────────────── */
+const PLANET_DETAIL = {
+  "太陽": {
+    sym: "☀", en: "THE SUN",
+    desc: "自己表現・創造・意志・誇り・生命力のエネルギーを司ります。太陽の守護を受けた宿は、オリジナルな才能を輝かせ、舞台の中心で存在感を放つ力を持ちます。自らが光源となって周囲を照らす、リーダーシップと創造性の星。",
+    keywords: ["自己表現","創造力","誇り","存在感","生命力"]
+  },
+  "月": {
+    sym: "☽", en: "THE MOON",
+    desc: "感情・記憶・直感・無意識・家族・仲間へのケアを司ります。月の守護を受けた宿は、豊かな感受性と共感力を持ち、周囲の感情の変化を敏感にキャッチします。感じることが行動の源泉となり、仲間や家族への深い献身が力となります。",
+    keywords: ["感受性","共感","記憶","直感","献身"]
+  },
+  "水星": {
+    sym: "☿", en: "MERCURY",
+    desc: "知性・言語・コミュニケーション・情報処理・移動を司ります。水星の守護を受けた宿は、鋭い分析力と言語の才を持ち、情報を素早く収集・整理・発信します。多芸多才で適応力が高く、言葉と知識を駆使して人と人・概念と概念をつなぎます。",
+    keywords: ["知性","言語","分析","情報収集","多芸多才"]
+  },
+  "金星": {
+    sym: "♀", en: "VENUS",
+    desc: "美・調和・愛・価値・豊かさを司ります。金星の守護を受けた宿は、美意識と社交性に優れ、人間関係を心地よく調律する力を持ちます。美しいものへの愛着と、価値あるものを見極める眼が強みです。愛と美のエネルギーで豊かさを引き寄せます。",
+    keywords: ["美意識","調和","愛","価値","豊かさ"]
+  },
+  "火星": {
+    sym: "♂", en: "MARS",
+    desc: "行動力・意欲・競争心・開拓・勝利への意志を司ります。火星の守護を受けた宿は、エネルギッシュで瞬発力があり、先陣を切る開拓者の気質を持ちます。「I am」を宣言し、自らの意志で道を切り拓く力。困難に立ち向かう戦士の精神が宿ります。",
+    keywords: ["行動力","競争心","開拓","意欲","瞬発力"]
+  },
+  "木星": {
+    sym: "♃", en: "JUPITER",
+    desc: "拡大・発展・知恵・哲学・海外・幸運を司ります。木星の守護を受けた宿は、スケールの大きな視野と楽観性を持ち、知恵と経験を広く世界に伝える力があります。「もっと大きく」「もっと遠くへ」というエネルギーが、豊かな成長と冒険を引き寄せます。",
+    keywords: ["拡大","発展","知恵","幸運","海外"]
+  },
+  "土星": {
+    sym: "♄", en: "SATURN",
+    desc: "規律・構造・責任・時間・試練・成熟を司ります。土星の守護を受けた宿は、時間をかけて着実に積み上げる力と、社会的責任への意識が強く出ます。試練を通じて本物の実力を磨き、長期的な視点で堅固な基盤を築きます。成熟と権威の星。",
+    keywords: ["規律","責任","構造","忍耐","成熟"]
+  },
+  "天王星": {
+    sym: "⛢", en: "URANUS",
+    desc: "革新・自由・先進技術・反既成概念・覚醒を司ります。天王星の守護を受けた宿は、時代の先を読む先見性と、既存の枠を超えるエネルギーを持ちます。まだ誰も手をつけていない領域でこそ輝き、研究→開発→発明の3ステップで世界を刷新します。",
+    keywords: ["革新","自由","先進技術","先見性","覚醒"]
+  },
+  "冥王星": {
+    sym: "PL", en: "PLUTO",
+    desc: "変容・死と再生・深層心理・執着・権力を司ります。冥王星の守護を受けた宿は、物事の核心まで迫る圧倒的な集中力と、表面では見えない深みへの探求力を持ちます。妥協を許さないプロ意識と、一度決めたら最後まで追い続ける不屈の執着心が特徴です。",
+    keywords: ["変容","深層","執着","再生","探求"]
+  },
+  "海王星": {
+    sym: "♆", en: "NEPTUNE",
+    desc: "霊性・夢・幻想・芸術・直感・癒し・境界の溶解を司ります。海王星の守護を受けた宿は、目に見えない世界への深い感受性と、芸術・音楽・スピリチュアルな領域での才能を持ちます。信じる力が現実を創り出し、普遍的な愛と美で周囲を癒します。",
+    keywords: ["霊性","芸術","直感","夢","癒し"]
+  },
+};
+
+/* ── エレメント詳細マップ（openShukuPanel用） ────────────── */
+const ELEM_PANEL_DETAIL = {
+  火: { emoji:"🔥", en:"FIRE", color:"#b8785c",
+    desc:"創造・行動・情熱のエネルギー。直感で動き、先陣を切る力。始まりと照らすことを象徴します。",
+    groupDesc: {
+      pure: "火×4足の純粋なエネルギー。情熱的で瞬発力に優れ、オリジナルな自己表現を持つ。",
+      mixed1: "火×1足・地×3足の2面性。普段は落ち着いて見えるが、スイッチが入ると誰も止められない底力を発揮する。"
+    }
+  },
+  地: { emoji:"🌿", en:"EARTH", color:"#a89058",
+    desc:"現実・安定・物質のエネルギー。時間をかけて積み上げ、確かな価値を生む力を持ちます。",
+    groupDesc: {
+      pure: "地×4足の純粋なエネルギー。堅実で着実、価値を蓄積し豊かさを育てる。",
+      mixed3: "地×2足・風×2足の2面性。理想と現実の間で葛藤しやすいが、その張力が傑出した才能を生む（例：大谷翔平）。"
+    }
+  },
+  風: { emoji:"💨", en:"AIR", color:"#8a9eaa",
+    desc:"知性・言語・コミュニケーションのエネルギー。情報を結び、関係を調律し、概念を拡げます。",
+    groupDesc: {
+      pure: "風×4足の純粋なエネルギー。知性と社交性に優れ、情報を自在に扱うコミュニケーターの資質。",
+      mixed5: "風×3足・水×1足の2面性。クールに見えて内側に熱い感情を持つ、いわゆるツンデレ気質。"
+    }
+  },
+  水: { emoji:"💧", en:"WATER", color:"#7a9aa6",
+    desc:"感情・直感・記憶・霊性のエネルギー。目に見えないものを感じ取り、癒し、つながる力。",
+    groupDesc: {
+      pure: "水×4足の純粋なエネルギー。共感力と霊的感受性が高く、感じることが行動の源泉となる。"
+    }
+  },
+};
+
+/* ── 9グループ構成テキスト ───────────────────────────── */
+const GROUP_ELEM_TEXT = {
+  1: { label:"火1足・地3足", type:"2面性", note:"普段は穏やかだが、怒ると手がつけられない" },
+  2: { label:"地4足",       type:"純粋",  note:"安定・蓄積・豊かさの純粋なエネルギー" },
+  3: { label:"地2足・風2足", type:"2面性", note:"理想と現実の葛藤から傑出した才能が生まれる" },
+  4: { label:"風4足",       type:"純粋",  note:"知性・社交・コミュニケーションの純粋なエネルギー" },
+  5: { label:"風3足・水1足", type:"2面性", note:"ツンデレ気質。クールな外見と内なる情熱" },
+  6: { label:"水4足",       type:"純粋",  note:"感情・共感・霊性の純粋なエネルギー" },
+  7: { label:"水4足",       type:"純粋",  note:"感情・共感・霊性の純粋なエネルギー" },
+  8: { label:"火4足",       type:"純粋",  note:"情熱・行動・自己表現の純粋なエネルギー" },
+  9: { label:"火4足",       type:"純粋",  note:"情熱・行動・自己表現の純粋なエネルギー" },
+};
+
+/* ── 宿詳細パネルを開く ──────────────────────────────── */
+// 現在パネルで表示中の宿kanji（タブ切り替え時に参照）
+let _sdpCurrentKanji = null;
+let _sdpCurrentSanzeIdx = null; // 命業胎トライアングルの本命宿インデックス
+
+function openShukuPanel(kanji, posLabel, sanzeIdx) {
+  const panel = document.getElementById("shuku-detail-panel");
+  const body  = document.getElementById("sdp-body");
+  const s = SHUKU.find(x => x.kanji === kanji);
+  if (!s) return;
+  _sdpCurrentKanji   = kanji;
+  _sdpCurrentSanzeIdx = (sanzeIdx !== undefined) ? sanzeIdx : null;
+
+  const idx = SHUKU.indexOf(s);
+  const oracle = SHUKU_ORACLE[kanji] || {};
+  const palaceIdx = SHUKU_TO_PALACE[idx];
+  const pd = PALACE_DATA[palaceIdx] || {};
+  const element   = oracle.element   || pd.element   || "";
+  const quality   = oracle.quality   || pd.quality   || "";
+  const palace    = oracle.palace    || pd.name      || "";
+  const planet    = oracle.planet    || pd.planet    || "";
+  const keyphrase = oracle.keyphrase || pd.keyphrase || "";
+  const palaceSym = pd.sym || "";
+  const palaceColor = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" }[element] || "var(--gold)";
+
+  const groupNum   = ((idx % 9) + 1);
+  const grpInfo    = GROUP_ELEM_TEXT[groupNum] || {};
+  const elemDetail = ELEM_PANEL_DETAIL[element] || {};
+  const planetDetail = PLANET_DETAIL[planet] || {};
+  const qualityDetail = QUALITY_DETAIL.find(q =>
+    q.name.includes(quality.replace(/（.*）/,"")) ) || {};
+
+  // ── ヘッダー
+  document.getElementById("sdp-header-title").textContent = `${kanji} の読み解き`;
+  document.getElementById("sdp-header-badge").textContent = posLabel || "";
+
+  // ── ヒーロー（タブ外・常時表示）
+  let heroHtml = `<div class="sdp-hero">
+    <div class="sdp-hero-eyebrow">YOUR SHUKU · ${palace}</div>
+    <div class="sdp-hero-kanji">${kanji}</div>
+    <div class="sdp-hero-yomi">${s.yomi || ""}</div>
+    ${oracle.oracle ? `<div class="sdp-hero-desc">${oracle.oracle}</div>` : ""}
+    <div class="sdp-hero-meta">
+      <span class="sdp-meta-chip gold">${keyphrase}</span>
+      <span class="sdp-meta-chip">${element} · ${quality}</span>
+      <span class="sdp-meta-chip">${palace}</span>
+      <span class="sdp-meta-chip">守護：${planet}</span>
+    </div>
+  </div>`;
+
+  // ── タブバー
+  let tabsHtml = `<div class="sdp-tabs" id="sdp-tabs">
+    <button class="sdp-tab active" data-tab="reading">読み解き</button>
+    <button class="sdp-tab" data-tab="sanze">宿命</button>
+    <button class="sdp-tab" data-tab="today">今日の運勢</button>
+  </div>`;
+
+  // ── 読み解きタブ
+  let readingHtml = `<div class="sdp-tab-content active" data-content="reading">`;
+  const kws = oracle.keywords || s.keywords || [];
+  if (kws.length) {
+    readingHtml += `<div class="sdp-section">
+      <div class="sdp-section-label">KEY WORDS</div>
+      <div class="sdp-kw-list">${kws.map(k => `<span class="sdp-kw">${k}</span>`).join("")}</div>
+    </div>`;
+  }
+  if (element) {
+    readingHtml += `<div class="sdp-section">
+      <div class="sdp-section-label">ELEMENT · エレメント</div>
+      <div class="sdp-elem-bar">
+        <div class="sdp-elem-icon">${elemDetail.emoji || ""}</div>
+        <div class="sdp-elem-info">
+          <div class="sdp-elem-name" style="color:${palaceColor};">${element}（${elemDetail.en || ""}）</div>
+          <div class="sdp-elem-en">${quality}・グループ ${groupNum}</div>
+        </div>
+      </div>
+      ${elemDetail.desc ? `<div class="sdp-section-text" style="margin-bottom:14px;">${elemDetail.desc}</div>` : ""}
+      <div class="sdp-group-badge">
+        <div class="sdp-group-num">${groupNum}</div>
+        <div class="sdp-group-label">
+          <div style="font-weight:600;color:var(--moon);font-size:12px;">${grpInfo.label || ""}（${grpInfo.type || ""}）</div>
+          <div>${grpInfo.note || ""}</div>
+        </div>
+      </div>
+      ${qualityDetail.desc ? `<div class="sdp-section-text" style="margin-top:12px;">
+        <span style="color:var(--gold);font-size:12px;font-weight:600;">${qualityDetail.name || ""}</span>
+        ── ${qualityDetail.desc}
+      </div>` : ""}
+    </div>`;
+  }
+  if (planet && planetDetail.desc) {
+    readingHtml += `<div class="sdp-section">
+      <div class="sdp-section-label">GUARDIAN PLANET · 守護惑星</div>
+      <div class="sdp-planet-card">
+        <div class="sdp-planet-sym">${planetDetail.sym || ""}</div>
+        <div class="sdp-planet-info">
+          <div class="sdp-planet-name">${planet}</div>
+          <div class="sdp-planet-en">${planetDetail.en || ""}</div>
+          <div class="sdp-planet-text">${planetDetail.desc}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+  if (palace && pd.name) {
+    readingHtml += `<div class="sdp-section">
+      <div class="sdp-section-label">PALACE · 十二宮</div>
+      <div class="sdp-palace-card">
+        <div class="sdp-palace-head">
+          <div class="sdp-palace-sym">${palaceSym}</div>
+          <div class="sdp-palace-name">${palace}</div>
+          <div class="sdp-palace-keyphrase">${keyphrase}</div>
+        </div>
+        <div class="sdp-palace-text">
+          ${element}の${quality}宮。守護惑星${planet}のエネルギーを${element}の性質で${
+            quality === "活動" ? "力強く起動する" :
+            quality === "不動" ? "深く蓄積し維持する" : "柔軟に変容させ広げる"
+          }、${palace}は${pd.keyphrase ? `「${pd.keyphrase}」` : ""}の問いを一生かけて深める宮です。
+        </div>
+      </div>
+    </div>`;
+  }
+  if (oracle.famous) {
+    readingHtml += `<div class="sdp-section" style="padding-top:16px;padding-bottom:20px;">
+      <div class="sdp-section-label">FAMOUS · この宿の著名人</div>
+      <div class="sdp-famous" style="text-align:left;font-size:13px;color:rgba(232,224,245,.65);">✦ ${oracle.famous}</div>
+    </div>`;
+  }
+  readingHtml += `</div>`;
+
+  // ── 宿命タブ（命業胎トライアングル）
+  let sanzeHtml = `<div class="sdp-tab-content" data-content="sanze">
+    <div class="sdp-sanze-wrap">
+      <div class="sdp-section-label" style="margin-bottom:8px;">DESTINY TRIANGLE · 宿命のトライアングル</div>
+      <p class="sdp-sanze-intro">命（パーパス）・業（カルマ）・胎（ビジョン）── あなたの人生の三層構造。各ノードをタップすると読み解きに入れます。</p>`;
+
+  if (_sdpCurrentSanzeIdx !== null) {
+    const tri = sanzeOf(_sdpCurrentSanzeIdx);
+    const meiS = SHUKU[tri.mei]; const meiO = SHUKU_ORACLE[meiS.kanji] || {};
+    const gyoS = SHUKU[tri.gyo]; const gyoO = SHUKU_ORACLE[gyoS.kanji] || {};
+    const taiS = SHUKU[tri.tai]; const taiO = SHUKU_ORACLE[taiS.kanji] || {};
+
+    const mkNode = (s, o, label, desc, pos) => {
+      const isThis = s.kanji === kanji;
+      const border = isThis ? "var(--gold)" : "rgba(201,169,97,.3)";
+      const bg     = isThis ? "rgba(201,169,97,.1)" : "rgba(255,255,255,.03)";
+      return `<div onclick="openShukuPanel('${s.kanji}','${label}',${_sdpCurrentSanzeIdx});sdpSwitchTab('reading');"
+        style="position:absolute;${pos};display:flex;flex-direction:column;align-items:center;
+        background:${bg};border:1px solid ${border};border-radius:12px;
+        padding:10px 12px;min-width:96px;cursor:pointer;transition:.2s;text-align:center;">
+        <div style="font-size:9px;letter-spacing:.12em;color:var(--gold);margin-bottom:2px;">${label}</div>
+        <div style="font-family:'Shippori Mincho',serif;font-size:22px;color:var(--moon);line-height:1;">${s.kanji}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px;">${o.palace||""} × ${o.planet||""}</div>
+        <div style="font-size:10px;color:rgba(232,224,245,.4);margin-top:1px;">${desc}</div>
+      </div>`;
+    };
+
+    sanzeHtml += `
+    <div style="position:relative;width:100%;height:230px;margin:8px 0 16px;">
+      <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 300 210" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M150 30 L50 178 L250 178 Z" fill="none" stroke="rgba(201,169,97,.4)" stroke-width="1.2" stroke-dasharray="4 4"/>
+      </svg>
+      ${mkNode(meiS, meiO, "命 · PURPOSE", "今世の使命", "top:0;left:50%;transform:translateX(-50%);")}
+      ${mkNode(gyoS, gyoO, "業 · KARMA",   "前世の課題", "bottom:0;left:2%;")}
+      ${mkNode(taiS, taiO, "胎 · VISION",  "未来の青写真","bottom:0;right:2%;")}
+    </div>`;
+  } else {
+    sanzeHtml += `<div style="font-size:13px;color:var(--muted);text-align:center;padding:24px 0;">
+      生年月日から計算した場合に命業胎が表示されます
+    </div>`;
+  }
+  sanzeHtml += `</div></div>`;
+
+  // ── 今日の運勢タブ（今日＋明日）
+  const now = new Date();
+  const ty = now.getFullYear(), tm = now.getMonth() + 1, td = now.getDate();
+  const tmrDate = new Date(now); tmrDate.setDate(td + 1);
+  const ty2 = tmrDate.getFullYear(), tm2 = tmrDate.getMonth() + 1, td2 = tmrDate.getDate();
+  const todayIdx = calcShukuIndex(ty, tm, td);
+  const tmrIdx   = calcShukuIndex(ty2, tm2, td2);
+  const todayS   = SHUKU[todayIdx];
+  const tmrS     = SHUKU[tmrIdx];
+  const relToday = getRelation(idx, todayIdx);
+  const relTmr   = getRelation(idx, tmrIdx);
+
+  const dayCard = (dateLabel, dayS, rel) => {
+    const rc = rel.color || "var(--gold)";
+    return `
+    <div style="padding:20px 20px 0;">
+      <div style="font-size:10px;letter-spacing:.14em;color:rgba(232,224,245,.4);margin-bottom:10px;">${dateLabel}</div>
+      <div style="display:flex;align-items:center;gap:14px;background:${rc}14;border:1px solid ${rc}44;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+        <div style="text-align:center;min-width:52px;">
+          <div style="font-size:28px;font-family:'Shippori Mincho',serif;font-weight:700;color:${rc};">${rel.key||"—"}</div>
+          <div style="font-size:10px;color:${rc};letter-spacing:.06em;">${rel.name||""}</div>
+        </div>
+        <div style="flex:1;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:4px;">
+            <span style="font-family:'Shippori Mincho',serif;font-size:20px;color:var(--moon);">${dayS.kanji}</span>
+            <span style="font-size:11px;color:var(--muted);">の日</span>
+          </div>
+          <div style="font-size:12.5px;line-height:1.8;color:rgba(232,224,245,.75);">${rel.text||""}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:rgba(255,255,255,.03);border-radius:10px;cursor:pointer;margin-bottom:4px;"
+        onclick="openShukuPanel('${dayS.kanji}','${dateLabel}の宿');">
+        <div style="font-family:'Shippori Mincho',serif;font-size:18px;color:var(--moon);">${dayS.kanji}</div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--gold);">${(SHUKU_ORACLE[dayS.kanji]||{}).palace||""} · ${(SHUKU_ORACLE[dayS.kanji]||{}).planet||""}</div>
+          <div style="font-size:12px;color:rgba(232,224,245,.6);margin-top:2px;">${(SHUKU_ORACLE[dayS.kanji]||{}).oracle||dayS.desc||""}</div>
+        </div>
+        <div style="color:var(--gold);font-size:16px;">›</div>
+      </div>
+    </div>`;
+  };
+
+  let todayHtml = `<div class="sdp-tab-content" data-content="today">
+    ${dayCard(`${ty}年${tm}月${td}日（今日）`, todayS, relToday)}
+    <div style="height:1px;background:var(--border);margin:20px 20px 0;"></div>
+    ${dayCard(`${ty2}年${tm2}月${td2}日（明日）`, tmrS, relTmr)}
+    <div style="height:24px;"></div>
+  </div>`;
+
+  // ── 組み立て
+  body.innerHTML = heroHtml + tabsHtml + readingHtml + sanzeHtml + todayHtml;
+  body.scrollTop = 0;
+
+  // タブ切り替えイベント
+  body.querySelectorAll(".sdp-tab").forEach(btn => {
+    btn.addEventListener("click", () => sdpSwitchTab(btn.dataset.tab));
+  });
+
+  panel.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+
+function sdpSwitchTab(tabName) {
+  const body = document.getElementById("sdp-body");
+  body.querySelectorAll(".sdp-tab").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === tabName));
+  body.querySelectorAll(".sdp-tab-content").forEach(c =>
+    c.classList.toggle("active", c.dataset.content === tabName));
+  body.scrollTop = 0;
+}
+
+function closeShukuPanel() {
+  const panel = document.getElementById("shuku-detail-panel");
+  panel.classList.remove("open");
+  document.body.style.overflow = "";
+}
+
+// 戻るボタン＆スワイプ（DOMが確実に存在してから登録）
+document.addEventListener("DOMContentLoaded", function() {
+  const backBtn = document.getElementById("sdp-back");
+  if (backBtn) backBtn.addEventListener("click", closeShukuPanel);
+
+  // スワイプで閉じる（左端から右スワイプで閉じる）
+  const panel = document.getElementById("shuku-detail-panel");
+  if (panel) {
+    let startX = 0;
+    panel.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
+    panel.addEventListener("touchend", e => {
+      const dx = e.changedTouches[0].clientX - startX;
+      if (dx > 60 && e.changedTouches[0].clientX < 80) closeShukuPanel();
+    }, { passive: true });
+  }
+});
+
 function renderAstrologyPage() {
   renderAstroPalaceGrid("all");
   renderAstroElementGrid();
@@ -4615,43 +5554,36 @@ function renderElementPage() {
   if (elementPageRendered) return;
   elementPageRendered = true;
 
-  // 4エレメントセクション
-  const sectionsEl = document.getElementById("ep-sections");
-  if (sectionsEl) {
-    sectionsEl.innerHTML = EP_DATA.map(e => `
-<section class="es-section ${e.cls}" style="margin-bottom:20px;">
-  <div class="es-hero">
-    ${e.heroBg}
-    <div class="es-hero-content">
-      <div class="es-symbol">${e.symbol}</div>
-      <div class="es-hero-text">
-        <div class="es-name-en">${e.en}</div>
-        <div class="es-name-ja">${e.name}</div>
-        <div class="es-keyphrase">${e.keyphrase}</div>
-      </div>
-    </div>
+  // 解説カード（4枚グリッド）
+  const descsEl = document.getElementById("ep-descs");
+  if (descsEl) {
+    descsEl.innerHTML = `<div class="ep-desc-grid">${EP_DATA.map(e => {
+      const cls = e.cls.replace("es-","ep-");
+      const descHeadBg = {
+        "ep-fire":  "linear-gradient(135deg,#b84a20,#d4703a)",
+        "ep-earth": "linear-gradient(135deg,#6a5020,#8a7040)",
+        "ep-wind":  "linear-gradient(135deg,#7a9aaa,#9ab8c8)",
+        "ep-water": "linear-gradient(135deg,#1a5aa0,#3a8ed0)",
+      }[cls] || "#888";
+      return `<div class="ep-desc-card ${cls}">
+  <div class="ep-desc-card-head" style="background:${descHeadBg};">
+    <div class="ep-desc-dot"></div>
+    <div class="ep-desc-label">${e.en}</div>
+    <div class="ep-desc-name">${e.name}</div>
   </div>
-  <div class="es-body">
-    <p class="es-core">${e.core}</p>
-    <div class="es-tags">${e.tags.map(t=>`<span class="es-tag">${t}</span>`).join("")}</div>
-
-    <div class="es-palaces-label">PALACES · 12宮との対応</div>
-    <div class="es-palaces">
-      ${e.palaces.map(p=>`
-      <div class="es-palace-card">
-        <div class="es-palace-quality">${p.quality}</div>
-        <div class="es-palace-name">${p.name}</div>
-        <div class="es-palace-planet">守護星：${p.planet}　<strong style="font-family:'Cinzel',serif;letter-spacing:.05em;">${p.keyphrase}</strong></div>
-        <div class="es-palace-shuku">対応宿（補足）<br>${p.shuku}</div>
+  <div class="ep-desc-body">
+    <div class="ep-desc-phrase ${cls}">${e.keyphrase}</div>
+    <div class="ep-desc-text">${e.core}</div>
+    <div class="ep-desc-tags">${e.tags.slice(0,5).map(t=>`<span class="ep-desc-tag ${cls}">${t}</span>`).join("")}</div>
+    <div class="ep-desc-palaces">${e.palaces.map(p=>`
+      <div class="ep-desc-palace ${cls}">
+        <div class="ep-desc-palace-name">${p.name}</div>
+        <div class="ep-desc-palace-sub">${p.keyphrase}</div>
       </div>`).join("")}
     </div>
-
-    <div class="es-workout">
-      <div class="es-workout-label">WORKOUT · 日々の実践</div>
-      <div class="es-workout-text">${e.workout}</div>
-    </div>
   </div>
-</section>`).join("");
+</div>`;
+    }).join("")}</div>`;
   }
 
   // 9グループ補足
@@ -4668,198 +5600,355 @@ function renderElementPage() {
       for(const [elem,count] of Object.entries(elems)) for(let i=0;i<count;i++) feet.push(elem);
       const feetHtml = feet.map(f=>`<div class="ep-foot ${EP_FOOT_CLS[f]}">${f}</div>`).join("");
       const shukuList=(groups[g]||[]).join("・");
-      return `<div class="ep-group-card">
-  <div class="ep-group-num">${g}</div>
-  <div class="ep-group-shuku">${shukuList}</div>
-  <div class="ep-group-feet">${feetHtml}</div>
-  <div class="ep-group-desc">${EP_GROUP_DESCS[g]||""}</div>
+      // エレメントカラー定義
+      const EC = {
+        "火": { head: "linear-gradient(135deg,#b84a20,#d4703a)", bar: "#c0603a", solid: "#b84a20", border: "rgba(192,80,45,.35)" },
+        "地": { head: "linear-gradient(135deg,#6a5020,#8a7040)", bar: "#8a7040", solid: "#6a5020", border: "rgba(130,105,55,.35)" },
+        "風": { head: "linear-gradient(135deg,#7a9aaa,#9ab8c8)", bar: "#9ab8c8", solid: "#7a9aaa", border: "rgba(154,184,200,.38)" },
+        "水": { head: "linear-gradient(135deg,#1a5aa0,#3a8ed0)", bar: "#3a8ed0", solid: "#1a5aa0", border: "rgba(58,142,208,.40)" },
+      };
+      const dominantElem = Object.entries(elems).sort((a,b)=>b[1]-a[1])[0][0];
+      const dc = EC[dominantElem];
+
+      // 比率バーのセグメント（足の順番どおり）
+      const barSegs = feet.map(f => `<div class="ep-group-bar-seg" style="background:${EC[f].bar};opacity:0.90;"></div>`).join("");
+
+      return `<div class="ep-group-card" style="border-color:${dc.border};background:#fff;">
+  <div class="ep-group-head" style="background:${dc.head};margin:-1px -1px 0;border-radius:13px 13px 0 0;">
+    <div class="ep-group-num">${g}</div>
+    <div class="ep-group-shuku">${shukuList}</div>
+  </div>
+  <div class="ep-group-bar">${barSegs}</div>
+  <div class="ep-group-body">
+    <div class="ep-group-feet">${feetHtml}</div>
+    <div class="ep-group-desc">${EP_GROUP_DESCS[g]||""}</div>
+  </div>
 </div>`;
     }).join("");
   }
 
-  // Canvasアニメーション初期化（DOM挿入後）
-  setTimeout(initElemCanvases, 50);
+  // 1枚絵Canvas初期化
+  setTimeout(initWorldCanvas, 50);
 }
 
 /* ══════════════════════════════════════════════
-   エレメント Canvas アニメーション
+   1枚絵：火・地・風・水の世界循環
    ══════════════════════════════════════════════ */
-function initElemCanvases() {
-  document.querySelectorAll(".es-canvas").forEach(canvas => {
-    const type = canvas.dataset.elem;
-    const hero = canvas.closest(".es-hero");
-    if (!hero) return;
-    canvas.width  = hero.offsetWidth  || 780;
-    canvas.height = hero.offsetHeight || 220;
-    const ctx = canvas.getContext("2d");
-    if (type === "fire")  animFire(canvas, ctx);
-    if (type === "earth") animEarth(canvas, ctx);
-    if (type === "wind")  animWind(canvas, ctx);
-    if (type === "water") animWater(canvas, ctx);
-  });
+function initWorldCanvas() {
+  const wrap   = document.getElementById("ep-world-wrap");
+  const canvas = document.getElementById("ep-world-canvas");
+  if (!canvas || !wrap) return;
+  const W = wrap.offsetWidth || 780;
+  const H = Math.round(W * 0.62);   // 縦横比 8:5
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext("2d");
+  animWorld(canvas, ctx, W, H);
 }
 
-/* 🔥 火：上昇する細い三角ライン群 */
-function animFire(canvas, ctx) {
-  const W = canvas.width, H = canvas.height;
-  const lines = Array.from({length: 18}, (_, i) => ({
-    x: W * (0.1 + 0.8 * (i / 17)),
+function animWorld(canvas, ctx, W, H) {
+  // ── ゾーン ──────────────────────────────
+  const sunX     = W * 0.28;   // 左寄り・平野から昇る
+  const sunCY    = H * 0.48;
+  const horizonY = H * 0.56;
+  const waterY   = H * 0.72;
+
+  // ── 太陽コロナ ────────────────────────────
+  const RAYS = 30;
+  const rays = Array.from({length: RAYS}, (_, i) => ({
+    angle: (i / RAYS) * Math.PI * 2,
+    lenF:  0.06 + Math.random() * 0.13,
     phase: Math.random() * Math.PI * 2,
-    speed: 0.008 + Math.random() * 0.006,
-    amp:   18 + Math.random() * 22,
-    height: 0.5 + Math.random() * 0.45,
-    alpha:  0.08 + Math.random() * 0.18
+    speed: 0.003 + Math.random() * 0.003,
+    width: 0.5 + Math.random() * 1.1,
+    alpha: 0.12 + Math.random() * 0.20
   }));
-  // 背景グラデーション
-  const bg = ctx.createLinearGradient(0, H, 0, 0);
-  bg.addColorStop(0, "#1a0800");
-  bg.addColorStop(0.5, "#3a1204");
-  bg.addColorStop(1, "#0a0200");
 
-  let t = 0;
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
+  // ── 風：ゆるやかな気流線 ──────────────────
+  const windLines = Array.from({length: 10}, (_, i) => ({
+    y:      H * (0.08 + 0.44 * (i / 9)) + (Math.random() - 0.5) * H * 0.03,
+    speed:  0.12 + Math.random() * 0.18,
+    len:    W * (0.10 + Math.random() * 0.20),
+    offset: Math.random() * W * 2.5,
+    alpha:  0.05 + Math.random() * 0.08,
+    width:  0.4 + Math.random() * 0.7,
+    curve:  (Math.random() - 0.5) * H * 0.012
+  }));
 
-    lines.forEach(l => {
-      const sway = Math.sin(t * l.speed * 60 + l.phase) * l.amp;
-      const topY = H * (1 - l.height) + sway * 0.3;
-      const grad = ctx.createLinearGradient(l.x, H, l.x + sway * 0.5, topY);
-      grad.addColorStop(0,   `rgba(200,120,40,${l.alpha * 1.8})`);
-      grad.addColorStop(0.4, `rgba(220,80,20,${l.alpha})`);
-      grad.addColorStop(1,   `rgba(255,160,60,0)`);
-      ctx.beginPath();
-      ctx.moveTo(l.x, H);
-      ctx.quadraticCurveTo(l.x + sway, H * 0.6, l.x + sway * 0.5, topY);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = 0.8;
-      ctx.stroke();
-    });
-    t++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
+  // ── 大気の光粒 ───────────────────────────
+  const motes = Array.from({length: 22}, () => ({
+    x:     Math.random() * W,
+    y:     Math.random() * horizonY * 0.92,
+    vx:    0.03 + Math.random() * 0.08,
+    vy:    -(0.015 + Math.random() * 0.04),
+    phase: Math.random() * Math.PI * 2,
+    size:  0.7 + Math.random() * 1.2,
+    alpha: 0.10 + Math.random() * 0.22
+  }));
 
-/* 🌿 地：中心から広がる同心四角 + ゆっくり回転するグリッド */
-function animEarth(canvas, ctx) {
-  const W = canvas.width, H = canvas.height;
-  const cx = W * 0.5, cy = H * 0.5;
-  const bg = ctx.createLinearGradient(0, H, 0, 0);
-  bg.addColorStop(0, "#0c0804");
-  bg.addColorStop(1, "#1a1408");
-
-  let t = 0;
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    const pulse = Math.sin(t * 0.012) * 0.08 + 1;
-    for (let i = 1; i <= 8; i++) {
-      const r = (i / 8) * Math.min(W, H) * 0.72 * pulse;
-      const alpha = (1 - i / 9) * 0.22;
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(t * 0.002 * (i % 2 === 0 ? 1 : -1));
-      ctx.strokeStyle = `rgba(180,140,60,${alpha})`;
-      ctx.lineWidth = 0.7;
-      ctx.beginPath();
-      ctx.rect(-r, -r * 0.6, r * 2, r * 1.2);
-      ctx.stroke();
-      ctx.restore();
+  // ── 山稜（朝の光を受けた緑の山） ─────────
+  function makeSil(n, hMin, hMax, seed, xStart) {
+    // xStart: 山が始まるX位置（0〜1）、左側は地平線の高さで平野
+    const pts = [{x: 0, y: horizonY}];
+    pts.push({x: xStart * W, y: horizonY}); // 左は平野
+    for (let i = 1; i <= n; i++) {
+      const x = xStart * W + (1 - xStart) * W * (i / n);
+      const h = hMin
+        + (Math.sin(i * seed) * 0.5 + 0.5) * (hMax - hMin)
+        + Math.cos(i * seed * 1.618) * (hMax - hMin) * 0.28;
+      pts.push({x, y: horizonY - Math.abs(h)});
     }
-    // 中心点
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 40);
-    glow.addColorStop(0, "rgba(200,160,60,0.25)");
-    glow.addColorStop(1, "rgba(200,160,60,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
-
-    t++;
-    requestAnimationFrame(draw);
+    pts.push({x: W, y: horizonY});
+    return pts;
   }
-  draw();
-}
+  // 山は右45%から始まる
+  const sil1 = makeSil(16, H*0.06, H*0.20, 1.41, 0.44);
+  const sil2 = makeSil(12, H*0.03, H*0.12, 2.72, 0.50);
+  const sil3 = makeSil( 8, H*0.01, H*0.07, 3.89, 0.54);
 
-/* 💨 風：左から右へ流れる水平ライン */
-function animWind(canvas, ctx) {
-  const W = canvas.width, H = canvas.height;
-  const bg = ctx.createLinearGradient(0, 0, W, 0);
-  bg.addColorStop(0, "#02060e");
-  bg.addColorStop(1, "#060c18");
+  // ── 川・水面の波 ─────────────────────────
+  const waveLayers = [
+    {yOff:-H*0.024, amp:H*0.007, speed:0.014, phase:0.0, alpha:0.55, w:1.1},
+    {yOff:-H*0.010, amp:H*0.005, speed:0.021, phase:1.8, alpha:0.42, w:0.8},
+    {yOff: H*0.003, amp:H*0.003, speed:0.030, phase:3.2, alpha:0.30, w:0.5},
+  ];
 
-  const lines = Array.from({length: 14}, (_, i) => ({
-    y:     H * (0.08 + 0.84 * (i / 13)),
-    speed: 0.4 + Math.random() * 0.6,
-    len:   W * (0.15 + Math.random() * 0.35),
-    offset: Math.random() * W,
-    alpha:  0.06 + Math.random() * 0.16,
-    width:  0.5 + Math.random() * 0.8
+  // ── 波紋 ─────────────────────────────────
+  const ripples = Array.from({length: 4}, (_, i) => ({
+    x:     W * (0.15 + i * 0.22 + Math.random() * 0.05),
+    phase: (i / 4) * Math.PI * 2,
+    speed: 0.009 + Math.random() * 0.006,
+    maxR:  W * (0.04 + Math.random() * 0.04),
+    alpha: 0.18 + Math.random() * 0.16
+  }));
+
+  // ── 鳥（朝の演出） ───────────────────────
+  const birds = Array.from({length: 6}, () => ({
+    x:     Math.random() * W,
+    y:     H * (0.12 + Math.random() * 0.28),
+    vx:    0.25 + Math.random() * 0.35,
+    phase: Math.random() * Math.PI * 2,
+    size:  3 + Math.random() * 4
   }));
 
   let t = 0;
   function draw() {
     ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
 
-    lines.forEach(l => {
-      const x = (l.offset + t * l.speed) % (W + l.len) - l.len;
-      const grad = ctx.createLinearGradient(x, l.y, x + l.len, l.y);
-      grad.addColorStop(0,   `rgba(120,180,220,0)`);
-      grad.addColorStop(0.3, `rgba(140,200,240,${l.alpha})`);
-      grad.addColorStop(0.7, `rgba(160,210,250,${l.alpha * 0.8})`);
-      grad.addColorStop(1,   `rgba(120,180,220,0)`);
+    // ── 空：夜明けグラデーション ─────────────
+    // 地平線付近が最も明るく、上に向かって薄い青
+    const sky = ctx.createLinearGradient(0, 0, 0, horizonY);
+    sky.addColorStop(0,    "#4a7fc0");   // 頭上：薄い青
+    sky.addColorStop(0.30, "#6aa0d8");   // 明るい青
+    sky.addColorStop(0.58, "#f0c080");   // 地平線寄り：黄金
+    sky.addColorStop(0.78, "#f08030");   // オレンジ
+    sky.addColorStop(1,    "#e86020");   // 地平線：朱
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, horizonY);
+
+    // 地平線の強い朝日グロー
+    const dawn = ctx.createRadialGradient(sunX, horizonY, 0, sunX, horizonY, W * 0.65);
+    dawn.addColorStop(0,    "rgba(255,240,180,0.60)");
+    dawn.addColorStop(0.18, "rgba(255,180,60,0.38)");
+    dawn.addColorStop(0.45, "rgba(240,100,20,0.15)");
+    dawn.addColorStop(1,    "rgba(180,40,0,0)");
+    ctx.fillStyle = dawn; ctx.fillRect(0, 0, W, horizonY);
+
+    // ── 朝日（地平線から昇りかけ） ────────────
+    // 太陽は地平線にかかる（半分隠れている）
+    const pulse = Math.sin(t * 0.007) * 0.03 + 1.0;
+    const sunR  = Math.min(W, H) * 0.082 * pulse;
+    const sunY  = horizonY - sunR * 0.5;   // 地平線から半分だけ上に出た朝日
+
+    // 地平線下の光（地面に差し込む）
+    const underGlow = ctx.createRadialGradient(sunX, horizonY, 0, sunX, horizonY, W * 0.45);
+    underGlow.addColorStop(0,   "rgba(255,210,100,0.30)");
+    underGlow.addColorStop(0.4, "rgba(255,140,30,0.10)");
+    underGlow.addColorStop(1,   "rgba(200,80,0,0)");
+    ctx.fillStyle = underGlow;
+    ctx.fillRect(0, horizonY, W, H - horizonY);
+
+    // ── 風：気流線 ───────────────────────────
+    windLines.forEach(l => {
+      const x = ((l.offset + t * l.speed) % (W + l.len * 1.5)) - l.len;
+      const midY = l.y + Math.sin(t * 0.005 + l.offset * 0.001) * l.curve;
+      const grad = ctx.createLinearGradient(x, midY, x + l.len, midY);
+      grad.addColorStop(0,   "rgba(255,220,150,0)");
+      grad.addColorStop(0.35,`rgba(255,210,130,${l.alpha})`);
+      grad.addColorStop(0.65,`rgba(255,200,120,${l.alpha * 0.75})`);
+      grad.addColorStop(1,   "rgba(255,190,100,0)");
       ctx.beginPath();
       ctx.moveTo(x, l.y);
-      ctx.lineTo(x + l.len, l.y);
-      ctx.strokeStyle = grad;
-      ctx.lineWidth = l.width;
-      ctx.stroke();
+      ctx.quadraticCurveTo(x + l.len * 0.5, midY, x + l.len, l.y + l.curve * 0.3);
+      ctx.strokeStyle = grad; ctx.lineWidth = l.width; ctx.stroke();
     });
-    t++;
-    requestAnimationFrame(draw);
-  }
-  draw();
-}
 
-/* 💧 水：渦巻き状に広がる同心楕円 */
-function animWater(canvas, ctx) {
-  const W = canvas.width, H = canvas.height;
-  const cx = W * 0.5, cy = H * 0.52;
-  const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, W * 0.6);
-  bg.addColorStop(0, "#061018");
-  bg.addColorStop(1, "#010408");
+    // ── 大気の光粒 ───────────────────────────
+    motes.forEach(m => {
+      m.x += m.vx + Math.sin(t * 0.007 + m.phase) * 0.06;
+      m.y += m.vy;
+      if (m.x > W + 8) m.x = -8;
+      if (m.y < -5) m.y = horizonY * 0.9;
+      const tw = Math.sin(t * 0.011 + m.phase) * 0.28 + 0.72;
+      ctx.beginPath(); ctx.arc(m.x, m.y, m.size * tw, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,215,120,${m.alpha * tw})`; ctx.fill();
+    });
 
-  let t = 0;
-  function draw() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = bg;
-    ctx.fillRect(0, 0, W, H);
-
-    for (let i = 0; i < 9; i++) {
-      const phase = (t * 0.008) + i * 0.7;
-      const rx = (40 + i * 38) * (1 + Math.sin(phase) * 0.04);
-      const ry = (28 + i * 24) * (1 + Math.cos(phase * 0.7) * 0.04);
-      const alpha = (1 - i / 10) * 0.28 * (0.7 + Math.sin(phase * 1.3) * 0.3);
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(phase * 0.15);
-      ctx.strokeStyle = `rgba(60,160,190,${alpha})`;
-      ctx.lineWidth = 0.7;
+    // ── 鳥（朝の飛翔） ───────────────────────
+    birds.forEach(b => {
+      b.x += b.vx;
+      if (b.x > W + 20) b.x = -20;
+      const flap = Math.sin(t * 0.08 + b.phase);
+      ctx.save(); ctx.translate(b.x, b.y + flap * b.size * 0.3);
+      ctx.strokeStyle = "rgba(30,15,40,0.55)"; ctx.lineWidth = 0.9; ctx.lineCap = "round";
+      // 鳥のシルエット（M字）
       ctx.beginPath();
-      ctx.ellipse(0, 0, rx, ry, 0, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-    // 中心の光
-    const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, 50);
-    glow.addColorStop(0, "rgba(80,180,210,0.18)");
-    glow.addColorStop(1, "rgba(80,180,210,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0, 0, W, H);
+      ctx.moveTo(-b.size, flap * b.size * 0.5);
+      ctx.quadraticCurveTo(-b.size * 0.5, -b.size * 0.6 * Math.abs(flap), 0, 0);
+      ctx.quadraticCurveTo(b.size * 0.5,  -b.size * 0.6 * Math.abs(flap), b.size, flap * b.size * 0.5);
+      ctx.stroke(); ctx.restore();
+    });
+
+    // ── 太陽（山の直前に描画・クリップなし） ─────
+    // 光芒
+    rays.forEach(r => {
+      const b = Math.sin(t * r.speed + r.phase) * 0.18 + 0.82;
+      const len = Math.min(W, H) * r.lenF * b;
+      const x1 = sunX + Math.cos(r.angle) * sunR * 0.90;
+      const y1 = sunY + Math.sin(r.angle) * sunR * 0.90;
+      const x2 = sunX + Math.cos(r.angle) * (sunR + len);
+      const y2 = sunY + Math.sin(r.angle) * (sunR + len);
+      const g = ctx.createLinearGradient(x1, y1, x2, y2);
+      g.addColorStop(0,   `rgba(255,240,140,${r.alpha * b})`);
+      g.addColorStop(0.5, `rgba(255,180,50,${r.alpha * b * 0.5})`);
+      g.addColorStop(1,   `rgba(230,110,10,0)`);
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.strokeStyle = g; ctx.lineWidth = r.width * b;
+      ctx.lineCap = "round"; ctx.stroke();
+    });
+    // 外周グロー
+    const sunAura = ctx.createRadialGradient(sunX, sunY, sunR * 0.8, sunX, sunY, sunR * 4);
+    sunAura.addColorStop(0,   "rgba(255,200,60,0.20)");
+    sunAura.addColorStop(0.5, "rgba(255,150,20,0.07)");
+    sunAura.addColorStop(1,   "rgba(220,80,0,0)");
+    ctx.fillStyle = sunAura; ctx.fillRect(0, 0, W, H);
+    // 太陽本体
+    const sGrad = ctx.createRadialGradient(sunX, sunY, 0, sunX, sunY, sunR);
+    sGrad.addColorStop(0,    "rgba(255,252,220,1.0)");
+    sGrad.addColorStop(0.40, "rgba(255,225,90,0.96)");
+    sGrad.addColorStop(0.75, "rgba(255,160,25,0.80)");
+    sGrad.addColorStop(1,    "rgba(235,95,0,0)");
+    ctx.beginPath(); ctx.arc(sunX, sunY, sunR, 0, Math.PI * 2);
+    ctx.fillStyle = sGrad; ctx.fill();
+
+    // ── 山稜（朝の光を受けた色） ──────────────
+    // 奥（霞・明るい青紫）
+    ctx.beginPath(); ctx.moveTo(0, horizonY);
+    sil3.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(W, horizonY); ctx.closePath();
+    ctx.fillStyle = "rgba(140,160,110,0.42)"; ctx.fill();
+    // 中（深緑）
+    ctx.beginPath(); ctx.moveTo(0, horizonY);
+    sil2.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(W, horizonY); ctx.closePath();
+    ctx.fillStyle = "rgba(55,90,40,0.72)"; ctx.fill();
+    // 手前（濃い緑、朝日に照らされた面）
+    ctx.beginPath(); ctx.moveTo(0, horizonY);
+    sil1.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(W, horizonY); ctx.closePath();
+    const mtGrad = ctx.createLinearGradient(0, horizonY - H*0.26, 0, horizonY);
+    mtGrad.addColorStop(0,   "rgba(38,68,25,0.90)");
+    mtGrad.addColorStop(0.5, "rgba(48,82,28,0.85)");
+    mtGrad.addColorStop(1,   "rgba(30,55,18,0.95)");
+    ctx.fillStyle = mtGrad; ctx.fill();
+
+    // 山の朝日ハイライト（太陽側の稜線を明るく）
+    const hlGrad = ctx.createRadialGradient(sunX, horizonY, 0, sunX, horizonY, W * 0.5);
+    hlGrad.addColorStop(0,   "rgba(255,200,80,0.12)");
+    hlGrad.addColorStop(0.5, "rgba(200,150,40,0.04)");
+    hlGrad.addColorStop(1,   "rgba(150,100,0,0)");
+    ctx.fillStyle = hlGrad; ctx.fillRect(0, 0, W, horizonY);
+
+    // ── 大地 ──────────────────────────────
+    const gndGrad = ctx.createLinearGradient(0, horizonY, 0, waterY);
+    gndGrad.addColorStop(0,   "rgba(60,80,30,0.95)");
+    gndGrad.addColorStop(0.5, "rgba(45,65,20,0.97)");
+    gndGrad.addColorStop(1,   "rgba(30,48,12,0.99)");
+    ctx.fillStyle = gndGrad; ctx.fillRect(0, horizonY, W, waterY - horizonY);
+    // 草地の質感
+    [0.25, 0.55, 0.82].forEach((f, i) => {
+      const y = horizonY + (waterY - horizonY) * f;
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y);
+      ctx.strokeStyle = `rgba(90,130,40,${0.08 + i * 0.04})`; ctx.lineWidth = 0.6; ctx.stroke();
+    });
+
+    // ── 水面（朝の川・湖） ──────────────────
+    const waterBg = ctx.createLinearGradient(0, waterY, 0, H);
+    waterBg.addColorStop(0,   "rgba(120,170,200,0.80)");
+    waterBg.addColorStop(0.2, "rgba(80,140,185,0.88)");
+    waterBg.addColorStop(0.6, "rgba(40,90,150,0.93)");
+    waterBg.addColorStop(1,   "rgba(20,55,110,0.97)");
+    ctx.fillStyle = waterBg; ctx.fillRect(0, waterY, W, H - waterY);
+
+    // 波
+    waveLayers.forEach(wl => {
+      const yBase = waterY + wl.yOff;
+      ctx.beginPath(); ctx.moveTo(0, yBase);
+      for (let x = 0; x <= W; x += 4) {
+        const y = yBase
+          + Math.sin(x * 0.010 + t * wl.speed + wl.phase) * wl.amp
+          + Math.sin(x * 0.018 + t * wl.speed * 1.4 + wl.phase + 1.2) * wl.amp * 0.32;
+        ctx.lineTo(x, y);
+      }
+      ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+      const wg = ctx.createLinearGradient(0, yBase, 0, H);
+      wg.addColorStop(0,   `rgba(160,210,240,${wl.alpha * 0.6})`);
+      wg.addColorStop(0.3, `rgba(60,130,190,${wl.alpha})`);
+      wg.addColorStop(1,   `rgba(20,60,120,${wl.alpha * 1.2})`);
+      ctx.fillStyle = wg; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(0, yBase);
+      for (let x = 0; x <= W; x += 4) {
+        const y = yBase
+          + Math.sin(x * 0.010 + t * wl.speed + wl.phase) * wl.amp
+          + Math.sin(x * 0.018 + t * wl.speed * 1.4 + wl.phase + 1.2) * wl.amp * 0.32;
+        ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = `rgba(200,235,255,${wl.alpha * 1.3})`; ctx.lineWidth = wl.w; ctx.stroke();
+    });
+
+    // 朝日の水面映り込み
+    const reflW = W * 0.10;
+    const reflGrad = ctx.createLinearGradient(sunX - reflW, waterY, sunX + reflW, waterY);
+    reflGrad.addColorStop(0,   "rgba(255,200,80,0)");
+    reflGrad.addColorStop(0.5, `rgba(255,200,80,${0.28 + Math.sin(t * 0.013) * 0.07})`);
+    reflGrad.addColorStop(1,   "rgba(255,200,80,0)");
+    ctx.fillStyle = reflGrad; ctx.fillRect(sunX - reflW, waterY, reflW * 2, H - waterY);
+
+    // 波紋
+    ripples.forEach(r => {
+      const frac  = ((t * r.speed + r.phase) % (Math.PI * 2)) / (Math.PI * 2);
+      const rad   = frac * r.maxR;
+      const alpha = r.alpha * (1 - frac);
+      const ry    = waterY + (H - waterY) * 0.28;
+      ctx.beginPath();
+      ctx.ellipse(r.x, ry, rad, rad * 0.22, 0, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(180,225,255,${alpha})`; ctx.lineWidth = 0.7; ctx.stroke();
+    });
+
+    // ── ラベル ───────────────────────────────
+    const lblSize = Math.max(14, Math.round(W * 0.024));
+    ctx.save();
+    ctx.font = `${lblSize}px 'Cinzel', serif`;
+    ctx.textAlign = "right";
+    [
+      {txt:"火  FIRE",  x:W*0.94, y:H*0.10, col:"rgba(255,200,70,0.95)"},
+      {txt:"風  WIND",  x:W*0.94, y:H*0.34, col:"rgba(220,235,255,0.88)"},
+      {txt:"地  EARTH", x:W*0.94, y:H*0.62, col:"rgba(130,200,80,0.90)"},
+      {txt:"水  WATER", x:W*0.94, y:H*0.86, col:"rgba(120,200,240,0.90)"},
+    ].forEach(l => {
+      ctx.shadowColor = "rgba(0,0,0,0.50)"; ctx.shadowBlur = 7;
+      ctx.fillStyle = l.col; ctx.fillText(l.txt, l.x, l.y);
+    });
+    ctx.shadowBlur = 0; ctx.restore();
 
     t++;
     requestAnimationFrame(draw);
@@ -5052,7 +6141,7 @@ document.getElementById("btn-back-from-mypage").addEventListener("click", () => 
 const PERSON_TAGS = { family: "家族", work: "仕事", private: "プライベート" };
 let bookTagFilter = "all";   // 盤・リストの絞り込み
 let bookAddTag = null;       // 追加フォームで選択中のタグ
-let saveSelectedTag = null;  // 結果ページ保存UIで選択中のタグ
+// saveSelectedTag は上部で宣言済み
 
 function tagLabel(p) { return PERSON_TAGS[p.tag] || null; }
 
@@ -5658,5 +6747,17 @@ window.addEventListener("hashchange", applyLocationHash);
 if (location.hash) applyLocationHash();
 
 </script>
+<!-- ── 宿詳細スライドインパネル ────────────────────────── -->
+<div id="shuku-detail-panel" role="dialog" aria-modal="true" aria-label="宿の詳細">
+  <div class="sdp-header">
+    <button class="sdp-back" id="sdp-back" aria-label="戻る">←</button>
+    <div class="sdp-header-title" id="sdp-header-title">宿の読み解き</div>
+    <div class="sdp-header-badge" id="sdp-header-badge"></div>
+  </div>
+  <div class="sdp-body" id="sdp-body">
+    <!-- JS で動的に描画 -->
+  </div>
+</div>
+
 </body>
 </html>
