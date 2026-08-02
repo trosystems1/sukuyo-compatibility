@@ -803,7 +803,7 @@ function buildSenseibanSVG() {
   const R_POINTER = R_COMPAT - 15;
 
   function pt(r, deg) {
-    const rad = (deg - 90) * Math.PI / 180;
+    const rad = (-deg - 90) * Math.PI / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   function circle(r, stroke, sw, fill) {
@@ -822,7 +822,7 @@ function buildSenseibanSVG() {
       const deg = angles[i];
       const p = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
-      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${(-deg).toFixed(1)})">` +
         (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
         `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
         `</g>`;
@@ -835,7 +835,7 @@ function buildSenseibanSVG() {
       const deg = slotDeg(i, items.length) + (360 / items.length) / 2;
       const p = pt(r, deg);
       const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
-      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
     }).join("");
   }
   function sectorPath(rOuter, rInner, aStart, aEnd) {
@@ -845,7 +845,7 @@ function buildSenseibanSVG() {
     const large = sweep > 180 ? 1 : 0;
     const o1 = pt(rOuter, aStart), o2 = pt(rOuter, end);
     const i1 = pt(rInner, aStart), i2 = pt(rInner, end);
-    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
+    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
   // 12宮セクター = PALACE_DATA.shukuIdx（占星術ページの「対応する宿」と同じ定義・境界宿は共有）
@@ -880,7 +880,7 @@ function buildSenseibanSVG() {
     elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#e8d9a8" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#e8d9a8" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
     elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
     // 境界線は惑星帯・宮帯にも
     planetSpokes += spoke(R1, R2, aStart, `${gold}.2)`, 0.5);
