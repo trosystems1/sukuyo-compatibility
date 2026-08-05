@@ -850,18 +850,17 @@ function buildSenseibanSVG() {
     return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  // 陰陽ゴールド（原型画像から採取）
-  // 陽=明るい金 / 陰=深いブロンズ。羊(0)=陰・牛(1)=陽
-  const GOLD_YANG = "#dcc469";      // 原型の明金 ≈ rgb(220,196,105)
-  const GOLD_YIN  = "#8a6a28";      // 原型の深金 ≈ rgb(138,106,40)
-  const GOLD_YANG_SOFT = "rgba(220,196,105,.55)";
-  const GOLD_YIN_SOFT  = "rgba(138,106,40,.75)";
-  const RING_DARK = "#141210";      // 原型の惑星帯・外周ダーク
-  const PALACE_BOUNDARY = "#1c1008"; // 原型のカスプ ≈ rgb(28,16,8)
+  // 陰陽（原型: 黒 ↔ 金の強い交互。火地風水の色塗りは載せない）
+  // 羊(0)=陰=黒 / 牛(1)=陽=金
+  const GOLD_YANG = "#e8d070";
+  const GOLD_YIN  = "#0e0c0a";
+  const RING_DARK = "#0e0c0a";
+  const PALACE_BOUNDARY = "#e8c860"; // 原型のカスプは明るい金線
   function palaceYinYang(i) {
-    return (i % 2 === 0)
-      ? { fill: GOLD_YIN, soft: GOLD_YIN_SOFT, label: "#f3e6b0", elemFill: RING_DARK, elemLabel: "#f0e2b0" }
-      : { fill: GOLD_YANG, soft: GOLD_YANG_SOFT, label: "#1a1408", elemFill: GOLD_YANG, elemLabel: "#1a1408" };
+    const yin = (i % 2 === 0);
+    return yin
+      ? { fill: GOLD_YIN, label: "#f0e2b0", text: "#f0e2b0" }
+      : { fill: GOLD_YANG, label: "#1a1408", text: "#1a1408" };
   }
 
   // 12宮の描画アーク（非重複）。
@@ -897,24 +896,29 @@ function buildSenseibanSVG() {
 
   let elemSectors = "", palaceSectors = "", planetSectors = "";
   let elemLabels = "", palaceSpokes = "", planetSpokes = "", palaceBoundaries = "";
+  let goldGradDefs = "";
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aEnd, aMid } = palaceAngles[i];
     const yy = palaceYinYang(i);
-    // 宮帯：陰陽ゴールド（原型どおり明金／深金）
-    palaceSectors += sectorPath(R2, R3, aStart, aEnd).replace("/>", ` fill="${yy.fill}"/>`);
-    // 惑星帯：原型どおりダーク地
-    planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${RING_DARK}"/>`);
-    // エレメント帯：陽=金／陰=ダーク（原型の外周交互）
-    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.15)";
-    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${yy.elemFill}"/>`);
-    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${soft}"/>`);
+    const yin = (i % 2 === 0);
+    // 陽セグメントはメタリック金グラデーション
+    let fill = yy.fill;
+    if (!yin) {
+      const gid = `sbGold${i}`;
+      goldGradDefs += `<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy - R0}" x2="${cx}" y2="${cy + R0}"><stop offset="0%" stop-color="#f5e6a0"/><stop offset="45%" stop-color="#e8d070"/><stop offset="100%" stop-color="#b8963a"/></linearGradient>`;
+      fill = `url(#${gid})`;
+    }
+    // 外周〜宮帯まで同じ陰陽（原型どおり黒/金の交互）
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
+    planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
+    palaceSectors += sectorPath(R2, R3, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="${yy.elemLabel}" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    // 宮境界：原型の細い黒カスプ（外周〜宮帯を貫通）
-    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.35);
-    planetSpokes += spoke(R1, R2, aStart, "rgba(220,196,105,.35)", 0.7);
-    palaceSpokes += spoke(R2, R3, aStart, PALACE_BOUNDARY, 1.0);
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="${yy.text}" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    // 宮境界：原型の明るい金のカスプ線
+    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.6);
+    planetSpokes += spoke(R1, R2, aStart, "rgba(232,200,96,.4)", 0.6);
+    palaceSpokes += spoke(R2, R3, aStart, PALACE_BOUNDARY, 1.1);
   });
 
   // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ・帯の塗り分けはしない）
@@ -938,7 +942,7 @@ function buildSenseibanSVG() {
   const planetSyms = PALACE_DATA.map(p => p.planetSym);
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
   const palaceLabelColor = (i) => palaceYinYang(i).label;
-  const planetLabelColor = () => "#e8d9a8"; // 惑星帯はダーク地なので常に明色
+  const planetLabelColor = (i) => palaceYinYang(i).label;
 
 
   // 運気ラベル（ローカル角0=命）。表示位置 i → COMPAT[(27-i)%27]
@@ -986,6 +990,7 @@ function buildSenseibanSVG() {
       <stop offset="70%" stop-color="#0e0e08"/>
       <stop offset="100%" stop-color="#060604"/>
     </radialGradient>
+    ${goldGradDefs}
   </defs>
   <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#sbBg)" stroke="${gold}.85)" stroke-width="2.2"/>
 
@@ -995,12 +1000,12 @@ function buildSenseibanSVG() {
     ${planetSectors}
     ${palaceSectors}
     ${elemLabels}
-    ${circle(R0, `${gold}.55)`, 1.2)}
+    ${circle(R0, "rgba(232,200,96,.55)", 1.2)}
     ${footTicks}
-    ${circle(R1, "rgba(220,196,105,.45)", 0.9)}
-    ${circle(R2, "rgba(28,16,8,.85)", 1.0)}
+    ${circle(R1, "rgba(232,200,96,.4)", 0.9)}
+    ${circle(R2, "rgba(232,200,96,.45)", 1.0)}
     ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 10.5, planetLabelColor, PLANET_ICONS)}
-    ${circle(R3, "rgba(28,16,8,.9)", 1.1)}
+    ${circle(R3, "rgba(232,200,96,.5)", 1.1)}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, palaceLabelColor, PALACE_ICONS)}
     ${circle(R4, `${gold}.4)`, 0.9)}
     ${spokes27}
