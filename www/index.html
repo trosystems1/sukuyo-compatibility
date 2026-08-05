@@ -3565,15 +3565,15 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
   const R_DATE    = 210;  // 日付は宮の外側で重ねる（薄く）
   const R_CENTER  = 56;   // 中心円
 
-  // ─ ヘルパー（deg増加=反時計。PSD: 昴の左=畢・牛・金星・地 / 右=胃・羊・火星・火）─
+  // ─ ヘルパー（本日以前の向き: deg増加=時計回り）─
   function pt(r, angleDeg) {
-    const rad = (-angleDeg - 90) * Math.PI / 180;
+    const rad = (angleDeg - 90) * Math.PI / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   function arcPath(r, aStart, aEnd) {
     const s = pt(r, aStart), e = pt(r, aEnd);
     const lg = (aEnd - aStart) > 180 ? 1 : 0;
-    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${lg} 0 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${r} ${r} 0 ${lg} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
   }
   function radialLine(r1, r2, angleDeg, stroke, sw) {
     const p1 = pt(r1, angleDeg), p2 = pt(r2, angleDeg);
@@ -3581,7 +3581,7 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
   }
   function textOnArc(text, r, midAngle, fontSize, fill, fontFamily, weight) {
     const p = pt(r, midAngle);
-    const rot = -midAngle; // 外向き（-deg座標系）
+    const rot = midAngle; // 外向き
     return `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" font-size="${fontSize}" fill="${fill}" font-family="${fontFamily||'sans-serif'}" font-weight="${weight||'normal'}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${p.x.toFixed(2)} ${p.y.toFixed(2)})">${text}</text>`;
   }
 
@@ -3624,8 +3624,8 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     const large = sweep > 180 ? 1 : 0;
     const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, end);
     const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, end);
-    const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 0 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 1 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
-    // 陰陽ゴールド（羊=陰・深い金 / 牛=陽・明るい金）+ 火地風水アクセント
+    const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 1 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 0 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
+    // 陰陽ゴールド（微調整）+ 火地風水アクセント。向きは本日以前のまま
     const yyFill = (i % 2 === 0) ? "#6b5420" : "#e0c57a";
     elemSectors += `<path d="${sectorD}" fill="${yyFill}" opacity="0.88"/>`;
     elemSectors += `<path d="${sectorD}" fill="${soft}"/>`;
@@ -3737,7 +3737,7 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
       const aEnd   = aStart + degPerShuku;
       const o1 = pt(R_SHUKU, aStart), o2 = pt(R_SHUKU, aEnd);
       const i1 = pt(R_COMPAT, aStart), i2 = pt(R_COMPAT, aEnd);
-      return `<path d="M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_SHUKU},${R_SHUKU} 0 0 0 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_COMPAT},${R_COMPAT} 0 0 1 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z" fill="transparent" data-shuku-idx="${i}" class="palace-shuku-sector" style="cursor:pointer;"/>`;
+      return `<path d="M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_SHUKU},${R_SHUKU} 0 0 1 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_COMPAT},${R_COMPAT} 0 0 0 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z" fill="transparent" data-shuku-idx="${i}" class="palace-shuku-sector" style="cursor:pointer;"/>`;
     }).join("")}
   </g>
 
@@ -6243,12 +6243,12 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const R_COMPAT = (R4 + R5) / 2;
   const R_PEOPLE = (R3 + R2) / 2;
   const R_POINTER = R_COMPAT - 15;
-  const rot = (baseIdx + 0.5) * (360 / N); // 基準宿の中央を12時（命）へ（-deg座標系は正回転）
+  const rot = -(baseIdx + 0.5) * (360 / N); // 基準宿の中央を12時（命）へ（本日以前の向き）
 
   function slotDeg(i) { return (i / N) * 360; }
-  // deg増加=反時計。PSD: 昴の左=畢・牛・金星・地 / 右=胃・羊・火星・火
+  // 本日以前の向き: deg増加=時計回り。微調整（カスプ中央・陰陽・境界）のみ追加
   function pt(r, deg) {
-    const rad = (-deg - 90) * Math.PI / 180;
+    const rad = (deg - 90) * Math.PI / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   function circle(r, stroke, sw, fill) {
@@ -6268,7 +6268,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       const p = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
       const fill = typeof labelColor === "function" ? labelColor(i) : labelColor;
-      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${(-deg).toFixed(1)})">` +
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
         (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
         `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
         `</g>`;
@@ -6281,7 +6281,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const large = sweep > 180 ? 1 : 0;
     const o1 = pt(rOuter, aStart), o2 = pt(rOuter, end);
     const i1 = pt(rInner, aStart), i2 = pt(rInner, end);
-    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
+    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
   const GOLD_YANG = "#e0c57a";
@@ -6335,7 +6335,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.label}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.label}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
     palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.6);
   });
 
@@ -6344,7 +6344,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   for (let i = 0; i < N; i++) {
     const deg = slotDeg(i) + degShuku / 2;
     const p = pt(R_SHUKU, deg);
-    shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
+    shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
   }
 
   // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ）
@@ -6366,7 +6366,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const deg = slotDeg(i) + degShuku / 2;
     const p = pt(R_COMPAT, deg);
     const c = COMPAT_TABLE[d].color || `${gold}.55)`;
-    compatLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${c}" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${COMPAT_TABLE[d].key}</text>`;
+    compatLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${c}" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${COMPAT_TABLE[d].key}</text>`;
   }
 
   const meiPt = pt(R_COMPAT, 0);
