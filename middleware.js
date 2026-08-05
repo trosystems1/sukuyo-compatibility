@@ -1,7 +1,5 @@
-// Vercel Routing Middleware — Basic認証
-// 環境変数 BASIC_AUTH_USER / BASIC_AUTH_PASS を
-// Vercelダッシュボード → Settings → Environment Variables で設定してください
-// (未設定の場合は下記デフォルト値が使われます)
+// Vercel Routing Middleware — Basic認証（全パス対象）
+// 本番は Vercel 環境変数 BASIC_AUTH_USER / BASIC_AUTH_PASS で上書きする
 
 export const config = {
   matcher: '/:path*',
@@ -10,18 +8,22 @@ export const config = {
 export default function middleware(request) {
   const auth = request.headers.get('authorization');
 
-  const validUser = process.env.BASIC_AUTH_USER || 'kosei-do';
-  const validPass = process.env.BASIC_AUTH_PASS || 'sukuyo2026';
-  const expected = 'Basic ' + btoa(validUser + ':' + validPass);
+  const validUser = process.env.BASIC_AUTH_USER || 'yoshida';
+  const validPass = process.env.BASIC_AUTH_PASS || 'test';
+  const expected = 'Basic ' + btoa(`${validUser}:${validPass}`);
 
   if (auth === expected) {
-    return; // 認証OK、そのまま通す
+    // 認証OK → 後続の静的配信へ通す
+    return new Response(null, {
+      headers: { 'x-middleware-next': '1' },
+    });
   }
 
   return new Response('Authentication required.', {
     status: 401,
     headers: {
       'WWW-Authenticate': 'Basic realm="Secure Area", charset="UTF-8"',
+      'Cache-Control': 'no-store',
     },
   });
 }
