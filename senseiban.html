@@ -852,15 +852,15 @@ function buildSenseibanSVG() {
 
   // 陰陽は180度ずつ（縞ではない）。
   // 境界: 蟹宮|獅子宮 と 磨宮|瓶宮
-  // 陽(金)=獅〜磨(4..9) / 陰(黒)=瓶〜蟹(10,11,0..3)
+  // 陰(黒)=獅〜磨(4..9) / 陽(金)=瓶〜蟹(10,11,0..3)
   const GOLD_YANG = "#e8d070";
   const GOLD_YIN  = "#0e0c0a";
   const RING_DARK = "#0e0c0a";
   const PALACE_BOUNDARY = "#e8c860"; // 原型のカスプは明るい金線
   const YIN_YANG_BOUNDARY = "#f0d878"; // 陰陽の境は一段はっきり
   function isYinPalace(i) {
-    // 瓶(10)・魚(11)・羊(0)・牛(1)・夫妻(2)・蟹(3)
-    return i >= 10 || i <= 3;
+    // 獅(4)・女(5)・秤(6)・蠍(7)・弓(8)・磨(9)
+    return i >= 4 && i <= 9;
   }
   function palaceYinYang(i) {
     const yin = isYinPalace(i);
