@@ -3625,21 +3625,22 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, end);
     const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, end);
     const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 0 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 1 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
-    // 陰陽ゴールド（羊=陰・深い金 / 牛=陽・明るい金）+ 火地風水アクセント
-    const yyFill = (i % 2 === 0) ? "#6b5420" : "#e0c57a";
-    elemSectors += `<path d="${sectorD}" fill="${yyFill}" opacity="0.88"/>`;
+    // 陰陽ゴールド（原型採取: 陽=#dcc469 / 陰=#8a6a28）+ 火地風水アクセント
+    const yyFill = (i % 2 === 0) ? "#8a6a28" : "#dcc469";
+    const yyDark = (i % 2 === 0);
+    elemSectors += `<path d="${sectorD}" fill="${yyDark ? "#141210" : yyFill}"/>`;
     elemSectors += `<path d="${sectorD}" fill="${soft}"/>`;
 
     const pr = (R_PALACE + R_PLANET) / 2;
-    const labelCol = (i % 2 === 0) ? "#f5e6b8" : "#2a2210";
+    const labelCol = yyDark ? "#f3e6b0" : "#1a1408";
     palaceLabels += textOnArc(p.sym, pr + 7, aMid, 14, labelCol, "'Cinzel',serif", "600");
     palaceLabels += textOnArc(p.name, pr - 9, aMid, 8.5, labelCol, "'Noto Serif JP',serif", "400");
 
     const plr = (R_PLANET + R_SHUKU) / 2;
-    planetLabels += textOnArc(p.planetSym, plr + 5, aMid, 14, labelCol, "'Cinzel',serif", "600");
-    planetLabels += textOnArc(p.planet, plr - 7, aMid, 7.5, labelCol, "'Noto Serif JP',serif", "400");
+    planetLabels += textOnArc(p.planetSym, plr + 5, aMid, 14, "#e8d9a8", "'Cinzel',serif", "600");
+    planetLabels += textOnArc(p.planet, plr - 7, aMid, 7.5, "#e8d9a8", "'Noto Serif JP',serif", "400");
 
-    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, "rgba(26,20,8,.65)", 1.4);
+    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, "#1c1008", 1.35);
   });
 
   // ─ 固定層：27宿リング ─
@@ -6284,15 +6285,16 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  const GOLD_YANG = "#e0c57a";
-  const GOLD_YIN  = "#6b5420";
-  const GOLD_YANG_SOFT = "rgba(224,197,122,.62)";
-  const GOLD_YIN_SOFT  = "rgba(107,84,32,.82)";
-  const PALACE_BOUNDARY = "#1a1408";
+  const GOLD_YANG = "#dcc469";
+  const GOLD_YIN  = "#8a6a28";
+  const GOLD_YANG_SOFT = "rgba(220,196,105,.55)";
+  const GOLD_YIN_SOFT  = "rgba(138,106,40,.75)";
+  const RING_DARK = "#141210";
+  const PALACE_BOUNDARY = "#1c1008";
   function palaceYinYang(i) {
     return (i % 2 === 0)
-      ? { fill: GOLD_YIN, soft: GOLD_YIN_SOFT, label: "#f5e6b8" }
-      : { fill: GOLD_YANG, soft: GOLD_YANG_SOFT, label: "#2a2210" };
+      ? { fill: GOLD_YIN, soft: GOLD_YIN_SOFT, label: "#f3e6b0", elemFill: RING_DARK, elemLabel: "#f0e2b0" }
+      : { fill: GOLD_YANG, soft: GOLD_YANG_SOFT, label: "#1a1408", elemFill: GOLD_YANG, elemLabel: "#1a1408" };
   }
 
   const degShuku = 360 / N;
@@ -6329,14 +6331,14 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const { aStart, aEnd, aMid } = palaceAngles[i];
     const yy = palaceYinYang(i);
     palaceSectors += sectorPath(R2, R3, aStart, aEnd).replace("/>", ` fill="${yy.fill}"/>`);
-    planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${yy.soft}"/>`);
-    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
-    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${yy.fill}" opacity="0.9"/>`);
+    planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${RING_DARK}"/>`);
+    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.15)";
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${yy.elemFill}"/>`);
     elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.label}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.6);
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.elemLabel}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.35);
   });
 
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
@@ -6424,7 +6426,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const palaceNames = PALACE_DATA.map(p => p.name);
   const planetSyms = PALACE_DATA.map(p => p.planetSym);
   const palaceLabelColor = (i) => palaceYinYang(i).label;
-  const planetLabelColor = (i) => palaceYinYang(i).label;
+  const planetLabelColor = () => "#e8d9a8";
 
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
@@ -6440,18 +6442,18 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${elemSectors}
     ${planetSectors}
     ${palaceSectors}
-    ${palaceBoundaries}
     ${elemLabels}
     ${footTicks}
     ${circle(R0, `${gold}.4)`, 1)}
-    ${circle(R1, "rgba(26,20,8,.55)", 0.8)}
-    ${circle(R2, "rgba(26,20,8,.55)", 0.8)}
+    ${circle(R1, "rgba(220,196,105,.45)", 0.8)}
+    ${circle(R2, "rgba(28,16,8,.85)", 1.0)}
     ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 9.5, planetLabelColor, PLANET_ICONS)}
-    ${circle(R3, "rgba(26,20,8,.65)", 0.9)}
+    ${circle(R3, "rgba(28,16,8,.9)", 1.0)}
     ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 11.5, palaceLabelColor, PALACE_ICONS)}
     ${circle(R4, `${gold}.3)`, 0.7)}
     ${ticks}
     ${shukuLabels}
+    ${palaceBoundaries}
   </g>
 
   <g id="mp-compat-fixed">
