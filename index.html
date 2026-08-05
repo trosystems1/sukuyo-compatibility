@@ -3585,30 +3585,38 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     return `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" font-size="${fontSize}" fill="${fill}" font-family="${fontFamily||'sans-serif'}" font-weight="${weight||'normal'}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${p.x.toFixed(2)} ${p.y.toFixed(2)})">${text}</text>`;
   }
 
-  // ─ 固定層：エレメント帯（PALACE_DATA.shukuIdx＝占星術ページと同じ宿配置）─
+  // ─ 固定層：エレメント帯（描画アークは非重複。共有宿境界＝その宿の中央）─
   const degPerShuku0 = 360 / N;
-  function palaceAnglesFromIdx(idxs) {
-    const sorted = [...idxs].sort((a, b) => a - b);
-    const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
-    let aStart, aEnd;
-    if (wraps) {
-      let gapAt = 0;
-      for (let k = 0; k < sorted.length - 1; k++) {
-        if (sorted[k + 1] - sorted[k] > 1) { gapAt = k; break; }
-      }
-      aStart = sorted[gapAt + 1] * degPerShuku0;
-      aEnd = (sorted[gapAt] + 1) * degPerShuku0;
-    } else {
-      aStart = sorted[0] * degPerShuku0;
-      aEnd = (sorted[sorted.length - 1] + 1) * degPerShuku0;
+  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
+    const nextSet = new Set(nextIdxs);
+    const shared = prevIdxs.filter((x) => nextSet.has(x));
+    if (shared.length >= 1) {
+      return (shared[0] + 0.5) * degPerShuku0;
     }
-    let end = aEnd;
-    if (end <= aStart) end += 360;
-    return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
+    const maxEx = Math.max(...exclusive);
+    return (maxEx + 1) * degPerShuku0;
   }
+  function buildPalaceDrawAngles(palaceData) {
+    const n = palaceData.length;
+    const starts = [];
+    for (let i = 0; i < n; i++) {
+      const prev = palaceData[(i - 1 + n) % n].shukuIdx;
+      const curr = palaceData[i].shukuIdx;
+      starts.push(palaceBoundaryBetween(prev, curr));
+    }
+    return palaceData.map((_, i) => {
+      const aStart = starts[i];
+      const aEnd = starts[(i + 1) % n];
+      let end = aEnd;
+      if (end <= aStart) end += 360;
+      return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+    });
+  }
+  const palaceDrawAngles = buildPalaceDrawAngles(PALACE_DATA);
   let elemSectors = "", palaceLabels = "", planetLabels = "", dividers12 = "";
-  PALACE_DATA.forEach((p) => {
-    const { aStart, aEnd, aMid } = palaceAnglesFromIdx(p.shukuIdx);
+  PALACE_DATA.forEach((p, i) => {
+    const { aStart, aEnd, aMid } = palaceDrawAngles[i];
     const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
     let end = aEnd;
     if (end <= aStart) end += 360;
@@ -6273,35 +6281,39 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   }
 
   const degShuku = 360 / N;
-  function anglesFromShukuIdx(idxs) {
-    const sorted = [...idxs].sort((a, b) => a - b);
-    const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
-    let aStart, aEnd;
-    if (wraps) {
-      let gapAt = 0;
-      for (let k = 0; k < sorted.length - 1; k++) {
-        if (sorted[k + 1] - sorted[k] > 1) { gapAt = k; break; }
-      }
-      aStart = sorted[gapAt + 1] * degShuku;
-      aEnd = (sorted[gapAt] + 1) * degShuku;
-    } else {
-      aStart = sorted[0] * degShuku;
-      aEnd = (sorted[sorted.length - 1] + 1) * degShuku;
-    }
-    let end = aEnd;
-    if (end <= aStart) end += 360;
-    const aMid = (aStart + end) / 2 % 360;
-    return { aStart, aEnd, aMid };
+  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
+    const nextSet = new Set(nextIdxs);
+    const shared = prevIdxs.filter((x) => nextSet.has(x));
+    if (shared.length >= 1) return (shared[0] + 0.5) * degShuku;
+    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
+    return (Math.max(...exclusive) + 1) * degShuku;
   }
-  const palaceAngles = PALACE_DATA.map(p => anglesFromShukuIdx(p.shukuIdx));
+  function buildPalaceDrawAngles(palaceData) {
+    const n = palaceData.length;
+    const starts = [];
+    for (let i = 0; i < n; i++) {
+      starts.push(palaceBoundaryBetween(
+        palaceData[(i - 1 + n) % n].shukuIdx,
+        palaceData[i].shukuIdx
+      ));
+    }
+    return palaceData.map((_, i) => {
+      const aStart = starts[i];
+      const aEnd = starts[(i + 1) % n];
+      let end = aEnd;
+      if (end <= aStart) end += 360;
+      return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+    });
+  }
+  const palaceAngles = buildPalaceDrawAngles(PALACE_DATA);
   const palaceMids = palaceAngles.map(a => a.aMid);
 
   let elemSectors = "", elemLabels = "";
   PALACE_DATA.forEach((p, i) => {
-    const { aStart, aMid } = palaceAngles[i];
+    const { aStart, aEnd, aMid } = palaceAngles[i];
     const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="#c9a961" opacity="0.14"/>`);
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${soft}"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="#c9a961" opacity="0.14"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="#e8d9a8" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;

@@ -679,9 +679,10 @@ const COMPAT_TABLE = [
 ];
 
 const PALACE_DATA = [
-  // 羊宮: 婁・胃・昴（SHUKUインデックス 25,26,0）
+  // 境界宿（昴・觜・井・翼・角・底・斗・虚・室）は隣接2宮にまたがる（PSDのカスプ）
+  // 羊宮: 婁・胃・昴（SHUKUインデックス 25,26,0）— 昴は牛宮とも共有
   { name:"羊宮",  sym:"♈", planet:"火星",  planetSym:"♂",  element:"火", quality:"活動", keyphrase:"I am",      color:"#e85555", shukuIdx:[25,26,0]  },
-  // 牛宮: 昴・畢・觜（0,1,2）
+  // 牛宮: 昴・畢・觜（0,1,2）— 昴は羊宮とも共有
   { name:"牛宮",  sym:"♉", planet:"金星",  planetSym:"♀",  element:"地", quality:"不動", keyphrase:"I have",    color:"#c9a961", shukuIdx:[0,1,2]    },
   // 夫妻宮: 觜・参・井（2,3,4）
   { name:"夫妻宮",sym:"♊", planet:"水星",  planetSym:"☿",  element:"風", quality:"柔軟", keyphrase:"I think",   color:"#6db3f2", shukuIdx:[2,3,4]    },
@@ -716,10 +717,10 @@ const SHUKU_TO_PALACE = (() => {
 const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
 /* 盤面用：ゴールド基調に乗せる淡いアクセント（UIチップは ELEM_COLOR） */
 const ELEM_ON_GOLD = {
-  火: "rgba(176,96,72,.42)",
-  地: "rgba(168,138,72,.40)",
-  風: "rgba(130,155,175,.38)",
-  水: "rgba(110,145,160,.38)"
+  火: "rgba(184,120,92,.55)",
+  地: "rgba(168,144,88,.52)",
+  風: "rgba(138,158,170,.50)",
+  水: "rgba(122,154,166,.50)"
 };
 const ELEM_CHIP = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
 
@@ -802,8 +803,9 @@ function buildSenseibanSVG() {
   const R_SHUKU = (R3 + R4) / 2;
   const R_POINTER = R_COMPAT - 15;
 
+  // deg増加 = 反時計（左回り）。PSD: 昴の左=畢・牛・金星・地(陽) / 右=胃・羊・火星・火(陰)
   function pt(r, deg) {
-    const rad = (deg - 90) * Math.PI / 180;
+    const rad = (-deg - 90) * Math.PI / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   function circle(r, stroke, sw, fill) {
@@ -822,20 +824,20 @@ function buildSenseibanSVG() {
       const deg = angles[i];
       const p = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
-      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
+      const fill = typeof labelColor === "function" ? labelColor(i) : labelColor;
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${(-deg).toFixed(1)})">` +
         (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
-        `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
+        `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
         `</g>`;
     }).join("");
   }
   function labelRing(items, r, fontSize, fillFn, skipIdx) {
     return items.map((label, i) => {
       if (skipIdx && skipIdx.has(i)) return "";
-      // 宿名は区画中央（始端+半スロット）に置く。運気も同様に中央。
       const deg = slotDeg(i, items.length) + (360 / items.length) / 2;
       const p = pt(r, deg);
       const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
-      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
     }).join("");
   }
   function sectorPath(rOuter, rInner, aStart, aEnd) {
@@ -845,46 +847,72 @@ function buildSenseibanSVG() {
     const large = sweep > 180 ? 1 : 0;
     const o1 = pt(rOuter, aStart), o2 = pt(rOuter, end);
     const i1 = pt(rInner, aStart), i2 = pt(rInner, end);
-    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 1 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
+    return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  // 12宮セクター = PALACE_DATA.shukuIdx（占星術ページの「対応する宿」と同じ定義・境界宿は共有）
+  // 陰陽ゴールド（PSD: 明るい金=陽、深い金=陰）。羊(0)=陰・牛(1)=陽 で交互
+  const GOLD_YANG = "#e0c57a";
+  const GOLD_YIN  = "#6b5420";
+  const GOLD_YANG_SOFT = "rgba(224,197,122,.62)";
+  const GOLD_YIN_SOFT  = "rgba(107,84,32,.82)";
+  const PALACE_BOUNDARY = "#1a1408";
+  function palaceYinYang(i) {
+    return (i % 2 === 0)
+      ? { fill: GOLD_YIN, soft: GOLD_YIN_SOFT, label: "#f5e6b8" }
+      : { fill: GOLD_YANG, soft: GOLD_YANG_SOFT, label: "#2a2210" };
+  }
+
+  // 12宮の描画アーク（非重複）。
+  // 共有宿（昴など）は2宮にまたがり、境界線はその宿の中央を通る。
   const degShuku = 360 / N;
-  function anglesFromShukuIdx(idxs) {
-    const sorted = [...idxs].sort((a, b) => a - b);
-    const wraps = sorted.length > 1 && (sorted[sorted.length - 1] - sorted[0] > N / 2);
-    let aStart, aEnd;
-    if (wraps) {
-      let gapAt = 0;
-      for (let k = 0; k < sorted.length - 1; k++) {
-        if (sorted[k + 1] - sorted[k] > 1) { gapAt = k; break; }
-      }
-      aStart = sorted[gapAt + 1] * degShuku;
-      aEnd = (sorted[gapAt] + 1) * degShuku;
-    } else {
-      aStart = sorted[0] * degShuku;
-      aEnd = (sorted[sorted.length - 1] + 1) * degShuku;
+  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
+    const nextSet = new Set(nextIdxs);
+    const shared = prevIdxs.filter((x) => nextSet.has(x));
+    if (shared.length >= 1) {
+      return (shared[0] + 0.5) * degShuku;
     }
-    let end = aEnd;
-    if (end <= aStart) end += 360;
-    const aMid = (aStart + end) / 2 % 360;
-    return { aStart, aEnd, aMid };
+    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
+    const maxEx = Math.max(...exclusive);
+    return (maxEx + 1) * degShuku;
   }
-  const palaceAngles = PALACE_DATA.map(p => anglesFromShukuIdx(p.shukuIdx));
+  function buildPalaceDrawAngles(palaceData) {
+    const n = palaceData.length;
+    const starts = [];
+    for (let i = 0; i < n; i++) {
+      const prev = palaceData[(i - 1 + n) % n].shukuIdx;
+      const curr = palaceData[i].shukuIdx;
+      starts.push(palaceBoundaryBetween(prev, curr));
+    }
+    return palaceData.map((_, i) => {
+      const aStart = starts[i];
+      const aEnd = starts[(i + 1) % n];
+      let end = aEnd;
+      if (end <= aStart) end += 360;
+      return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+    });
+  }
+  const palaceAngles = buildPalaceDrawAngles(PALACE_DATA);
 
-  let elemSectors = "", elemLabels = "", palaceSpokes = "", planetSpokes = "";
+  let elemSectors = "", palaceSectors = "", planetSectors = "";
+  let elemLabels = "", palaceSpokes = "", planetSpokes = "", palaceBoundaries = "";
   PALACE_DATA.forEach((p, i) => {
-    const { aStart, aMid } = palaceAngles[i];
+    const { aStart, aEnd, aMid } = palaceAngles[i];
+    const yy = palaceYinYang(i);
+    // 宮帯：陰陽ゴールドをはっきり塗る
+    palaceSectors += sectorPath(R2, R3, aStart, aEnd).replace("/>", ` fill="${yy.fill}"/>`);
+    // 惑星帯：同じ陰陽
+    planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${yy.soft}"/>`);
+    // エレメント帯：陰陽ベース＋元素アクセント
     const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="#c9a961" opacity="0.14"/>`);
-    elemSectors += sectorPath(R0 - 1, R1, palaceAngles[i].aStart, palaceAngles[i].aEnd).replace("/>", ` fill="${soft}"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${yy.fill}" opacity="0.9"/>`);
+    elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${soft}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
-    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="#e8d9a8" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${aMid.toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    elemLabels += spoke(R1, R0, aStart, `${gold}.35)`, 0.7);
-    // 境界線は惑星帯・宮帯にも
-    planetSpokes += spoke(R1, R2, aStart, `${gold}.2)`, 0.5);
-    palaceSpokes += spoke(R2, R3, aStart, `${gold}.15)`, 0.4);
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="${yy.label}" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+    // 宮境界をR0〜R3で明示（PSDのカスプ線）
+    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.7);
+    planetSpokes += spoke(R1, R2, aStart, "rgba(26,20,8,.4)", 0.6);
+    palaceSpokes += spoke(R2, R3, aStart, "rgba(26,20,8,.5)", 0.7);
   });
 
   // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ・帯の塗り分けはしない）
@@ -907,6 +935,8 @@ function buildSenseibanSVG() {
   const palaceNames = PALACE_DATA.map(p => p.name);
   const planetSyms = PALACE_DATA.map(p => p.planetSym);
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+  const palaceLabelColor = (i) => palaceYinYang(i).label;
+  const planetLabelColor = (i) => palaceYinYang(i).label;
 
   // 運気ラベル（ローカル角0=命）。表示位置 i → COMPAT[(27-i)%27]
   const compatDisplay = Array.from({ length: N }, (_, i) => COMPAT_TABLE[(27 - i) % 27].key);
@@ -949,28 +979,30 @@ function buildSenseibanSVG() {
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient id="sbBg" cx="50%" cy="50%" r="60%">
-      <stop offset="0%" stop-color="#1c1438"/>
-      <stop offset="100%" stop-color="#0d0920"/>
+      <stop offset="0%" stop-color="#1a1508"/>
+      <stop offset="70%" stop-color="#0e0e08"/>
+      <stop offset="100%" stop-color="#060604"/>
     </radialGradient>
   </defs>
-  <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#sbBg)" stroke="${gold}.5)" stroke-width="1.3"/>
+  <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#sbBg)" stroke="${gold}.85)" stroke-width="2.2"/>
 
   <!-- 外周回転：火地風水・惑星・宮・27宿（宿区画に揃えた固定位置関係のまま一体で回る） -->
   <g id="sb-astro-ring" transform="rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})" style="cursor:grab">
     ${elemSectors}
+    ${planetSectors}
+    ${palaceSectors}
+    ${palaceBoundaries}
     ${elemLabels}
-    ${circle(R0, `${gold}.45)`, 1.1)}
+    ${circle(R0, `${gold}.55)`, 1.2)}
     ${footTicks}
-    ${circle(R1, `${gold}.3)`, 0.7)}
-    ${circle(R2, `${gold}.22)`, 0.5)}
-    ${planetSpokes}
-    ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 10.5, `${gold}.68)`, PLANET_ICONS)}
-    ${circle(R3, `${gold}.22)`, 0.5)}
-    ${palaceSpokes}
-    ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, `${gold}.8)`, PALACE_ICONS)}
-    ${circle(R4, `${gold}.32)`, 0.8)}
+    ${circle(R1, "rgba(26,20,8,.55)", 0.9)}
+    ${circle(R2, "rgba(26,20,8,.55)", 0.9)}
+    ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 10.5, planetLabelColor, PLANET_ICONS)}
+    ${circle(R3, "rgba(26,20,8,.65)", 1.0)}
+    ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, palaceLabelColor, PALACE_ICONS)}
+    ${circle(R4, `${gold}.4)`, 0.9)}
     ${spokes27}
-    ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.88)`)}
+    ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.92)`)}
   </g>
 
   <!-- 中央固定：運気・命業胎・三又 -->
@@ -989,8 +1021,8 @@ function setBaseIdx(idx, { animate = true } = {}) {
   const N = 27;
   const deg = 360 / N;
   senseibanBaseIdx = ((idx % N) + N) % N;
-  // 外周を回して宿 baseIdx の中央を12時（命）へ
-  senseibanRotation = -(senseibanBaseIdx + 0.5) * deg;
+  // pt関数が-deg描画のため、回転方向も反転（正の値で時計回りに見える）
+  senseibanRotation = (senseibanBaseIdx + 0.5) * deg;
   const group = document.getElementById("sb-astro-ring");
   if (group) {
     if (animate) group.style.transition = "transform .35s ease";
@@ -1052,7 +1084,7 @@ function initDrag() {
     const group = document.getElementById("sb-astro-ring");
     if (group) group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})`);
     // 12時（命）に中央が来ている宿を更新
-    const raw = Math.round(-senseibanRotation / degPerSlot - 0.5);
+    const raw = Math.round(senseibanRotation / degPerSlot - 0.5);
     const idx = ((raw % N) + N) % N;
     if (idx !== senseibanBaseIdx) {
       senseibanBaseIdx = idx;
@@ -1065,7 +1097,7 @@ function initDrag() {
     if (!dragging) return;
     dragging = false;
     holder.classList.remove("grabbing");
-    const idx = ((Math.round(-senseibanRotation / degPerSlot - 0.5) % N) + N) % N;
+    const idx = ((Math.round(senseibanRotation / degPerSlot - 0.5) % N) + N) % N;
     setBaseIdx(idx, { animate: true });
   }
 
