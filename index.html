@@ -3624,8 +3624,8 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, end);
     const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, end);
     const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 0 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 1 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
-    // 陰陽（原型: 黒↔金）。火地風水の色塗りは載せない
-    const yin = (i % 2 === 0);
+    // 陰陽は180度ハーフ（獅〜磨=陽/金、瓶〜蟹=陰/黒）
+    const yin = (i >= 10 || i <= 3);
     const yyFill = yin ? "#0e0c0a" : "#e8d070";
     const labelCol = yin ? "#f0e2b0" : "#1a1408";
     elemSectors += `<path d="${sectorD}" fill="${yyFill}"/>`;
@@ -3638,7 +3638,8 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     planetLabels += textOnArc(p.planetSym, plr + 5, aMid, 14, labelCol, "'Cinzel',serif", "600");
     planetLabels += textOnArc(p.planet, plr - 7, aMid, 7.5, labelCol, "'Noto Serif JP',serif", "400");
 
-    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, "#e8c860", 1.6);
+    const isYyEdge = (i === 4 || i === 10); // 蟹|獅・磨|瓶
+    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, isYyEdge ? "#f0d878" : "#e8c860", isYyEdge ? 2.2 : 1.6);
   });
 
   // ─ 固定層：27宿リング ─
@@ -6287,8 +6288,11 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const GOLD_YIN  = "#0e0c0a";
   const RING_DARK = "#0e0c0a";
   const PALACE_BOUNDARY = "#e8c860";
+  const YIN_YANG_BOUNDARY = "#f0d878";
+  // 陰陽は180度ずつ。陽=獅〜磨 / 陰=瓶〜蟹。境界は蟹|獅・磨|瓶
+  function isYinPalace(i) { return i >= 10 || i <= 3; }
   function palaceYinYang(i) {
-    return (i % 2 === 0)
+    return isYinPalace(i)
       ? { fill: GOLD_YIN, label: "#f0e2b0", text: "#f0e2b0" }
       : { fill: GOLD_YANG, label: "#1a1408", text: "#1a1408" };
   }
@@ -6332,7 +6336,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.text}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.6);
+    palaceBoundaries += spoke(R0, R3, aStart, (i === 4 || i === 10) ? YIN_YANG_BOUNDARY : PALACE_BOUNDARY, (i === 4 || i === 10) ? 2.2 : 1.6);
   });
 
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));

@@ -850,14 +850,20 @@ function buildSenseibanSVG() {
     return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  // 陰陽（原型: 黒 ↔ 金の強い交互。火地風水の色塗りは載せない）
-  // 羊(0)=陰=黒 / 牛(1)=陽=金
+  // 陰陽は180度ずつ（縞ではない）。
+  // 境界: 蟹宮|獅子宮 と 磨宮|瓶宮
+  // 陽(金)=獅〜磨(4..9) / 陰(黒)=瓶〜蟹(10,11,0..3)
   const GOLD_YANG = "#e8d070";
   const GOLD_YIN  = "#0e0c0a";
   const RING_DARK = "#0e0c0a";
   const PALACE_BOUNDARY = "#e8c860"; // 原型のカスプは明るい金線
+  const YIN_YANG_BOUNDARY = "#f0d878"; // 陰陽の境は一段はっきり
+  function isYinPalace(i) {
+    // 瓶(10)・魚(11)・羊(0)・牛(1)・夫妻(2)・蟹(3)
+    return i >= 10 || i <= 3;
+  }
   function palaceYinYang(i) {
-    const yin = (i % 2 === 0);
+    const yin = isYinPalace(i);
     return yin
       ? { fill: GOLD_YIN, label: "#f0e2b0", text: "#f0e2b0" }
       : { fill: GOLD_YANG, label: "#1a1408", text: "#1a1408" };
@@ -900,7 +906,7 @@ function buildSenseibanSVG() {
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aEnd, aMid } = palaceAngles[i];
     const yy = palaceYinYang(i);
-    const yin = (i % 2 === 0);
+    const yin = isYinPalace(i);
     // 陽セグメントはメタリック金グラデーション
     let fill = yy.fill;
     if (!yin) {
@@ -908,15 +914,16 @@ function buildSenseibanSVG() {
       goldGradDefs += `<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy - R0}" x2="${cx}" y2="${cy + R0}"><stop offset="0%" stop-color="#f5e6a0"/><stop offset="45%" stop-color="#e8d070"/><stop offset="100%" stop-color="#b8963a"/></linearGradient>`;
       fill = `url(#${gid})`;
     }
-    // 外周〜宮帯まで同じ陰陽（原型どおり黒/金の交互）
+    // 外周〜宮帯まで同じ陰陽（180度ハーフ）
     elemSectors += sectorPath(R0 - 1, R1, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
     planetSectors += sectorPath(R1, R2, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
     palaceSectors += sectorPath(R2, R3, aStart, aEnd).replace("/>", ` fill="${fill}"/>`);
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="${yy.text}" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    // 宮境界：原型の明るい金のカスプ線
-    palaceBoundaries += spoke(R0, R3, aStart, PALACE_BOUNDARY, 1.6);
+    // 宮境界。陰陽境（蟹|獅・磨|瓶）は太めの金線
+    const isYyEdge = (i === 4 || i === 10); // 獅の始端=蟹|獅、瓶の始端=磨|瓶
+    palaceBoundaries += spoke(R0, R3, aStart, isYyEdge ? YIN_YANG_BOUNDARY : PALACE_BOUNDARY, isYyEdge ? 2.2 : 1.6);
     planetSpokes += spoke(R1, R2, aStart, "rgba(232,200,96,.4)", 0.6);
     palaceSpokes += spoke(R2, R3, aStart, PALACE_BOUNDARY, 1.1);
   });
