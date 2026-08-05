@@ -3617,7 +3617,6 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
   let elemSectors = "", palaceLabels = "", planetLabels = "", dividers12 = "";
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aEnd, aMid } = palaceDrawAngles[i];
-    const soft = ELEM_ON_GOLD[p.element] || "rgba(201,169,97,.2)";
     let end = aEnd;
     if (end <= aStart) end += 360;
     const sweep = end - aStart;
