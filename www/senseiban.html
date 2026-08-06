@@ -608,18 +608,11 @@ html, body {
   <h1 class="hero-title">占星盤</h1>
   <p class="hero-sub">
     12宮・守護惑星・27宿を重ねた盤。<br>
-    中央の命・業・胎（三又）は固定。外周の宿・宮・火地風水を一体で回して、命の位置に基準の宿を合わせます。
+    中央の命・業・胎（三又）は固定。外周の宿・宮・エレメントを一体で回して、命の位置に基準の宿を合わせます。
   </p>
 </div>
 
 <main class="main-wrap">
-  <div class="card">
-    <div class="card-title">使い方</div>
-    <p class="intro-text">
-      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・27宿）を一体で回し、「命」の下に基準の宿を合わせます。外周の細い帯は1宿＝4足で、またがり宿（例: 昴＝羊1／牛3、亢＝秤に4足すべて）を色分け表示します。
-    </p>
-  </div>
-
   <div class="senseiban-wheel-card">
     <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
     <div class="senseiban-base-label">
@@ -760,17 +753,17 @@ const SHUKU_TO_PALACE = (() => {
   return map;
 })();
 
-const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
-/* 盤面用：ゴールド基調に乗せる淡いアクセント（UIチップは ELEM_COLOR） */
+const ELEM_COLOR = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
+/* 盤面用：宿曜トップ「火・地・風・水」カードと同じ色（エレメント帯） */
 const ELEM_ON_GOLD = {
-  火: "rgba(184,120,92,.55)",
-  地: "rgba(168,144,88,.52)",
-  風: "rgba(138,158,170,.50)",
-  水: "rgba(122,154,166,.50)"
+  火: "#b8785c",
+  地: "#a89058",
+  風: "#8a9eaa",
+  水: "#7a9aa6"
 };
 const ELEM_CHIP = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
 
-/** 竹本流 9グループ × 4足（火地風水）。各宿は必ず4足。27×4=108足 */
+/** 竹本流 9グループ × 4足（エレメント）。各宿は必ず4足。27×4=108足 */
 const GROUP_ELEMENTS = {
   1: { 火: 1, 地: 3 },
   2: { 地: 4 },
@@ -883,7 +876,7 @@ function buildSenseibanSVG() {
   const violet = "#6b4ba8";
   const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
-  // 外→内: 火地風水（外周に4足目盛り） / 惑星 / 宮 / 27宿 / 運気
+  // 外→内: エレメント（外周に4足目盛り） / 惑星 / 宮 / 27宿 / 運気
   const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
   // 帯の幾何中心よりわずかに内側へ（外周寄りの文字潰れを避ける）
   const R_ELEM = R0 * 0.38 + R1 * 0.62;
@@ -979,7 +972,7 @@ function buildSenseibanSVG() {
   const palaceAngles = buildPalaceDrawAngles(PALACE_DATA);
 
   let elemSectors = "", palaceSectors = "", planetSectors = "";
-  let elemLabels = "", palaceSpokes = "", planetSpokes = "", palaceBoundaries = "";
+  let elemLabels = "", palaceBoundaries = "";
   let goldGradDefs = "";
   PALACE_DATA.forEach((p, i) => {
     const { aStart, aEnd, aMid } = palaceAngles[i];
@@ -999,14 +992,13 @@ function buildSenseibanSVG() {
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="11" fill="${yy.text}" font-family="'Shippori Mincho','Noto Serif JP',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    // 宮境界。陰陽境（蟹|獅・磨|瓶）は太めの金線
+    // 宮境界（昴を通る羊|牛など）。他の放射細線（0.55）と同程度。明るい太線に見えないよう色も抑える
     const isYyEdge = (i === 4 || i === 10); // 獅の始端=蟹|獅、瓶の始端=磨|瓶
-    palaceBoundaries += spoke(R0, R3, aStart, isYyEdge ? YIN_YANG_BOUNDARY : PALACE_BOUNDARY, isYyEdge ? 2.2 : 1.6);
-    planetSpokes += spoke(R1, R2, aStart, "rgba(232,200,96,.4)", 0.6);
-    palaceSpokes += spoke(R2, R3, aStart, PALACE_BOUNDARY, 1.1);
+    palaceBoundaries += spoke(R0, R3, aStart, isYyEdge ? YIN_YANG_BOUNDARY : `${gold}.5)`, 0.55);
+    // 帯内の補助線は palaceBoundaries と角度が重なるため描かない（二重描画で太く見える原因）
   });
 
-  // 火地風水帯の外周：各宿を4足に分ける。またがり境界の足線は強調。
+  // エレメント帯の外周：各宿を4足に分ける。またがり境界は短い目盛りのみ（長い縦線は palaceBoundaries に任せる）
   const degFoot = degShuku / 4;
   let footTicks = "";
   let footSectors = "";
@@ -1014,22 +1006,20 @@ function buildSenseibanSVG() {
   for (let si = 0; si < N; si++) {
     const base = si * degShuku;
     const feet = SHUKU_FEET[si];
-    // 足ごとの淡いエレメント色（外周帯）。純粋／またがりが一目で分かる
+    // 足ごとのエレメント色＝トップページの火・地・風・水カードと同色
     for (let fi = 0; fi < 4; fi++) {
       const pi = feet[fi];
       const elem = (PALACE_DATA[pi] || {}).element;
       const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
-      footSectors += sectorPath(R0 - 1, R0 - 8, base + fi * degFoot, base + (fi + 1) * degFoot)
-        .replace("/>", ` fill="${fill}" opacity="0.85"/>`);
-      const isPalaceEdge = fi > 0 && feet[fi] !== feet[fi - 1];
-      if (isPalaceEdge) {
-        footTicks += spoke(R1, R0, base + fi * degFoot, YIN_YANG_BOUNDARY, 1.6);
-      } else if (fi > 0) {
-        footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
+      footSectors += sectorPath(R0 - 1, R0 - 12, base + fi * degFoot, base + (fi + 1) * degFoot)
+        .replace("/>", ` fill="${fill}" opacity="0.92"/>`);
+      if (fi > 0) {
+        // 通常の足目盛り／またがり境界とも短い細線（長い放射線は重ねない）
+        footTicks += spoke(R0 - 10, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
       }
     }
-    // 宿境界（長め）
-    footTicks += spoke(R1, R0, base, `${gold}.55)`, 0.9);
+    // 宿境界（長め）も同心円と同程度の細さ
+    footTicks += spoke(R1, R0, base, `${gold}.45)`, 0.7);
     spokes27 += spoke(R3, R4, base, `${gold}.22)`, 0.55);
   }
 
@@ -1094,7 +1084,7 @@ function buildSenseibanSVG() {
   </defs>
   <circle cx="${cx}" cy="${cy}" r="${R0+4}" fill="url(#sbBg)" stroke="${gold}.85)" stroke-width="2.2"/>
 
-  <!-- 外周回転：火地風水・惑星・宮・27宿（宿区画に揃えた固定位置関係のまま一体で回る） -->
+  <!-- 外周回転：エレメント・惑星・宮・27宿（宿区画に揃えた固定位置関係のまま一体で回る） -->
   <g id="sb-astro-ring" transform="rotate(${senseibanRotation.toFixed(2)} ${cx} ${cy})" style="cursor:grab">
     ${elemSectors}
     ${planetSectors}

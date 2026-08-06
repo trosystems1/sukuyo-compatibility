@@ -3568,12 +3568,12 @@ const SHUKU_TO_PALACE = (() => {
 })();
 
 // エレメント色
-const ELEM_COLOR = { 火:"#c94040", 地:"#8a7040", 風:"#4080b0", 水:"#3a7a9c" };
+const ELEM_COLOR = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
 const ELEM_ON_GOLD = {
-  火: "rgba(176,96,72,.42)",
-  地: "rgba(168,138,72,.40)",
-  風: "rgba(130,155,175,.38)",
-  水: "rgba(110,145,160,.38)"
+  火: "#b8785c",
+  地: "#a89058",
+  風: "#8a9eaa",
+  水: "#7a9aa6"
 };
 
 let palaceWheelDateRot   = 0;  // 日付リング（外回転）の現在角度
@@ -3649,8 +3649,8 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     planetLabels += textOnArc(p.planetSym, plr + 5, aMid, 14, labelCol, "'Cinzel',serif", "600");
     planetLabels += textOnArc(p.planet, plr - 7, aMid, 7.5, labelCol, "'Noto Serif JP',serif", "400");
 
-    const isYyEdge = (i === 4 || i === 10); // 蟹|獅・磨|瓶
-    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, isYyEdge ? "#f0d878" : "#e8c860", isYyEdge ? 2.2 : 1.6);
+    const isYyEdge = (i === 4 || i === 10); // 蟹|獅・磨|瓶（色だけで区別、太さは他の境界と同じ）
+    dividers12 += radialLine(R_PLANET, R_ELEM, aStart, isYyEdge ? "#f0d878" : "#e8c860", 0.7);
   });
 
   // ─ 固定層：27宿リング ─
@@ -6333,7 +6333,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
     const ep = pt(R_ELEM, aMid);
     elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10.5" fill="${yy.text}" font-family="'Shippori Mincho',serif" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
-    palaceBoundaries += spoke(R0, R3, aStart, (i === 4 || i === 10) ? YIN_YANG_BOUNDARY : PALACE_BOUNDARY, (i === 4 || i === 10) ? 2.2 : 1.6);
+    palaceBoundaries += spoke(R0, R3, aStart, (i === 4 || i === 10) ? YIN_YANG_BOUNDARY : `${gold}.5)`, 0.55);
   });
 
   const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
@@ -6344,15 +6344,24 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     shukuLabels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="10.5" fill="${gold}.85)" font-family="'Shippori Mincho',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${shukuNames[i]}</text>`;
   }
 
-  // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ）
+  // エレメント帯の外周：4足色分け＋短い目盛り（長い縦線は palaceBoundaries のみ）
   const degFoot = degShuku / 4;
   let footTicks = "";
+  let footSectors = "";
   for (let si = 0; si < N; si++) {
     const base = si * degShuku;
-    footTicks += spoke(R1, R0, base, `${gold}.55)`, 0.85);
-    for (let fi = 1; fi < 4; fi++) {
-      footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.5);
+    const feet = SHUKU_FEET[si];
+    for (let fi = 0; fi < 4; fi++) {
+      const pi = feet[fi];
+      const elem = (PALACE_DATA[pi] || {}).element;
+      const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
+      footSectors += sectorPath(R0 - 1, R0 - 12, base + fi * degFoot, base + (fi + 1) * degFoot)
+        .replace("/>", ` fill="${fill}" opacity="0.92"/>`);
+      if (fi > 0) {
+        footTicks += spoke(R0 - 10, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
+      }
     }
+    footTicks += spoke(R1, R0, base, `${gold}.45)`, 0.7);
   }
 
   let compatLabels = "";
@@ -6441,6 +6450,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${planetSectors}
     ${palaceSectors}
     ${elemLabels}
+    ${footSectors}
     ${footTicks}
     ${circle(R0, `${gold}.4)`, 1)}
     ${circle(R1, "rgba(220,196,105,.45)", 0.8)}
