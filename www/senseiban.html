@@ -323,14 +323,39 @@ html, body {
 }
 .senseiban-base-label {
   font-family: 'Shippori Mincho', serif;
-  font-size: 19px;
+  font-size: 24px;
   color: var(--ink);
   letter-spacing: .06em;
   text-align: center;
+  line-height: 1.45;
 }
 .senseiban-base-label span {
   color: var(--gold);
   font-weight: 500;
+}
+.senseiban-base-palace {
+  display: inline;
+  opacity: .85;
+  font-size: 22px;
+  margin-left: 6px;
+  color: var(--ink);
+  font-weight: 500;
+}
+.senseiban-detail-link {
+  display: inline-block;
+  margin-top: 6px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  color: var(--teal, #6b4ba8);
+  text-decoration: none;
+  letter-spacing: .06em;
+  border-bottom: 1px solid rgba(107,75,168,.35);
+  padding-bottom: 1px;
+  transition: color .15s ease, border-color .15s ease;
+}
+.senseiban-detail-link:hover {
+  color: var(--accent, #8a6fc4);
+  border-bottom-color: var(--accent, #8a6fc4);
 }
 .senseiban-ashi {
   display: flex;
@@ -414,54 +439,6 @@ html, body {
   font-size: 12px;
   font-weight: 600;
 }
-.senseiban-ashi-label {
-  font-size: 16px;
-  color: var(--muted);
-  font-weight: 500;
-}
-.senseiban-ashi-mixed {
-  font-size: 14px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(201,169,97,.55);
-  color: var(--deep);
-  background: rgba(201,169,97,.14);
-  letter-spacing: .06em;
-}
-.senseiban-ashi-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 14px 20px;
-  margin-top: 14px;
-  font-size: 17px;
-  color: var(--ink);
-  font-weight: 600;
-}
-.senseiban-ashi-legend span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.senseiban-ashi-legend i {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  border: 2px solid;
-  font-style: normal;
-  font-size: 14px;
-  font-weight: 700;
-  font-family: 'Shippori Mincho', serif;
-}
-.senseiban-ashi-legend .is-fire  i { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.55); }
-.senseiban-ashi-legend .is-earth i { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.55); }
-.senseiban-ashi-legend .is-wind  i { background: rgba(122,154,170,.14); color: #3a5568; border-color: rgba(122,154,170,.55); }
-.senseiban-ashi-legend .is-water i { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
-
 .base-picker-title {
   font-family: 'Shippori Mincho', serif;
   font-size: 16px;
@@ -640,15 +617,10 @@ html, body {
     <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
     <div class="senseiban-base-label">
       基準（命）：<span id="senseiban-base-shuku">昴宿</span>
-      <span id="senseiban-base-palace" style="opacity:.7;font-size:16px;margin-left:8px;"></span>
+      <span class="senseiban-base-palace" id="senseiban-base-palace"></span>
     </div>
+    <a class="senseiban-detail-link" id="senseiban-detail-link" href="index.html#shuku=%E6%98%82%E5%AE%BF">自分の宿を詳しく見る →</a>
     <div class="senseiban-ashi" id="senseiban-ashi"></div>
-    <div class="senseiban-ashi-legend" aria-hidden="true">
-      <span class="is-fire"><i>火</i>火</span>
-      <span class="is-earth"><i>地</i>地</span>
-      <span class="is-wind"><i>風</i>風</span>
-      <span class="is-water"><i>水</i>水</span>
-    </div>
   </div>
 
   <div class="card">
@@ -1277,21 +1249,20 @@ function updateLabels() {
   palaceEl.textContent = palace ? `／ ${palace.name} · ${palace.planet} · ${palace.element}` : "";
   const center = document.getElementById("sb-center-kanji");
   if (center) center.textContent = s.kanji.replace("宿", "");
+  const detailLink = document.getElementById("senseiban-detail-link");
+  if (detailLink) {
+    detailLink.href = `index.html#shuku=${encodeURIComponent(s.kanji)}`;
+  }
   const g = groupOfIdx(senseibanBaseIdx);
   const feet = feetOfShuku(senseibanBaseIdx);
   const ashiEl = document.getElementById("senseiban-ashi");
   if (ashiEl) {
-    const mixed = Object.keys(GROUP_ELEMENTS[g] || {}).length > 1;
     const feetHtml = feet.map((e) =>
       `<span class="senseiban-ashi-foot ${ELEM_CHIP_CLS[e] || ""}" title="${e}">${e}</span>`
     ).join("");
     ashiEl.innerHTML =
       `<span class="senseiban-ashi-group">第${g}グループ</span>` +
-      (mixed
-        ? `<span class="senseiban-ashi-mixed">2面性・混成</span>`
-        : `<span class="senseiban-ashi-mixed" style="opacity:.75;">純粋</span>`) +
-      `<span class="senseiban-ashi-feet">${feetHtml}</span>` +
-      `<span class="senseiban-ashi-label">${elementsLabel(g)}　${feetAllocLabel(senseibanBaseIdx)}</span>`;
+      `<span class="senseiban-ashi-feet">${feetHtml}</span>`;
   }
 }
 
