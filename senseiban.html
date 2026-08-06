@@ -1323,8 +1323,8 @@ function updateRelFocusLine() {
   const R_COMPAT = (110 + 78) / 2;
   const mei = pt(R_COMPAT, 0);
   const tgt = pt(R_COMPAT, visualDeg);
-  // 命の上＝「自分が相手にとって何の縁か」（相手→自分）
-  // 相手側＝「相手が自分にとって何の縁か」（自分→相手＝サイクル上のラベルと同じ）
+  // 命の上＝自分が相手にとって何の縁か（例: 昴が亢に対して「壊」）
+  // 相手側＝相手が自分にとって何の縁か（例: 亢が昴に対して「安」＝サイクル表記と同じ）
   const relOnMei = getRelation(focusIdx, senseibanBaseIdx);
   const relOnOther = getRelation(senseibanBaseIdx, focusIdx);
   const lineColor = relOnOther.color || "#c9a961";
