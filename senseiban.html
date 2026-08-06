@@ -922,10 +922,12 @@ function buildSenseibanSVG() {
         `</g>`;
     }).join("");
   }
-  function labelRing(items, r, fontSize, fillFn, skipIdx) {
+  // halfSlot=true: 宿帯など区画の中央（i+0.5）。false: 命=0°基準の固定運気帯（i×区画）にピタッと合わせる
+  function labelRing(items, r, fontSize, fillFn, skipIdx, halfSlot = true) {
+    const step = 360 / items.length;
     return items.map((label, i) => {
       if (skipIdx && skipIdx.has(i)) return "";
-      const deg = slotDeg(i, items.length) + (360 / items.length) / 2;
+      const deg = slotDeg(i, items.length) + (halfSlot ? step / 2 : 0);
       const p = pt(r, deg);
       const fill = typeof fillFn === "function" ? fillFn(i, label) : fillFn;
       return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fill}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
@@ -1051,13 +1053,14 @@ function buildSenseibanSVG() {
   const taiPt = pt(R_COMPAT, taiDeg);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
 
-  const badgeR = 12;
+  // バッジ半径を抑え、隣接する親・友などが宿マス内に収まるようにする
+  const badgeR = 10;
   function meiGyoTaiBadge(deg, label) {
     const p = pt(R_COMPAT, deg);
     // 白枠なし（紫円そのもので中心合わせを確認できるようにする）
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
       `<circle r="${badgeR}" fill="${violet}"/>` +
-      `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="12" fill="#fff" font-weight="700">${label}</text>` +
+      `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="11" fill="#fff" font-weight="700">${label}</text>` +
       `</g>`;
   }
   const meiGyoTaiBadges =
@@ -1113,7 +1116,7 @@ function buildSenseibanSVG() {
   <!-- 中央固定：運気・三又・命業胎（紫バッジを最前面にして中心線を確認しやすく） -->
   <g id="sb-compat-fixed">
     ${circle(R5, `${gold}.25)`, 0.6)}
-    ${labelRing(compatDisplay, R_COMPAT, 11.5, otherCompatFill, meiGyoTaiIdx)}
+    ${labelRing(compatDisplay, R_COMPAT, 10.5, otherCompatFill, meiGyoTaiIdx, false)}
     ${goldPointer}
     <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.2" stroke-linejoin="round" opacity="0.85"/>
     ${meiGyoTaiBadges}
