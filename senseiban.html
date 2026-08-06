@@ -357,6 +357,18 @@ html, body {
   color: var(--accent, #8a6fc4);
   border-bottom-color: var(--accent, #8a6fc4);
 }
+.senseiban-relation-detail {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--teal, #6b4ba8);
+  text-decoration: none;
+  letter-spacing: .04em;
+  border-bottom: 1px solid rgba(107,75,168,.3);
+}
+.senseiban-relation-detail:hover {
+  color: var(--accent, #8a6fc4);
+}
 .senseiban-ashi {
   display: flex;
   align-items: center;
@@ -619,7 +631,7 @@ html, body {
       基準（命）：<span id="senseiban-base-shuku">昴宿</span>
       <span class="senseiban-base-palace" id="senseiban-base-palace"></span>
     </div>
-    <a class="senseiban-detail-link" id="senseiban-detail-link" href="index.html#shuku=%E6%98%82%E5%AE%BF">自分の宿を詳しく見る →</a>
+    <a class="senseiban-detail-link" id="senseiban-detail-link" href="index.html#shuku=%E6%98%82%E5%AE%BF">昴宿を詳しく見る →</a>
     <div class="senseiban-ashi" id="senseiban-ashi"></div>
   </div>
 
@@ -631,7 +643,7 @@ html, body {
   <div class="card">
     <div class="card-title">基準から見た27宿の縁</div>
     <p class="intro-text" style="margin-bottom:12px;font-size:13.5px;">
-      宿を選ぶと、命の上に「自分が相手にとって何の縁か」、相手側のサイクルに「相手が自分にとって何の縁か」のアイコンが付き、線で結ばれます。
+      宿を選ぶと、命の上に「自分が相手にとって何の縁か」、相手側のサイクルに「相手が自分にとって何の縁か」のアイコンが付き、線で結ばれます。「詳しく見る」から各宿の解説ページへ移動できます。
     </p>
     <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
   </div>
@@ -1252,6 +1264,7 @@ function updateLabels() {
   const detailLink = document.getElementById("senseiban-detail-link");
   if (detailLink) {
     detailLink.href = `index.html#shuku=${encodeURIComponent(s.kanji)}`;
+    detailLink.textContent = `${s.kanji}を詳しく見る →`;
   }
   const g = groupOfIdx(senseibanBaseIdx);
   const feet = feetOfShuku(senseibanBaseIdx);
@@ -1307,6 +1320,10 @@ function updateRelFocusLine() {
     edgeIcon(tgt, relOnOther);
 }
 
+function shukuDetailHref(kanji) {
+  return `index.html#shuku=${encodeURIComponent(kanji)}`;
+}
+
 function renderRelationTable() {
   const table = document.getElementById("senseiban-relation-table");
   const baseIdx = senseibanBaseIdx;
@@ -1323,12 +1340,14 @@ function renderRelationTable() {
           <div class="senseiban-relation-name">${s.kanji}（${s.yomi}）</div>
           <div class="senseiban-relation-rel">${isBase ? "基準（命）" : rel.name}</div>
           <div class="senseiban-relation-meta">${meta}</div>
+          <a class="senseiban-relation-detail" href="${shukuDetailHref(s.kanji)}">${s.kanji.replace("宿","")}宿を詳しく見る</a>
         </div>
       </div>`;
   }).join("");
 
   table.querySelectorAll(".senseiban-relation-cell").forEach(cell => {
-    cell.addEventListener("click", () => {
+    cell.addEventListener("click", (e) => {
+      if (e.target.closest("a")) return; // 解説リンクはセルの縁選択と分離
       const idx = parseInt(cell.dataset.idx, 10);
       if (idx === senseibanBaseIdx) {
         senseibanFocusIdx = null;

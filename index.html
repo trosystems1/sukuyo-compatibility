@@ -6794,8 +6794,9 @@ function applyLocationHash() {
     const raw = decodeURIComponent(hash.slice("shuku=".length));
     const kanji = raw.endsWith("宿") ? raw : (raw ? raw + "宿" : "");
     const idx = SHUKU.findIndex(s => s.kanji === kanji || s.kanji.replace("宿","") === raw);
-    if (idx >= 0) {
-      // 他ページを閉じて本命宿パネルを開く
+    if (idx < 0) return;
+    // パネル DOM が後ろにあるため、未準備なら次フレームで開く
+    const open = () => {
       document.getElementById("moon-rune-page")?.classList.remove("show");
       document.getElementById("astrology-page")?.classList.remove("show");
       document.getElementById("element-page")?.classList.remove("show");
@@ -6805,7 +6806,9 @@ function applyLocationHash() {
         document.getElementById(id)?.classList.remove("active");
       });
       openShukuPanel(SHUKU[idx].kanji, "命 · PURPOSE", idx);
-    }
+    };
+    if (document.getElementById("shuku-detail-panel")) open();
+    else document.addEventListener("DOMContentLoaded", open, { once: true });
   }
 }
 window.addEventListener("hashchange", applyLocationHash);
