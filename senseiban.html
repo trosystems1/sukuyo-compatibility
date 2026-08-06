@@ -891,7 +891,6 @@ function buildSenseibanSVG() {
   const R_PALACE = R2 * 0.42 + R3 * 0.58;
   const R_COMPAT = (R4 + R5) / 2;
   const R_SHUKU = (R3 + R4) / 2;
-  const R_POINTER = R_COMPAT - 15;
 
   // deg増加 = 反時計（左回り）。PSD: 昴の左=畢・牛・金星・地(陽) / 右=胃・羊・火星・火(陰)
   function pt(r, deg) {
@@ -1066,10 +1065,11 @@ function buildSenseibanSVG() {
     meiGyoTaiBadge(gyoDeg, "業") +
     meiGyoTaiBadge(taiDeg, "胎");
 
-  // 三又ポインタ（中央は小さな暗色パッド＋宿1文字のみ。金の大円は置かない）
+  // 三又ポインタ（先端は紫バッジの内縁直前で止め、バッジを上に重ねて中心を見やすくする）
   const hubR = 30;
+  const tipR = R_COMPAT - badgeR - 1; // バッジ内縁のすぐ内側
   function pointerArm(deg) {
-    const tip = pt(R_POINTER, deg);
+    const tip = pt(tipR, deg);
     const L = pt(hubR + 1, deg - 11);
     const R = pt(hubR + 1, deg + 11);
     return `<polygon points="${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${L.x.toFixed(1)},${L.y.toFixed(1)} ${R.x.toFixed(1)},${R.y.toFixed(1)}" fill="#c9a961" stroke="#a88840" stroke-width="0.4"/>`;
@@ -1110,13 +1110,13 @@ function buildSenseibanSVG() {
     ${palaceBoundaries}
   </g>
 
-  <!-- 中央固定：運気・命業胎・三又 -->
+  <!-- 中央固定：運気・三又・命業胎（紫バッジを最前面にして中心線を確認しやすく） -->
   <g id="sb-compat-fixed">
     ${circle(R5, `${gold}.25)`, 0.6)}
     ${labelRing(compatDisplay, R_COMPAT, 11.5, otherCompatFill, meiGyoTaiIdx)}
+    ${goldPointer}
     <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.2" stroke-linejoin="round" opacity="0.85"/>
     ${meiGyoTaiBadges}
-    ${goldPointer}
     <text id="sb-center-kanji" x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-family="'Shippori Mincho',serif" font-size="24" fill="#e0c785" font-weight="700" style="pointer-events:none">昴</text>
   </g>
 </svg>`;

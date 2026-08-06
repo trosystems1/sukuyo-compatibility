@@ -6378,8 +6378,9 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="11" fill="#fff" font-weight="700">${label}</text></g>`;
   }
   const hubR = 28;
+  const tipR = R_COMPAT - 11 - 1; // 紫バッジ内縁のすぐ内側
   function pointerArm(deg) {
-    const tip = pt(R_POINTER, deg);
+    const tip = pt(tipR, deg);
     const L = pt(hubR + 1, deg - 11);
     const R = pt(hubR + 1, deg + 11);
     return `<polygon points="${tip.x.toFixed(1)},${tip.y.toFixed(1)} ${L.x.toFixed(1)},${L.y.toFixed(1)} ${R.x.toFixed(1)},${R.y.toFixed(1)}" fill="#c9a961" stroke="#a88840" stroke-width="0.4"/>`;
@@ -6457,8 +6458,8 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${circle(R5, `${gold}.22)`, 0.5)}
     ${compatLabels}
     <polygon points="${triPts}" fill="none" stroke="${violet}" stroke-width="1.1" stroke-linejoin="round" opacity="0.9"/>
-    ${badge(meiPt, "命")}${badge(gyoPt, "業")}${badge(taiPt, "胎")}
     ${goldPointer}
+    ${badge(meiPt, "命")}${badge(gyoPt, "業")}${badge(taiPt, "胎")}
   </g>
 
   <g id="mp-rel-lines">${lines}</g>
