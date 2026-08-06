@@ -337,38 +337,51 @@ html, body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 8px 12px;
-  margin-top: 6px;
-  font-size: 14px;
-  color: var(--moon);
+  gap: 10px 14px;
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--ink);
   letter-spacing: .04em;
 }
 .senseiban-ashi-group {
   font-family: 'Shippori Mincho', serif;
-  color: var(--gold-l);
+  color: var(--deep);
   font-weight: 600;
+  font-size: 16px;
 }
 .senseiban-ashi-feet {
   display: inline-flex;
-  gap: 3px;
+  gap: 6px;
   align-items: center;
 }
 .senseiban-ashi-foot {
-  min-width: 28px;
-  height: 20px;
-  padding: 0 4px;
-  border-radius: 2px;
-  border: 1px solid rgba(201,169,97,.55);
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid;
   box-sizing: border-box;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
-  color: #fdfaf4;
   font-family: 'Shippori Mincho', serif;
-  text-shadow: 0 1px 2px rgba(0,0,0,.35);
+  line-height: 1.05;
+  text-shadow: none;
 }
+.senseiban-ashi-foot small {
+  font-size: 9px;
+  font-weight: 600;
+  opacity: .85;
+  letter-spacing: 0;
+}
+.senseiban-ashi-foot.is-fire  { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.55); }
+.senseiban-ashi-foot.is-earth { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.55); }
+.senseiban-ashi-foot.is-wind  { background: rgba(122,154,170,.14); color: #3a5568; border-color: rgba(122,154,170,.55); }
+.senseiban-ashi-foot.is-water { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
 .ashi-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -409,38 +422,56 @@ html, body {
   font-weight: 600;
 }
 .senseiban-ashi-label {
-  font-size: 13px;
-  opacity: .9;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 500;
 }
 .senseiban-ashi-mixed {
-  font-size: 12px;
-  padding: 2px 8px;
+  font-size: 13px;
+  padding: 3px 10px;
   border-radius: 999px;
   border: 1px solid rgba(201,169,97,.55);
-  color: var(--gold-l);
-  background: rgba(201,169,97,.12);
+  color: var(--deep);
+  background: rgba(201,169,97,.14);
   letter-spacing: .06em;
 }
 .senseiban-ashi-legend {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px 14px;
-  margin-top: 10px;
-  font-size: 12px;
-  color: rgba(232,224,245,.7);
+  align-items: center;
+  gap: 12px 18px;
+  margin-top: 12px;
+  font-size: 15px;
+  color: var(--ink);
+  font-weight: 600;
 }
 .senseiban-ashi-legend span {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 7px;
 }
 .senseiban-ashi-legend i {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 2px;
-  border: 1px solid rgba(253,250,244,.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: 'Shippori Mincho', serif;
+}
+.senseiban-ashi-legend .is-fire  i { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.55); }
+.senseiban-ashi-legend .is-earth i { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.55); }
+.senseiban-ashi-legend .is-wind  i { background: rgba(122,154,170,.14); color: #3a5568; border-color: rgba(122,154,170,.55); }
+.senseiban-ashi-legend .is-water i { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
+.senseiban-ashi-legend-note {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
 }
 .senseiban-drag-hint {
   font-size: 13px;
@@ -630,11 +661,11 @@ html, body {
     </div>
     <div class="senseiban-ashi" id="senseiban-ashi"></div>
     <div class="senseiban-ashi-legend" aria-hidden="true">
-      <span><i style="background:#b8785c"></i>火</span>
-      <span><i style="background:#a89058"></i>地</span>
-      <span><i style="background:#8a9eaa"></i>風</span>
-      <span><i style="background:#7a9aa6"></i>水</span>
-      <span>1宿＝4足　／　外周の短い線が足の区切り</span>
+      <span class="is-fire"><i>火</i>火</span>
+      <span class="is-earth"><i>地</i>地</span>
+      <span class="is-wind"><i>風</i>風</span>
+      <span class="is-water"><i>水</i>水</span>
+      <span class="senseiban-ashi-legend-note">1宿＝4足　／　外周の短い線が足の区切り</span>
     </div>
     <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ（カチッ）</div>
   </div>
@@ -749,14 +780,7 @@ const SHUKU_TO_PALACE = (() => {
 })();
 
 const ELEM_COLOR = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
-/* 盤面用：カード色を明るくしたパステル（文字の下に敷き、可読性を優先） */
-const ELEM_ON_GOLD = {
-  火: "#f0c8b4",
-  地: "#e6d9a8",
-  風: "#c8ddf0",
-  水: "#b4d4e8"
-};
-const ELEM_CHIP = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
+const ELEM_CHIP_CLS = { 火: "is-fire", 地: "is-earth", 風: "is-wind", 水: "is-water" };
 
 /** 竹本流 9グループ × 4足（エレメント）。各宿は必ず4足。27×4=108足 */
 const GROUP_ELEMENTS = {
@@ -1027,25 +1051,15 @@ function buildSenseibanSVG() {
     // 帯内の補助線は palaceBoundaries と角度が重なるため描かない（二重描画で太く見える原因）
   });
 
-  // エレメント帯の外周：各宿を4足に分ける。またがり境界は短い目盛りのみ（長い縦線は palaceBoundaries に任せる）
+  // エレメント帯の外周：各宿を4足に分ける目盛りのみ（色帯は下の凡例・足チップで表現）
   const degFoot = degShuku / 4;
   let footTicks = "";
-  let footSectors = "";
   let spokes27 = "";
   for (let si = 0; si < N; si++) {
     const base = si * degShuku;
-    const feet = SHUKU_FEET[si];
-    // 足ごとのエレメント色＝トップページの火・地・風・水カードと同色
-    for (let fi = 0; fi < 4; fi++) {
-      const pi = feet[fi];
-      const elem = (PALACE_DATA[pi] || {}).element;
-      const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
-      footSectors += sectorPath(R0 - 1, R0 - 7, base + fi * degFoot, base + (fi + 1) * degFoot)
-        .replace("/>", ` fill="${fill}" opacity="0.9"/>`);
-      if (fi > 0) {
-        // 通常の足目盛り／またがり境界とも短い細線（長い放射線は重ねない）
-        footTicks += spoke(R0 - 6, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
-      }
+    for (let fi = 1; fi < 4; fi++) {
+      // 通常の足目盛り／またがり境界とも短い細線（長い放射線は重ねない）
+      footTicks += spoke(R0 - 6, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
     }
     // 宿境界（長め）も同心円と同程度の細さ
     footTicks += spoke(R1, R0, base, `${gold}.45)`, 0.7);
@@ -1118,7 +1132,6 @@ function buildSenseibanSVG() {
     ${elemSectors}
     ${planetSectors}
     ${palaceSectors}
-    ${footSectors}
     ${elemLabels}
     ${circle(R0, "rgba(232,200,96,.55)", 1.2)}
     ${footTicks}
@@ -1290,13 +1303,13 @@ function updateLabels() {
     const mixed = Object.keys(GROUP_ELEMENTS[g] || {}).length > 1;
     const marks = ["一", "二", "三", "四"];
     const feetHtml = feet.map((e, i) =>
-      `<span class="senseiban-ashi-foot" style="background:${ELEM_CHIP[e]}" title="${marks[i]}足・${e}">${marks[i]}${e}</span>`
+      `<span class="senseiban-ashi-foot ${ELEM_CHIP_CLS[e] || ""}" title="${marks[i]}足・${e}"><small>${marks[i]}</small>${e}</span>`
     ).join("");
     ashiEl.innerHTML =
       `<span class="senseiban-ashi-group">第${g}グループ</span>` +
       (mixed
         ? `<span class="senseiban-ashi-mixed">2面性・混成</span>`
-        : `<span class="senseiban-ashi-mixed" style="opacity:.65;border-color:rgba(232,224,245,.25);color:rgba(232,224,245,.75);">純粋</span>`) +
+        : `<span class="senseiban-ashi-mixed" style="opacity:.75;">純粋</span>`) +
       `<span class="senseiban-ashi-feet">${feetHtml}</span>` +
       `<span class="senseiban-ashi-label">${elementsLabel(g)}　${feetAllocLabel(senseibanBaseIdx)}</span>`;
   }
