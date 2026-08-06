@@ -3062,23 +3062,49 @@ const GROUP_ELEMENTS = {
   1: { 火: 1, 地: 3 },  // 穏やか・現実的だが、内に情熱（怒ると怖い）
   2: { 地: 4 },          // 純粋な地
   3: { 地: 2, 風: 2 },  // 特殊：現実と理想の葛藤、大物が出やすい
-  4: { 風: 4 },          // 知性の風
+  4: { 風: 4 },          // 知性の風（亢・危・参はすっぽり風4足）
   5: { 風: 3, 水: 1 },  // ドライな知性×やさしい感情（ツンデレ）
   6: { 水: 4 },
   7: { 水: 4 },
   8: { 火: 4 },
   9: { 火: 4 }
 };
+
+/**
+ * 原型盤「syukuyouban全体(昴)_251206」準拠の108足配当。
+ * SHUKU_FEET[宿idx][足0..3] = 所属宮インデックス（PALACE_DATA順: 羊=0 … 魚=11）
+ * 各宮ちょうど9足。またがり例: 昴=羊1/牛3、觜=牛2/夫妻2、亢=秤4（純粋風）。
+ */
+const SHUKU_FEET = [
+  /*0昴*/ [0,1,1,1], /*1畢*/ [1,1,1,1], /*2觜*/ [1,1,2,2], /*3参*/ [2,2,2,2],
+  /*4井*/ [2,2,2,3], /*5鬼*/ [3,3,3,3], /*6柳*/ [3,3,3,3], /*7星*/ [4,4,4,4],
+  /*8張*/ [4,4,4,4], /*9翼*/ [4,5,5,5], /*10軫*/[5,5,5,5], /*11角*/[5,5,6,6],
+  /*12亢*/[6,6,6,6], /*13底*/[6,6,6,7], /*14房*/[7,7,7,7], /*15心*/[7,7,7,7],
+  /*16尾*/[8,8,8,8], /*17箕*/[8,8,8,8], /*18斗*/[8,9,9,9], /*19女*/[9,9,9,9],
+  /*20虚*/[9,9,10,10], /*21危*/[10,10,10,10], /*22室*/[10,10,10,11], /*23壁*/[11,11,11,11],
+  /*24奎*/[11,11,11,11], /*25婁*/[0,0,0,0], /*26胃*/[0,0,0,0]
+];
+function palaceStartDeg(palaceIdx, degShuku) {
+  for (let si = 0; si < 27; si++) {
+    for (let f = 0; f < 4; f++) {
+      const prevSi = f === 0 ? (si + 26) % 27 : si;
+      const prevF = f === 0 ? 3 : f - 1;
+      if (SHUKU_FEET[si][f] === palaceIdx && SHUKU_FEET[prevSi][prevF] !== palaceIdx) {
+        return (si + f / 4) * degShuku;
+      }
+    }
+  }
+  return 0;
+}
 function elementsLabel(g) {
   return Object.entries(GROUP_ELEMENTS[g] || {}).map(([k, v]) => `${k}×${v}`).join("・");
 }
+function feetOfShuku(idx) {
+  const feet = SHUKU_FEET[((idx % 27) + 27) % 27] || [];
+  return feet.map((pi) => (PALACE_DATA[pi] || {}).element || "—");
+}
 function feetOfGroup(g) {
-  const el = GROUP_ELEMENTS[g] || {};
-  const feet = [];
-  for (const [elem, n] of Object.entries(el)) {
-    for (let i = 0; i < n; i++) feet.push(elem);
-  }
-  return feet.slice(0, 4);
+  return feetOfShuku(g - 1);
 }
 
 /**
@@ -3585,26 +3611,11 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     return `<text x="${p.x.toFixed(2)}" y="${p.y.toFixed(2)}" font-size="${fontSize}" fill="${fill}" font-family="${fontFamily||'sans-serif'}" font-weight="${weight||'normal'}" text-anchor="middle" dominant-baseline="middle" transform="rotate(${rot.toFixed(2)} ${p.x.toFixed(2)} ${p.y.toFixed(2)})">${text}</text>`;
   }
 
-  // ─ 固定層：エレメント帯（描画アークは非重複。共有宿境界＝その宿の中央）─
+  // ─ 固定層：エレメント帯（描画アークは非重複。境界は108足のまたがり位置）─
   const degPerShuku0 = 360 / N;
-  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
-    const nextSet = new Set(nextIdxs);
-    const shared = prevIdxs.filter((x) => nextSet.has(x));
-    if (shared.length >= 1) {
-      return (shared[0] + 0.5) * degPerShuku0;
-    }
-    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
-    const maxEx = Math.max(...exclusive);
-    return (maxEx + 1) * degPerShuku0;
-  }
   function buildPalaceDrawAngles(palaceData) {
     const n = palaceData.length;
-    const starts = [];
-    for (let i = 0; i < n; i++) {
-      const prev = palaceData[(i - 1 + n) % n].shukuIdx;
-      const curr = palaceData[i].shukuIdx;
-      starts.push(palaceBoundaryBetween(prev, curr));
-    }
+    const starts = palaceData.map((_, i) => palaceStartDeg(i, degPerShuku0));
     return palaceData.map((_, i) => {
       const aStart = starts[i];
       const aEnd = starts[(i + 1) % n];
@@ -6298,22 +6309,9 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   }
 
   const degShuku = 360 / N;
-  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
-    const nextSet = new Set(nextIdxs);
-    const shared = prevIdxs.filter((x) => nextSet.has(x));
-    if (shared.length >= 1) return (shared[0] + 0.5) * degShuku;
-    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
-    return (Math.max(...exclusive) + 1) * degShuku;
-  }
   function buildPalaceDrawAngles(palaceData) {
     const n = palaceData.length;
-    const starts = [];
-    for (let i = 0; i < n; i++) {
-      starts.push(palaceBoundaryBetween(
-        palaceData[(i - 1 + n) % n].shukuIdx,
-        palaceData[i].shukuIdx
-      ));
-    }
+    const starts = palaceData.map((_, i) => palaceStartDeg(i, degShuku));
     return palaceData.map((_, i) => {
       const aStart = starts[i];
       const aEnd = starts[(i + 1) % n];
@@ -6374,8 +6372,9 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const taiPt = pt(R_COMPAT, 240);
   const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
   function badge(p, label) {
+    // 白枠なし（紫円そのもので中心合わせを確認できるようにする）
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
-      `<circle r="11" fill="${violet}" stroke="#fff" stroke-width="1.4"/>` +
+      `<circle r="11" fill="${violet}"/>` +
       `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="11" fill="#fff" font-weight="700">${label}</text></g>`;
   }
   const hubR = 28;

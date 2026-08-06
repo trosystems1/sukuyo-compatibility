@@ -354,8 +354,9 @@ html, body {
   align-items: center;
 }
 .senseiban-ashi-foot {
-  width: 22px;
-  height: 18px;
+  min-width: 28px;
+  height: 20px;
+  padding: 0 4px;
   border-radius: 2px;
   border: 1px solid rgba(201,169,97,.55);
   box-sizing: border-box;
@@ -367,6 +368,45 @@ html, body {
   color: #fdfaf4;
   font-family: 'Shippori Mincho', serif;
   text-shadow: 0 1px 2px rgba(0,0,0,.35);
+}
+.ashi-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.ashi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  color: var(--moon);
+  letter-spacing: .04em;
+}
+.ashi-table th,
+.ashi-table td {
+  border-bottom: 1px solid rgba(201,169,97,.18);
+  padding: 7px 8px;
+  text-align: center;
+  white-space: nowrap;
+}
+.ashi-table th {
+  color: var(--gold-l);
+  font-family: 'Shippori Mincho', serif;
+  font-weight: 600;
+  background: rgba(201,169,97,.06);
+}
+.ashi-table td:first-child,
+.ashi-table th:first-child {
+  text-align: left;
+}
+.ashi-table tr.is-pure td { color: rgba(232,224,245,.92); }
+.ashi-table tr.is-mixed td { color: rgba(232,224,245,.78); }
+.ashi-table .ashi-cell-elem {
+  display: inline-block;
+  min-width: 2.6em;
+  padding: 2px 5px;
+  border-radius: 2px;
+  border: 1px solid rgba(201,169,97,.35);
+  font-size: 11px;
+  font-weight: 600;
 }
 .senseiban-ashi-label {
   font-size: 12px;
@@ -576,7 +616,7 @@ html, body {
   <div class="card">
     <div class="card-title">使い方</div>
     <p class="intro-text">
-      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・27宿）を一体で回し、「命」の下に基準の宿を合わせます。火地風水帯の外周目盛りは1宿＝4足（短い線が足の区切り、長い線が宿の境界）です。
+      中央の三又（命・業・胎）と運気ラベルは固定です。外周（火地風水・宮・惑星・27宿）を一体で回し、「命」の下に基準の宿を合わせます。外周の細い帯は1宿＝4足で、またがり宿（例: 昴＝羊1／牛3、亢＝秤に4足すべて）を色分け表示します。
     </p>
   </div>
 
@@ -605,6 +645,23 @@ html, body {
   <div class="card">
     <div class="card-title">基準から見た27宿の縁</div>
     <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">27宿 × 108足　12宮またがり配当表</div>
+    <p class="intro-text" style="margin-bottom:14px;">
+      原型盤に沿い、各宿の一〜四足がどの宮（エレメント）に属するか。各宮はちょうど9足。亢・危・参は風4足ですっぽり収まります。
+    </p>
+    <div class="ashi-table-wrap">
+      <table class="ashi-table" id="ashi-alloc-table">
+        <thead>
+          <tr>
+            <th>宿</th><th>G</th><th>一</th><th>二</th><th>三</th><th>四</th><th>構造</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <div class="retry-wrap">
@@ -679,30 +736,19 @@ const COMPAT_TABLE = [
 ];
 
 const PALACE_DATA = [
-  // 境界宿（昴・觜・井・翼・角・底・斗・虚・室）は隣接2宮にまたがる（PSDのカスプ）
-  // 羊宮: 婁・胃・昴（SHUKUインデックス 25,26,0）— 昴は牛宮とも共有
+  // shukuIdx は表示用（またがり宿を両宮に含む）。実境界は SHUKU_FEET（108足）で算出。
+  // 羊宮9足: 婁4+胃4+昴1／牛宮9足: 昴3+畢4+觜2 … 各宮ちょうど9足
   { name:"羊宮",  sym:"♈", planet:"火星",  planetSym:"♂",  element:"火", quality:"活動", keyphrase:"I am",      color:"#e85555", shukuIdx:[25,26,0]  },
-  // 牛宮: 昴・畢・觜（0,1,2）— 昴は羊宮とも共有
   { name:"牛宮",  sym:"♉", planet:"金星",  planetSym:"♀",  element:"地", quality:"不動", keyphrase:"I have",    color:"#c9a961", shukuIdx:[0,1,2]    },
-  // 夫妻宮: 觜・参・井（2,3,4）
   { name:"夫妻宮",sym:"♊", planet:"水星",  planetSym:"☿",  element:"風", quality:"柔軟", keyphrase:"I think",   color:"#6db3f2", shukuIdx:[2,3,4]    },
-  // 蟹宮: 井・鬼・柳（4,5,6）
   { name:"蟹宮",  sym:"♋", planet:"月",    planetSym:"☽",  element:"水", quality:"活動", keyphrase:"I feel",    color:"#a0c4ff", shukuIdx:[4,5,6]    },
-  // 獅子宮: 星・張・翼（7,8,9）
   { name:"獅子宮",sym:"♌", planet:"太陽",  planetSym:"☀",  element:"火", quality:"不動", keyphrase:"I create",  color:"#e89555", shukuIdx:[7,8,9]    },
-  // 女宮: 翼・軫・角（9,10,11）
   { name:"女宮",  sym:"♍", planet:"水星",  planetSym:"☿",  element:"地", quality:"柔軟", keyphrase:"I analyze", color:"#9de06e", shukuIdx:[9,10,11]  },
-  // 秤宮: 角・亢・底（11,12,13）
   { name:"秤宮",  sym:"♎", planet:"金星",  planetSym:"♀",  element:"風", quality:"活動", keyphrase:"I balance", color:"#f9c6d0", shukuIdx:[11,12,13] },
-  // 蠍宮: 底・房・心（13,14,15）
   { name:"蠍宮",  sym:"♏", planet:"冥王星",planetSym:"PL", element:"水", quality:"不動", keyphrase:"I desire",  color:"#9b59b6", shukuIdx:[13,14,15] },
-  // 弓宮: 尾・箕・斗（16,17,18）
   { name:"弓宮",  sym:"♐", planet:"木星",  planetSym:"♃",  element:"火", quality:"柔軟", keyphrase:"I explora", color:"#e8d055", shukuIdx:[16,17,18] },
-  // 磨宮: 斗・女・虚（18,19,20）
   { name:"磨宮",  sym:"♑", planet:"土星",  planetSym:"♄",  element:"地", quality:"活動", keyphrase:"I use",     color:"#8a8a8a", shukuIdx:[18,19,20] },
-  // 瓶宮: 虚・危・室（20,21,22）
   { name:"瓶宮",  sym:"♒", planet:"天王星",planetSym:"⛢",  element:"風", quality:"不動", keyphrase:"I know",    color:"#5ec4e8", shukuIdx:[20,21,22] },
-  // 魚宮: 室・壁・奎（22,23,24）
   { name:"魚宮",  sym:"♓", planet:"海王星",planetSym:"♆",  element:"水", quality:"柔軟", keyphrase:"I believe", color:"#7087f7", shukuIdx:[22,23,24] },
 ];
 
@@ -736,17 +782,58 @@ const GROUP_ELEMENTS = {
   8: { 火: 4 },
   9: { 火: 4 }
 };
+
+/**
+ * 原型盤「syukuyouban全体(昴)_251206」準拠の108足配当。
+ * SHUKU_FEET[宿idx][足0..3] = 所属宮インデックス（PALACE_DATA順: 羊=0 … 魚=11）
+ * 足の並びは宿の進行方向（昴→畢→…）＝一・二・三・四。
+ * 各宮ちょうど9足。またがり例: 昴=羊1/牛3、觜=牛2/夫妻2、井=夫妻3/蟹1、亢=秤4（純粋風）。
+ */
+const SHUKU_FEET = [
+  /*0昴*/ [0,1,1,1], /*1畢*/ [1,1,1,1], /*2觜*/ [1,1,2,2], /*3参*/ [2,2,2,2],
+  /*4井*/ [2,2,2,3], /*5鬼*/ [3,3,3,3], /*6柳*/ [3,3,3,3], /*7星*/ [4,4,4,4],
+  /*8張*/ [4,4,4,4], /*9翼*/ [4,5,5,5], /*10軫*/[5,5,5,5], /*11角*/[5,5,6,6],
+  /*12亢*/[6,6,6,6], /*13底*/[6,6,6,7], /*14房*/[7,7,7,7], /*15心*/[7,7,7,7],
+  /*16尾*/[8,8,8,8], /*17箕*/[8,8,8,8], /*18斗*/[8,9,9,9], /*19女*/[9,9,9,9],
+  /*20虚*/[9,9,10,10], /*21危*/[10,10,10,10], /*22室*/[10,10,10,11], /*23壁*/[11,11,11,11],
+  /*24奎*/[11,11,11,11], /*25婁*/[0,0,0,0], /*26胃*/[0,0,0,0]
+];
+
 function groupOfIdx(idx) { return (idx % 9) + 1; }
+function feetOfShuku(idx) {
+  const feet = SHUKU_FEET[((idx % 27) + 27) % 27] || [];
+  return feet.map((pi) => (PALACE_DATA[pi] || {}).element || "—");
+}
 function feetOfGroup(g) {
-  const el = GROUP_ELEMENTS[g] || {};
-  const feet = [];
-  for (const [elem, n] of Object.entries(el)) {
-    for (let i = 0; i < n; i++) feet.push(elem);
-  }
-  return feet.slice(0, 4);
+  // グループ代表（グループ番号-1 の宿）の足並び。同一グループは同パターン
+  return feetOfShuku(g - 1);
 }
 function elementsLabel(g) {
   return Object.entries(GROUP_ELEMENTS[g] || {}).map(([k, v]) => `${k}×${v}`).join("・");
+}
+function feetAllocLabel(idx) {
+  const feet = SHUKU_FEET[((idx % 27) + 27) % 27] || [];
+  const counts = {};
+  feet.forEach((pi) => {
+    const p = PALACE_DATA[pi];
+    if (!p) return;
+    const key = `${p.name}(${p.element})`;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  return Object.entries(counts).map(([k, n]) => `${k}${n}`).join("／");
+}
+/** 宮の始端角度（足境界）。deg増加＝反時計。 */
+function palaceStartDeg(palaceIdx, degShuku) {
+  for (let si = 0; si < 27; si++) {
+    for (let f = 0; f < 4; f++) {
+      const prevSi = f === 0 ? (si + 26) % 27 : si;
+      const prevF = f === 0 ? 3 : f - 1;
+      if (SHUKU_FEET[si][f] === palaceIdx && SHUKU_FEET[prevSi][prevF] !== palaceIdx) {
+        return (si + f / 4) * degShuku;
+      }
+    }
+  }
+  return 0;
 }
 
 const _ICON_S = "#c9a961";
@@ -798,7 +885,10 @@ function buildSenseibanSVG() {
 
   // 外→内: 火地風水（外周に4足目盛り） / 惑星 / 宮 / 27宿 / 運気
   const R0 = 224, R1 = 200, R2 = 168, R3 = 136, R4 = 110, R5 = 78, R6 = 46;
-  const R_ELEM = (R0 + R1) / 2;
+  // 帯の幾何中心よりわずかに内側へ（外周寄りの文字潰れを避ける）
+  const R_ELEM = R0 * 0.38 + R1 * 0.62;
+  const R_PLANET = R1 * 0.42 + R2 * 0.58;
+  const R_PALACE = R2 * 0.42 + R3 * 0.58;
   const R_COMPAT = (R4 + R5) / 2;
   const R_SHUKU = (R3 + R4) / 2;
   const R_POINTER = R_COMPAT - 15;
@@ -817,8 +907,10 @@ function buildSenseibanSVG() {
   }
   function dualRingAt(syms, names, angles, r, fontSize, labelColor, iconMap) {
     const sc = fontSize / 16;
-    const iconOff = -(fontSize * 0.7);
-    const nameOff = fontSize * 0.85;
+    // アイコンと名称を帯の中心から左右対称に置き、宮の中心線にピタリ合わせる
+    const pairHalf = fontSize * 0.78;
+    const iconOff = -pairHalf;
+    const nameOff = pairHalf;
     const nameSize = (fontSize * 0.75).toFixed(1);
     return syms.map((sym, i) => {
       const deg = angles[i];
@@ -869,27 +961,11 @@ function buildSenseibanSVG() {
       : { fill: GOLD_YANG, label: "#1a1408", text: "#1a1408" };
   }
 
-  // 12宮の描画アーク（非重複）。
-  // 共有宿（昴など）は2宮にまたがり、境界線はその宿の中央を通る。
+  // 12宮の描画アーク（非重複）。境界は108足のまたがり位置（例: 昴は足1|2＝羊|牛）。
   const degShuku = 360 / N;
-  function palaceBoundaryBetween(prevIdxs, nextIdxs) {
-    const nextSet = new Set(nextIdxs);
-    const shared = prevIdxs.filter((x) => nextSet.has(x));
-    if (shared.length >= 1) {
-      return (shared[0] + 0.5) * degShuku;
-    }
-    const exclusive = prevIdxs.filter((x) => !nextSet.has(x));
-    const maxEx = Math.max(...exclusive);
-    return (maxEx + 1) * degShuku;
-  }
   function buildPalaceDrawAngles(palaceData) {
     const n = palaceData.length;
-    const starts = [];
-    for (let i = 0; i < n; i++) {
-      const prev = palaceData[(i - 1 + n) % n].shukuIdx;
-      const curr = palaceData[i].shukuIdx;
-      starts.push(palaceBoundaryBetween(prev, curr));
-    }
+    const starts = palaceData.map((_, i) => palaceStartDeg(i, degShuku));
     return palaceData.map((_, i) => {
       const aStart = starts[i];
       const aEnd = starts[(i + 1) % n];
@@ -907,11 +983,11 @@ function buildSenseibanSVG() {
     const { aStart, aEnd, aMid } = palaceAngles[i];
     const yy = palaceYinYang(i);
     const yin = isYinPalace(i);
-    // 陽セグメントはメタリック金グラデーション
+    // 陽セグメントはメタリック金グラデーション（上半分が飛びすぎないよう抑えめ）
     let fill = yy.fill;
     if (!yin) {
       const gid = `sbGold${i}`;
-      goldGradDefs += `<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy - R0}" x2="${cx}" y2="${cy + R0}"><stop offset="0%" stop-color="#f5e6a0"/><stop offset="45%" stop-color="#e8d070"/><stop offset="100%" stop-color="#b8963a"/></linearGradient>`;
+      goldGradDefs += `<linearGradient id="${gid}" gradientUnits="userSpaceOnUse" x1="${cx}" y1="${cy - R0}" x2="${cx}" y2="${cy + R0}"><stop offset="0%" stop-color="#e2c86a"/><stop offset="40%" stop-color="#d4b24e"/><stop offset="100%" stop-color="#a88830"/></linearGradient>`;
       fill = `url(#${gid})`;
     }
     // 外周〜宮帯まで同じ陰陽（180度ハーフ）
@@ -928,18 +1004,30 @@ function buildSenseibanSVG() {
     palaceSpokes += spoke(R2, R3, aStart, PALACE_BOUNDARY, 1.1);
   });
 
-  // 火地風水帯の外周：各宿を4足に分ける目盛り（線のみ・帯の塗り分けはしない）
+  // 火地風水帯の外周：各宿を4足に分ける。またがり境界の足線は強調。
   const degFoot = degShuku / 4;
   let footTicks = "";
+  let footSectors = "";
   let spokes27 = "";
   for (let si = 0; si < N; si++) {
     const base = si * degShuku;
+    const feet = SHUKU_FEET[si];
+    // 足ごとの淡いエレメント色（外周帯）。純粋／またがりが一目で分かる
+    for (let fi = 0; fi < 4; fi++) {
+      const pi = feet[fi];
+      const elem = (PALACE_DATA[pi] || {}).element;
+      const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
+      footSectors += sectorPath(R0 - 1, R0 - 8, base + fi * degFoot, base + (fi + 1) * degFoot)
+        .replace("/>", ` fill="${fill}" opacity="0.85"/>`);
+      const isPalaceEdge = fi > 0 && feet[fi] !== feet[fi - 1];
+      if (isPalaceEdge) {
+        footTicks += spoke(R1, R0, base + fi * degFoot, YIN_YANG_BOUNDARY, 1.6);
+      } else if (fi > 0) {
+        footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
+      }
+    }
     // 宿境界（長め）
     footTicks += spoke(R1, R0, base, `${gold}.55)`, 0.9);
-    // 足の区切り3本（短め・外周寄り）
-    for (let fi = 1; fi < 4; fi++) {
-      footTicks += spoke(R0 - 7, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
-    }
     spokes27 += spoke(R3, R4, base, `${gold}.22)`, 0.55);
   }
 
@@ -967,8 +1055,9 @@ function buildSenseibanSVG() {
   const badgeR = 12;
   function meiGyoTaiBadge(deg, label) {
     const p = pt(R_COMPAT, deg);
+    // 白枠なし（紫円そのもので中心合わせを確認できるようにする）
     return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)})">` +
-      `<circle r="${badgeR}" fill="${violet}" stroke="#fff" stroke-width="1.4"/>` +
+      `<circle r="${badgeR}" fill="${violet}"/>` +
       `<text y="0.5" text-anchor="middle" dominant-baseline="middle" font-family="'Shippori Mincho',serif" font-size="12" fill="#fff" font-weight="700">${label}</text>` +
       `</g>`;
   }
@@ -1007,13 +1096,14 @@ function buildSenseibanSVG() {
     ${planetSectors}
     ${palaceSectors}
     ${elemLabels}
+    ${footSectors}
     ${circle(R0, "rgba(232,200,96,.55)", 1.2)}
     ${footTicks}
     ${circle(R1, "rgba(232,200,96,.4)", 0.9)}
     ${circle(R2, "rgba(232,200,96,.45)", 1.0)}
-    ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, (R1+R2)/2, 10.5, planetLabelColor, PLANET_ICONS)}
+    ${dualRingAt(planetSyms, PALACE_DATA.map(p => p.planet), palaceMids, R_PLANET, 10.5, planetLabelColor, PLANET_ICONS)}
     ${circle(R3, "rgba(232,200,96,.5)", 1.1)}
-    ${dualRingAt(palaceSyms, palaceNames, palaceMids, (R2+R3)/2, 12.5, palaceLabelColor, PALACE_ICONS)}
+    ${dualRingAt(palaceSyms, palaceNames, palaceMids, R_PALACE, 12.5, palaceLabelColor, PALACE_ICONS)}
     ${circle(R4, `${gold}.4)`, 0.9)}
     ${spokes27}
     ${labelRing(shukuNames, R_SHUKU, 11.5, `${gold}.92)`)}
@@ -1133,12 +1223,13 @@ function updateLabels() {
   const center = document.getElementById("sb-center-kanji");
   if (center) center.textContent = s.kanji.replace("宿", "");
   const g = groupOfIdx(senseibanBaseIdx);
-  const feet = feetOfGroup(g);
+  const feet = feetOfShuku(senseibanBaseIdx);
   const ashiEl = document.getElementById("senseiban-ashi");
   if (ashiEl) {
     const mixed = Object.keys(GROUP_ELEMENTS[g] || {}).length > 1;
-    const feetHtml = feet.map(e =>
-      `<span class="senseiban-ashi-foot" style="background:${ELEM_CHIP[e]}" title="${e}">${e}</span>`
+    const marks = ["一", "二", "三", "四"];
+    const feetHtml = feet.map((e, i) =>
+      `<span class="senseiban-ashi-foot" style="background:${ELEM_CHIP[e]}" title="${marks[i]}足・${e}">${marks[i]}${e}</span>`
     ).join("");
     ashiEl.innerHTML =
       `<span class="senseiban-ashi-group">第${g}グループ</span>` +
@@ -1146,7 +1237,7 @@ function updateLabels() {
         ? `<span class="senseiban-ashi-mixed">2面性・混成</span>`
         : `<span class="senseiban-ashi-mixed" style="opacity:.65;border-color:rgba(232,224,245,.25);color:rgba(232,224,245,.75);">純粋</span>`) +
       `<span class="senseiban-ashi-feet">${feetHtml}</span>` +
-      `<span class="senseiban-ashi-label">${elementsLabel(g)}</span>`;
+      `<span class="senseiban-ashi-label">${elementsLabel(g)}　${feetAllocLabel(senseibanBaseIdx)}</span>`;
   }
 }
 
@@ -1193,9 +1284,32 @@ function syncPicker() {
   });
 }
 
+function renderAshiAllocTable() {
+  const tbody = document.querySelector("#ashi-alloc-table tbody");
+  if (!tbody) return;
+  const marks = ["一", "二", "三", "四"];
+  tbody.innerHTML = SHUKU.map((s, si) => {
+    const feet = SHUKU_FEET[si];
+    const elems = feetOfShuku(si);
+    const unique = new Set(feet);
+    const mixed = unique.size > 1;
+    const cells = elems.map((e, i) => {
+      const p = PALACE_DATA[feet[i]];
+      return `<td><span class="ashi-cell-elem" style="background:${ELEM_CHIP[e]};color:#fdfaf4" title="${p.name}">${marks[i]}${e}</span></td>`;
+    }).join("");
+    return `<tr class="${mixed ? "is-mixed" : "is-pure"}">
+      <td>${s.kanji}<small style="opacity:.65;margin-left:4px">${s.yomi}</small></td>
+      <td>${groupOfIdx(si)}</td>
+      ${cells}
+      <td>${mixed ? "またがり　" + feetAllocLabel(si) : "すっぽり　" + feetAllocLabel(si)}</td>
+    </tr>`;
+  }).join("");
+}
+
 document.getElementById("senseiban-wheel-holder").innerHTML = buildSenseibanSVG();
 initDrag();
 renderPicker();
+renderAshiAllocTable();
 setBaseIdx(0, { animate: false });
 
 const navToggleBtn = document.getElementById("nav-toggle");
