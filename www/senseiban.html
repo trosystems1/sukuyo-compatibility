@@ -647,7 +647,7 @@ html, body {
   <div class="card">
     <div class="card-title">基準から見た27宿の縁</div>
     <p class="intro-text" style="margin-bottom:12px;font-size:13.5px;">
-      宿を選ぶと、命の上に自分から見た縁、相手側のサイクルに相手から見た縁のアイコンが付き、線で結ばれます。
+      宿を選ぶと、命の上に「自分が相手にとって何の縁か」、相手側のサイクルに「相手が自分にとって何の縁か」のアイコンが付き、線で結ばれます。
     </p>
     <div class="senseiban-relation-table" id="senseiban-relation-table"></div>
   </div>
@@ -1323,9 +1323,11 @@ function updateRelFocusLine() {
   const R_COMPAT = (110 + 78) / 2;
   const mei = pt(R_COMPAT, 0);
   const tgt = pt(R_COMPAT, visualDeg);
-  const relSelf = getRelation(senseibanBaseIdx, focusIdx);   // 自分→相手（命の上）
-  const relOther = getRelation(focusIdx, senseibanBaseIdx); // 相手→自分（相手側）
-  const lineColor = relSelf.color || "#c9a961";
+  // 命の上＝「自分が相手にとって何の縁か」（相手→自分）
+  // 相手側＝「相手が自分にとって何の縁か」（自分→相手＝サイクル上のラベルと同じ）
+  const relOnMei = getRelation(focusIdx, senseibanBaseIdx);
+  const relOnOther = getRelation(senseibanBaseIdx, focusIdx);
+  const lineColor = relOnOther.color || "#c9a961";
 
   function edgeIcon(p, rel) {
     const color = rel.color || "#c9a961";
@@ -1337,8 +1339,8 @@ function updateRelFocusLine() {
 
   g.innerHTML =
     `<line x1="${mei.x.toFixed(1)}" y1="${mei.y.toFixed(1)}" x2="${tgt.x.toFixed(1)}" y2="${tgt.y.toFixed(1)}" stroke="${lineColor}" stroke-width="2.2" stroke-opacity="0.9" stroke-linecap="round"/>` +
-    edgeIcon(mei, relSelf) +
-    edgeIcon(tgt, relOther);
+    edgeIcon(mei, relOnMei) +
+    edgeIcon(tgt, relOnOther);
 }
 
 function renderRelationTable() {
