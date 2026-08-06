@@ -323,7 +323,7 @@ html, body {
 }
 .senseiban-base-label {
   font-family: 'Shippori Mincho', serif;
-  font-size: 17px;
+  font-size: 19px;
   color: var(--ink);
   letter-spacing: .06em;
   text-align: center;
@@ -337,9 +337,9 @@ html, body {
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px 14px;
-  margin-top: 8px;
-  font-size: 15px;
+  gap: 12px 16px;
+  margin-top: 10px;
+  font-size: 17px;
   color: var(--ink);
   letter-spacing: .04em;
 }
@@ -347,36 +347,29 @@ html, body {
   font-family: 'Shippori Mincho', serif;
   color: var(--deep);
   font-weight: 600;
-  font-size: 16px;
+  font-size: 18px;
 }
 .senseiban-ashi-feet {
   display: inline-flex;
-  gap: 6px;
+  gap: 8px;
   align-items: center;
 }
 .senseiban-ashi-foot {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
   padding: 0;
   border-radius: 50%;
   border: 2px solid;
   box-sizing: border-box;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 13px;
+  font-size: 17px;
   font-weight: 700;
   font-family: 'Shippori Mincho', serif;
-  line-height: 1.05;
+  line-height: 1;
   text-shadow: none;
-}
-.senseiban-ashi-foot small {
-  font-size: 9px;
-  font-weight: 600;
-  opacity: .85;
-  letter-spacing: 0;
 }
 .senseiban-ashi-foot.is-fire  { background: rgba(192,96,58,.16); color: #8a2a10; border-color: rgba(192,96,58,.55); }
 .senseiban-ashi-foot.is-earth { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.55); }
@@ -422,13 +415,13 @@ html, body {
   font-weight: 600;
 }
 .senseiban-ashi-label {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--muted);
   font-weight: 500;
 }
 .senseiban-ashi-mixed {
-  font-size: 13px;
-  padding: 3px 10px;
+  font-size: 14px;
+  padding: 4px 12px;
   border-radius: 999px;
   border: 1px solid rgba(201,169,97,.55);
   color: var(--deep);
@@ -440,27 +433,27 @@ html, body {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 12px 18px;
-  margin-top: 12px;
-  font-size: 15px;
+  gap: 14px 20px;
+  margin-top: 14px;
+  font-size: 17px;
   color: var(--ink);
   font-weight: 600;
 }
 .senseiban-ashi-legend span {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
 }
 .senseiban-ashi-legend i {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   border: 2px solid;
   font-style: normal;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 700;
   font-family: 'Shippori Mincho', serif;
 }
@@ -468,16 +461,6 @@ html, body {
 .senseiban-ashi-legend .is-earth i { background: rgba(138,112,64,.16); color: #4a3010; border-color: rgba(138,112,64,.55); }
 .senseiban-ashi-legend .is-wind  i { background: rgba(122,154,170,.14); color: #3a5568; border-color: rgba(122,154,170,.55); }
 .senseiban-ashi-legend .is-water i { background: rgba(58,142,208,.14); color: #1a4878; border-color: rgba(58,142,208,.60); }
-.senseiban-ashi-legend-note {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--muted);
-}
-.senseiban-drag-hint {
-  font-size: 13px;
-  color: var(--muted);
-  letter-spacing: .06em;
-}
 
 .base-picker-title {
   font-family: 'Shippori Mincho', serif;
@@ -657,7 +640,7 @@ html, body {
     <div class="senseiban-wheel-holder" id="senseiban-wheel-holder"></div>
     <div class="senseiban-base-label">
       基準（命）：<span id="senseiban-base-shuku">昴宿</span>
-      <span id="senseiban-base-palace" style="opacity:.7;font-size:14px;margin-left:8px;"></span>
+      <span id="senseiban-base-palace" style="opacity:.7;font-size:16px;margin-left:8px;"></span>
     </div>
     <div class="senseiban-ashi" id="senseiban-ashi"></div>
     <div class="senseiban-ashi-legend" aria-hidden="true">
@@ -665,9 +648,7 @@ html, body {
       <span class="is-earth"><i>地</i>地</span>
       <span class="is-wind"><i>風</i>風</span>
       <span class="is-water"><i>水</i>水</span>
-      <span class="senseiban-ashi-legend-note">1宿＝4足　／　外周の短い線が足の区切り</span>
     </div>
-    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ（カチッ）</div>
   </div>
 
   <div class="card">
@@ -1301,9 +1282,8 @@ function updateLabels() {
   const ashiEl = document.getElementById("senseiban-ashi");
   if (ashiEl) {
     const mixed = Object.keys(GROUP_ELEMENTS[g] || {}).length > 1;
-    const marks = ["一", "二", "三", "四"];
-    const feetHtml = feet.map((e, i) =>
-      `<span class="senseiban-ashi-foot ${ELEM_CHIP_CLS[e] || ""}" title="${marks[i]}足・${e}"><small>${marks[i]}</small>${e}</span>`
+    const feetHtml = feet.map((e) =>
+      `<span class="senseiban-ashi-foot ${ELEM_CHIP_CLS[e] || ""}" title="${e}">${e}</span>`
     ).join("");
     ashiEl.innerHTML =
       `<span class="senseiban-ashi-group">第${g}グループ</span>` +
