@@ -626,7 +626,7 @@ html, body {
       <span><i style="background:#7a9aa6"></i>水</span>
       <span>1宿＝4足　／　外周の短い線が足の区切り</span>
     </div>
-    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ</div>
+    <div class="senseiban-drag-hint">外周をドラッグして回転 · 27分割でスナップ（カチッ）</div>
   </div>
 
   <div class="card">
@@ -863,6 +863,39 @@ function getRelation(idxA, idxB) {
 
 let senseibanBaseIdx = 0;
 let senseibanRotation = 0; // 外周（天文層）回転角。命は12時固定
+let senseibanAudioCtx = null;
+
+/** 盤のスナップ時カチッ音（Web Audio、外部ファイル不要・オフライン可） */
+function playSenseibanClick() {
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    if (!senseibanAudioCtx) senseibanAudioCtx = new AC();
+    const ctx = senseibanAudioCtx;
+    if (ctx.state === "suspended") ctx.resume();
+    const t = ctx.currentTime;
+    const n = Math.max(1, Math.floor(ctx.sampleRate * 0.028));
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (n * 0.1));
+    }
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = "bandpass";
+    bp.frequency.value = 2200;
+    bp.Q.value = 6;
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.4, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.045);
+    src.connect(bp);
+    bp.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(t);
+    src.stop(t + 0.05);
+  } catch (_) { /* autoplay制限などは無視 */ }
+}
 
 function slotDeg(i, n) {
   return (i / n) * 360;
@@ -1118,7 +1151,9 @@ function buildSenseibanSVG() {
 function setBaseIdx(idx, { animate = true } = {}) {
   const N = 27;
   const deg = 360 / N;
-  senseibanBaseIdx = ((idx % N) + N) % N;
+  const next = ((idx % N) + N) % N;
+  const changed = next !== senseibanBaseIdx;
+  senseibanBaseIdx = next;
   // pt関数が-deg描画のため、回転方向も反転（正の値で時計回りに見える）
   senseibanRotation = (senseibanBaseIdx + 0.5) * deg;
   const group = document.getElementById("sb-astro-ring");
@@ -1131,6 +1166,7 @@ function setBaseIdx(idx, { animate = true } = {}) {
       setBaseIdx._t = setTimeout(() => { group.style.transition = "none"; }, 380);
     }
   }
+  if (changed) playSenseibanClick();
   updateLabels();
   renderRelationTable();
   syncPicker();
@@ -1166,6 +1202,14 @@ function initDrag() {
   function onDown(e) {
     const pt = e.touches ? e.touches[0] : e;
     // 外周（天文層）を回転。中央の三角・運気は固定
+    if (senseibanAudioCtx && senseibanAudioCtx.state === "suspended") {
+      senseibanAudioCtx.resume();
+    } else if (!senseibanAudioCtx) {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) senseibanAudioCtx = new AC();
+      } catch (_) {}
+    }
     dragging = true;
     startAngle = angleAt(pt.clientX, pt.clientY);
     startRotation = senseibanRotation;
@@ -1186,6 +1230,7 @@ function initDrag() {
     const idx = ((raw % N) + N) % N;
     if (idx !== senseibanBaseIdx) {
       senseibanBaseIdx = idx;
+      playSenseibanClick();
       updateLabels();
       syncPicker();
     }
@@ -1196,7 +1241,23 @@ function initDrag() {
     dragging = false;
     holder.classList.remove("grabbing");
     const idx = ((Math.round(senseibanRotation / degPerSlot - 0.5) % N) + N) % N;
-    setBaseIdx(idx, { animate: true });
+    // ドラッグ中に既にカチッ済みの場合は二重再生しない
+    const silent = idx === senseibanBaseIdx;
+    if (silent) {
+      senseibanRotation = (idx + 0.5) * degPerSlot;
+      const group = document.getElementById("sb-astro-ring");
+      if (group) {
+        group.style.transition = "transform .35s ease";
+        group.setAttribute("transform", `rotate(${senseibanRotation.toFixed(2)} 230 230)`);
+        clearTimeout(setBaseIdx._t);
+        setBaseIdx._t = setTimeout(() => { group.style.transition = "none"; }, 380);
+      }
+      updateLabels();
+      renderRelationTable();
+      syncPicker();
+    } else {
+      setBaseIdx(idx, { animate: true });
+    }
   }
 
   holder.addEventListener("mousedown", onDown);
