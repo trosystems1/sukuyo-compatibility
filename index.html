@@ -3635,9 +3635,9 @@ function buildPalaceWheelSVG(honmeiIdx, todayIdx) {
     const o1 = pt(R_ELEM, aStart), o2 = pt(R_ELEM, end);
     const i1 = pt(R_PALACE, aStart), i2 = pt(R_PALACE, end);
     const sectorD = `M${o1.x.toFixed(2)},${o1.y.toFixed(2)} A${R_ELEM},${R_ELEM} 0 ${large} 0 ${o2.x.toFixed(2)},${o2.y.toFixed(2)} L${i2.x.toFixed(2)},${i2.y.toFixed(2)} A${R_PALACE},${R_PALACE} 0 ${large} 1 ${i1.x.toFixed(2)},${i1.y.toFixed(2)} Z`;
-    // 陰陽は180度ハーフ（獅〜磨=陰/黒、瓶〜蟹=陽/金）
-    const yin = (i >= 4 && i <= 9);
-    const yyFill = yin ? "#0e0c0a" : "#e8d070";
+    // 陰陽は180度ハーフ（瓶〜蟹=陰/濃色＝昴側、獅〜磨=陽/深金）
+    const yin = (i <= 3 || i >= 10);
+    const yyFill = yin ? "#0e0c0a" : "#c9a84a";
     const labelCol = yin ? "#f0e2b0" : "#1a1408";
     elemSectors += `<path d="${sectorD}" fill="${yyFill}"/>`;
 
@@ -6294,13 +6294,13 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     return `<path d="M${o1.x.toFixed(1)},${o1.y.toFixed(1)} A${rOuter},${rOuter} 0 ${large} 0 ${o2.x.toFixed(1)},${o2.y.toFixed(1)} L${i2.x.toFixed(1)},${i2.y.toFixed(1)} A${rInner},${rInner} 0 ${large} 1 ${i1.x.toFixed(1)},${i1.y.toFixed(1)} Z"/>`;
   }
 
-  const GOLD_YANG = "#e8d070";
+  const GOLD_YANG = "#c9a84a";
   const GOLD_YIN  = "#0e0c0a";
   const RING_DARK = "#0e0c0a";
   const PALACE_BOUNDARY = "#e8c860";
   const YIN_YANG_BOUNDARY = "#f0d878";
-  // 陰陽は180度ずつ。陰=獅〜磨 / 陽=瓶〜蟹。境界は蟹|獅・磨|瓶
-  function isYinPalace(i) { return i >= 4 && i <= 9; }
+  // 陰陽は180度ずつ。陰=瓶〜蟹（昴を含む） / 陽=獅〜磨（深めゴールド）。境界は蟹|獅・磨|瓶
+  function isYinPalace(i) { return i <= 3 || i >= 10; }
   function palaceYinYang(i) {
     return isYinPalace(i)
       ? { fill: GOLD_YIN, label: "#f0e2b0", text: "#f0e2b0" }
