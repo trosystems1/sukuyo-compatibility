@@ -3570,10 +3570,10 @@ const SHUKU_TO_PALACE = (() => {
 // エレメント色
 const ELEM_COLOR = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
 const ELEM_ON_GOLD = {
-  火: "#b8785c",
-  地: "#a89058",
-  風: "#8a9eaa",
-  水: "#7a9aa6"
+  火: "#f0c8b4",
+  地: "#e6d9a8",
+  風: "#c8ddf0",
+  水: "#b4d4e8"
 };
 
 let palaceWheelDateRot   = 0;  // 日付リング（外回転）の現在角度
@@ -6355,10 +6355,10 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
       const pi = feet[fi];
       const elem = (PALACE_DATA[pi] || {}).element;
       const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
-      footSectors += sectorPath(R0 - 1, R0 - 12, base + fi * degFoot, base + (fi + 1) * degFoot)
-        .replace("/>", ` fill="${fill}" opacity="0.92"/>`);
+      footSectors += sectorPath(R0 - 1, R0 - 7, base + fi * degFoot, base + (fi + 1) * degFoot)
+        .replace("/>", ` fill="${fill}" opacity="0.9"/>`);
       if (fi > 0) {
-        footTicks += spoke(R0 - 10, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
+        footTicks += spoke(R0 - 6, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
       }
     }
     footTicks += spoke(R1, R0, base, `${gold}.45)`, 0.7);
@@ -6449,8 +6449,8 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${elemSectors}
     ${planetSectors}
     ${palaceSectors}
-    ${elemLabels}
     ${footSectors}
+    ${elemLabels}
     ${footTicks}
     ${circle(R0, `${gold}.4)`, 1)}
     ${circle(R1, "rgba(220,196,105,.45)", 0.8)}

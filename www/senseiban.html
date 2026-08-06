@@ -753,12 +753,12 @@ const SHUKU_TO_PALACE = (() => {
 })();
 
 const ELEM_COLOR = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
-/* 盤面用：宿曜トップ「火・地・風・水」カードと同じ色（エレメント帯） */
+/* 盤面用：カード色を明るくしたパステル（文字の下に敷き、可読性を優先） */
 const ELEM_ON_GOLD = {
-  火: "#b8785c",
-  地: "#a89058",
-  風: "#8a9eaa",
-  水: "#7a9aa6"
+  火: "#f0c8b4",
+  地: "#e6d9a8",
+  風: "#c8ddf0",
+  水: "#b4d4e8"
 };
 const ELEM_CHIP = { 火:"#b8785c", 地:"#a89058", 風:"#8a9eaa", 水:"#7a9aa6" };
 
@@ -1010,11 +1010,11 @@ function buildSenseibanSVG() {
       const pi = feet[fi];
       const elem = (PALACE_DATA[pi] || {}).element;
       const fill = ELEM_ON_GOLD[elem] || "rgba(201,169,97,.12)";
-      footSectors += sectorPath(R0 - 1, R0 - 12, base + fi * degFoot, base + (fi + 1) * degFoot)
-        .replace("/>", ` fill="${fill}" opacity="0.92"/>`);
+      footSectors += sectorPath(R0 - 1, R0 - 7, base + fi * degFoot, base + (fi + 1) * degFoot)
+        .replace("/>", ` fill="${fill}" opacity="0.9"/>`);
       if (fi > 0) {
         // 通常の足目盛り／またがり境界とも短い細線（長い放射線は重ねない）
-        footTicks += spoke(R0 - 10, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
+        footTicks += spoke(R0 - 6, R0, base + fi * degFoot, `${gold}.4)`, 0.55);
       }
     }
     // 宿境界（長め）も同心円と同程度の細さ
@@ -1088,8 +1088,8 @@ function buildSenseibanSVG() {
     ${elemSectors}
     ${planetSectors}
     ${palaceSectors}
-    ${elemLabels}
     ${footSectors}
+    ${elemLabels}
     ${circle(R0, "rgba(232,200,96,.55)", 1.2)}
     ${footTicks}
     ${circle(R1, "rgba(232,200,96,.4)", 0.9)}
