@@ -2210,20 +2210,22 @@ html, body {
 }
 #hero-compass-bg.loaded { opacity: 1; }
 #hero-compass-bg svg {
-  width: min(600px, 140vw);
-  height: min(600px, 140vw);
+  width: min(660px, 154vw);
+  height: min(660px, 154vw);
   overflow: visible;
+  /* 盤全体をゆっくり反時計回り 100秒/周 */
+  animation: compassSlowCCW 100s linear infinite;
+  transform-origin: center center;
 }
 /* 外リング：ゆっくり時計回り */
 @keyframes compassSlowCW  { from { transform: rotate(0deg);   } to { transform: rotate(360deg);  } }
 /* 中リング：ゆっくり反時計回り */
 @keyframes compassSlowCCW { from { transform: rotate(0deg);   } to { transform: rotate(-360deg); } }
-/* 固定層：静止（宿・12宮・惑星・エレメント） */
-#compass-fixed { /* static */ }
-/* 回転層：宿＋運気ラベルが一緒にゆっくり反時計回り 100秒/周 */
-#compass-ring-compat { animation: compassSlowCCW 100s linear infinite; transform-origin: 220px 220px; }
 /* 日付リングは削除済み */
 #compass-ring-date { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  #hero-compass-bg svg { animation: none; }
+}
 /* heroコンテンツはz-index:1で前面に */
 .hero-eyebrow, .hero-title, .hero-sub { position: relative; z-index: 1; }
 
@@ -2424,7 +2426,7 @@ html, body {
     <!-- JS で buildCompassBgSVG() の結果を挿入 -->
   </div>
   <div class="hero-eyebrow">SUKUYO · BIRTH STAR READING</div>
-  <h1 class="hero-title">宿曜占い</h1>
+  <h1 class="hero-title">宿曜占星術の世界へようこそ</h1>
   <p class="hero-sub">
     生年月日から本命宿を導き、自分自身を、あるいは<br>
     人と人・人と法人との縁を、宿曜の観点で読み解きます
@@ -3887,23 +3889,25 @@ const PLANET_ICONS = {
   "PL": `<circle cx="-1" cy="3" r="4" stroke="${_ICON_S}" stroke-width="1.2" fill="none"/><line x1="-1" y1="-1" x2="-1" y2="-7" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="-4" y1="-4" x2="2" y2="-4" stroke="${_ICON_S}" stroke-width="1.2"/><line x1="4" y1="-1" x2="7" y2="-7" stroke="${_ICON_S}" stroke-width="1.2"/>`,
 };
 
-// ─ 背景羅針盤SVG（ゴールド線画・装飾専用） ─
+// ─ 背景羅針盤SVG（従来のゴールド線画デザイン＋占星盤と同じ配置・罫線） ─
 function buildCompassBgSVG() {
   const cx = 220, cy = 220, vb = 440;
-  const N = 27, Np = 12;
-  const gold     = "rgba(201,169,97,";  // ゴールドベース
+  const N = 27;
+  const gold = "rgba(201,169,97,";
+  const Q_SHORT = { 活動: "活", 不動: "不", 柔軟: "柔" };
 
-  // 半径
-  const R0 = 214;  // 最外縁（目盛りリング）
-  const R1 = 196;  // 宮帯外縁
-  const R2 = 164;  // 宮帯内縁／惑星帯外縁
-  const R3 = 132;  // 惑星帯内縁／宿帯外縁
-  const R4 = 108;  // 宿帯内縁／内リング外縁
-  const R5 =  76;  // 内リング内縁
-  const R6 =  44;  // 中心円
+  // 外→内: エレメント / 惑星 / 宮 / 27宿 / 運気（占星盤と同じ帯順）
+  const R0 = 214, R1 = 192, R2 = 162, R3 = 132, R4 = 108, R5 = 76, R6 = 44;
+  const R_ELEM = (R0 + R1) / 2;
+  const R_PLANET = (R1 + R2) / 2;
+  const R_PALACE = (R2 + R3) / 2;
+  const R_SHUKU = (R3 + R4) / 2;
+  const R_COMPAT = (R4 + R5) / 2;
 
+  function slotDeg(i, n) { return (i / n) * 360; }
+  // 占星盤と同じ座標系（deg増加＝反時計）
   function pt(r, deg) {
-    const rad = (deg - 90) * Math.PI / 180;
+    const rad = (-deg - 90) * Math.PI / 180;
     return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
   }
   function circle(r, stroke, sw, fill) {
@@ -3913,113 +3917,105 @@ function buildCompassBgSVG() {
     const p1 = pt(r1, deg), p2 = pt(r2, deg);
     return `<line x1="${p1.x.toFixed(1)}" y1="${p1.y.toFixed(1)}" x2="${p2.x.toFixed(1)}" y2="${p2.y.toFixed(1)}" stroke="${stroke}" stroke-width="${sw}"/>`;
   }
-  // アイコン＋名前を横並び1行で描画
-  function dualRing(syms, names, r, fontSize, _symColor, labelColor, iconMap) {
-    const sc      = fontSize / 16;
+  // アイコン＋名前（従来デザイン）。角度は占星盤の宮中央に合わせる
+  function dualRingAt(syms, names, angles, r, fontSize, labelColor, iconMap) {
+    const sc = fontSize / 16;
     const iconOff = -(fontSize * 0.7);
     const nameOff = fontSize * 0.85;
     const nameSize = (fontSize * 0.75).toFixed(1);
     return syms.map((sym, i) => {
-      const deg = (i / syms.length) * 360 + (180 / syms.length);
-      const p   = pt(r, deg);
+      const deg = angles[i];
+      const p = pt(r, deg);
       const iconPath = iconMap ? iconMap[sym] : null;
-      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${deg.toFixed(1)})">` +
+      return `<g transform="translate(${p.x.toFixed(1)},${p.y.toFixed(1)}) rotate(${(-deg).toFixed(1)})">` +
         (iconPath ? `<g transform="translate(${iconOff.toFixed(1)},0) scale(${sc.toFixed(3)})">${iconPath}</g>` : "") +
         `<text x="${nameOff.toFixed(1)}" y="0" font-size="${nameSize}" fill="${labelColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle">${names[i]}</text>` +
         `</g>`;
     }).join("");
   }
-
-  // 日本語テキストリング（宿名・相性ラベル等）
-  function labelRing(items, r, fontSize, fillColor) {
+  function labelRing(items, r, fontSize, fillColor, halfSlot = true) {
+    const step = 360 / items.length;
     return items.map((label, i) => {
-      const deg = (i / items.length) * 360 + (180 / items.length);
+      const deg = slotDeg(i, items.length) + (halfSlot ? step / 2 : 0);
       const p = pt(r, deg);
-      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fillColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${deg.toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
+      return `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" font-size="${fontSize}" fill="${fillColor}" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-deg).toFixed(1)} ${p.x.toFixed(1)} ${p.y.toFixed(1)})">${label}</text>`;
     }).join("");
   }
 
+  const degShuku = 360 / N;
+  const palaceAngles = PALACE_DATA.map((_, i) => {
+    const aStart = palaceStartDeg(i, degShuku);
+    const aEnd = palaceStartDeg((i + 1) % PALACE_DATA.length, degShuku);
+    let end = aEnd;
+    if (end <= aStart) end += 360;
+    return { aStart, aEnd, aMid: (aStart + end) / 2 % 360 };
+  });
+  const palaceMids = palaceAngles.map(a => a.aMid);
 
-  // 12宮記号
-  const palaceSyms   = PALACE_DATA.map(p => p.sym);
-  const palaceNames  = PALACE_DATA.map(p => p.name);  // 「羊宮」のままフル表示
-  const planetSyms   = PALACE_DATA.map(p => p.planetSym);
-  // 27宿名（短縮）
-  const shukuNames   = SHUKU.map(s => s.kanji.replace("宿",""));
-  // 相性ラベル（運気：栄・命・親…）
-  const compatLabels = COMPAT_TABLE.map(r => r.key);
-
-  // 27宿 仕切り線（宿帯R3〜R4の範囲）
-  let spokes27 = "";
-  for (let i = 0; i < N; i++) {
-    const deg = i * (360 / N);
-    spokes27 += spoke(R3, R4, deg, `${gold}.18)`, 0.5);
+  // 罫線：108足の宮境界（R0〜R3）＋27宿仕切り（R3〜R4）＋外周4足目盛り
+  let palaceBoundaries = "", spokes27 = "", footTicks = "", elemLabels = "";
+  palaceAngles.forEach(({ aStart, aMid }, i) => {
+    palaceBoundaries += spoke(R0, R3, aStart, `${gold}.22)`, 0.5);
+    const p = PALACE_DATA[i];
+    const q = Q_SHORT[p.quality] || (p.quality || "").charAt(0);
+    const ep = pt(R_ELEM, aMid);
+    elemLabels += `<text x="${ep.x.toFixed(1)}" y="${ep.y.toFixed(1)}" font-size="10" fill="${gold}.55)" font-family="'Shippori Mincho','Noto Serif JP',serif" text-anchor="middle" dominant-baseline="middle" transform="rotate(${(-aMid).toFixed(1)} ${ep.x.toFixed(1)} ${ep.y.toFixed(1)})">${p.element}(${q})</text>`;
+  });
+  const degFoot = degShuku / 4;
+  for (let si = 0; si < N; si++) {
+    const base = si * degShuku;
+    for (let fi = 1; fi < 4; fi++) {
+      footTicks += spoke(R0 - 6, R0, base + fi * degFoot, `${gold}.2)`, 0.4);
+    }
+    footTicks += spoke(R0 - 10, R0, base, `${gold}.35)`, 0.55);
+    spokes27 += spoke(R3, R4, base, `${gold}.18)`, 0.5);
   }
 
-  // 12宮帯の細い区切り目盛り（装飾）
-  let ticks = "";
-  for (let i = 0; i < 120; i++) {
-    const deg = i * 3;
-    const isMain = i % 10 === 0;
-    ticks += spoke(R0 - (isMain ? 10 : 5), R0, deg, `${gold}${isMain ? ".5)" : ".2)"}`, isMain ? 0.8 : 0.4);
-  }
+  const palaceSyms = PALACE_DATA.map(p => p.sym);
+  const palaceNames = PALACE_DATA.map(p => p.name);
+  const planetSyms = PALACE_DATA.map(p => p.planetSym);
+  const planetNames = PALACE_DATA.map(p => p.planet);
+  const shukuNames = SHUKU.map(s => s.kanji.replace("宿", ""));
+  // 運気：占星盤と同じ並び（ローカル0°=命）。半マスずらさない
+  const compatDisplay = Array.from({ length: N }, (_, i) => COMPAT_TABLE[(27 - i) % 27].key);
 
-  // 中心：命業胎を指す正三角形（運気ラベル直下の内円 R5 まで。漢字には重ねない）
-  // labelRing と同じ角度: deg = i * (360/N) + 180/N
-  const slotHalf = 180 / N;
-  const meiDeg = 0 * (360 / N) + slotHalf;   // 命
-  const taiDeg = 9 * (360 / N) + slotHalf;   // 胎
-  const gyoDeg = 18 * (360 / N) + slotHalf;  // 業
-  const labelR = (R4 + R5) / 2;              // 命・胎・業テキストの半径（参照用）
-  const triR = R5;                           // 頂点はテキスト直下の内円まで
-  const meiPt = pt(triR, meiDeg);
-  const taiPt = pt(triR, taiDeg);
-  const gyoPt = pt(triR, gyoDeg);
-  const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)}`;
-  // 罫線は内円（R5）と同じ色・太さ
+  // 命・業・胎は12時・120°・240°（占星盤と同じ）
+  const meiPt = pt(R5, 0);
+  const gyoPt = pt(R5, 120);
+  const taiPt = pt(R5, 240);
+  const triPts = `${meiPt.x.toFixed(1)},${meiPt.y.toFixed(1)} ${gyoPt.x.toFixed(1)},${gyoPt.y.toFixed(1)} ${taiPt.x.toFixed(1)},${taiPt.y.toFixed(1)}`;
   const ringStroke = `${gold}.25)`;
   const ringSw = 0.6;
 
   return `
 <svg viewBox="0 0 ${vb} ${vb}" xmlns="http://www.w3.org/2000/svg">
-
-  <!-- ══ 固定層：エレメント帯 / 12宮 / 惑星 / 27宿 ══ -->
   <g id="compass-fixed">
-    <!-- 最外縁リング・目盛り -->
-    ${circle(R0,      `${gold}.4)`,  1)}
-    ${circle(R0 - 24, `${gold}.15)`, 0.4)}
-    ${ticks}
-
-    <!-- 12宮帯（記号＋宮名） -->
+    ${circle(R0, `${gold}.4)`, 1)}
     ${circle(R1, `${gold}.25)`, 0.6)}
-    ${circle(R2, `${gold}.2)`,  0.5)}
-    ${Array.from({length:Np}, (_,i) => spoke(R1, R2, i*(360/Np), `${gold}.2)`, 0.5)).join("")}
-    ${dualRing(palaceSyms, palaceNames, (R1+R2)/2, 12, `${gold}.9)`, `${gold}.7)`, PALACE_ICONS)}
+    ${footTicks}
+    ${palaceBoundaries}
+    ${elemLabels}
 
-    <!-- 惑星帯（記号＋惑星名） -->
-    ${circle(R3, `${gold}.2)`, 0.5)}
-    ${Array.from({length:Np}, (_,i) => spoke(R2, R3, i*(360/Np), `${gold}.15)`, 0.4)).join("")}
-    ${dualRing(planetSyms, PALACE_DATA.map(p => p.planet), (R2+R3)/2, 10, `${gold}.85)`, `${gold}.6)`, PLANET_ICONS)}
+    ${circle(R2, `${gold}.2)`, 0.5)}
+    ${dualRingAt(planetSyms, planetNames, palaceMids, R_PLANET, 10, `${gold}.6)`, PLANET_ICONS)}
 
-    <!-- 27宿帯 -->
+    ${circle(R3, `${gold}.25)`, 0.6)}
+    ${dualRingAt(palaceSyms, palaceNames, palaceMids, R_PALACE, 12, `${gold}.7)`, PALACE_ICONS)}
+
     ${circle(R4, `${gold}.3)`, 0.8)}
     ${spokes27}
+    ${labelRing(shukuNames, R_SHUKU, 10, `${gold}.65)`)}
   </g>
 
-  <!-- ══ 回転層：宿リング＋運気ラベル＋命業胎三角形 ══ -->
   <g id="compass-ring-compat">
-    ${labelRing(shukuNames,   (R3+R4)/2,   10, `${gold}.65)`)}
     ${circle(R5, ringStroke, ringSw)}
-    ${labelRing(compatLabels, labelR,   11, `${gold}.45)`)}
-    <!-- 命・胎・業の直下の内円（R5）まで伸ばした正三角形（漢字には重ねない） -->
+    ${labelRing(compatDisplay, R_COMPAT, 11, `${gold}.45)`, false)}
     <polygon points="${triPts}" fill="none" stroke="${ringStroke}" stroke-width="${ringSw}" stroke-linejoin="round"/>
   </g>
 
-  <!-- 中心円（固定の枠） -->
   ${circle(R5, ringStroke, ringSw)}
-  ${circle(R6, `${gold}.5)`,  1.2)}
+  ${circle(R6, `${gold}.5)`, 1.2)}
 </svg>`;
-
 }
 
 function renderPalaceWheel() {
@@ -4034,8 +4030,8 @@ function renderPalaceWheel() {
 /* ── 左右余白の天体回転（スタートレイル風） ─────────────── */
 function buildHeroStarfieldSVG() {
   const vb = 1000, cx = 500, cy = 500;
-  // 中央羅針盤（約600px）から大きく空けた外側リングのみ
-  const rMin = 310;
+  // 中央羅針盤（約660px）から大きく空けた外側リングのみ
+  const rMin = 341;
   const rMax = 490;
   const gold = "rgba(201,169,97,";
   const moon = "rgba(232,224,245,";
