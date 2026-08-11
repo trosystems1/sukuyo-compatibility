@@ -1378,6 +1378,115 @@ html, body {
 }
 .btn-retry:hover { border-color: var(--gold); color: var(--gold); }
 
+/* ── 書籍セクション（トップ下部・白背景） ─────────────── */
+.books-section {
+  background: #fff;
+  padding: 56px 20px 72px;
+  border-top: 1px solid rgba(26,20,38,.06);
+}
+.books-section-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+.books-section-head {
+  text-align: center;
+  margin-bottom: 32px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(201,169,97,.22);
+}
+.books-eyebrow {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: .35em;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+.books-heading {
+  font-family: 'Shippori Mincho', serif;
+  font-size: clamp(22px, 3.5vw, 28px);
+  font-weight: 500;
+  letter-spacing: .08em;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+.books-lead {
+  font-size: 14.5px;
+  line-height: 1.9;
+  color: var(--muted);
+}
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+.book-link {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  background: var(--paper);
+  border: 1px solid rgba(26,20,38,.06);
+  border-radius: var(--r);
+  padding: 18px 18px 18px 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+}
+.book-link:hover {
+  border-color: rgba(201,169,97,.5);
+  background: #faf8fc;
+  transform: translateY(-2px);
+}
+.book-cover {
+  width: 92px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px rgba(26,20,38,.14);
+  background: #eee;
+}
+.book-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 345 / 500;
+  object-fit: cover;
+}
+.book-body { min-width: 0; flex: 1; }
+.book-title {
+  font-family: 'Shippori Mincho', serif;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  line-height: 1.45;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.book-author {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  letter-spacing: .04em;
+}
+.book-blurb {
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+.book-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  letter-spacing: .08em;
+  color: var(--gold);
+  font-weight: 600;
+}
+.book-link:hover .book-cta { color: #b8953a; }
+@media (max-width: 700px) {
+  .book-cover { width: 84px; }
+}
+
 /* ── Footer ───────────────────────────────────────────── */
 .site-footer {
   background: var(--deep);
@@ -2402,7 +2511,7 @@ html, body {
   <div class="sep">｜</div>
   <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav" id="header-nav">
-    <a href="sukuyo-about.html" id="nav-sukuyo-about" class="nav-link">宿曜とは</a>
+    <a href="sukuyo-about.html" id="nav-sukuyo-about" class="nav-link">宿曜占星術とは</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
     <a href="senseiban.html" id="nav-senseiban" class="nav-link">占星盤</a>
     <a href="#" id="nav-element" class="nav-link">エレメント</a>
@@ -2725,6 +2834,44 @@ html, body {
 
 </main>
 
+  <!-- 書籍セクション -->
+  <section class="books-section" id="books-section" aria-labelledby="books-heading">
+    <div class="books-section-inner">
+      <header class="books-section-head">
+        <div class="books-eyebrow">BOOKS</div>
+        <h2 class="books-heading" id="books-heading">書籍</h2>
+        <p class="books-lead">
+          宿曜占星術の第一人者・竹本光晴の著作です。<br>
+          本命宿の先にある世界を、一冊ずつひらいてください。
+        </p>
+      </header>
+      <div class="books-grid">
+        <a class="book-link" href="https://amzn.asia/d/0iZLVT5g" target="_blank" rel="noopener noreferrer">
+          <div class="book-cover">
+            <img src="assets/books/sukuyo-taizen.jpg" alt="宿曜大全 表紙" width="345" height="500" loading="lazy">
+          </div>
+          <div class="book-body">
+            <div class="book-title">宿曜大全</div>
+            <div class="book-author">竹本光晴 著</div>
+            <p class="book-blurb">この一冊で宿曜の全てがわかる決定版。空海の宿曜経を現代に甦らせた叡智の集大成。</p>
+            <span class="book-cta">Amazonで見る →</span>
+          </div>
+        </a>
+        <a class="book-link" href="https://amzn.asia/d/04Qo23yx" target="_blank" rel="noopener noreferrer">
+          <div class="book-cover">
+            <img src="assets/books/sukuyo-super-kaiun.jpg" alt="神様・仏様を味方にする 宿曜スーパー開運術 表紙" width="340" height="500" loading="lazy">
+          </div>
+          <div class="book-body">
+            <div class="book-title">神様・仏様を味方にする<br>宿曜スーパー開運術</div>
+            <div class="book-author">竹本光晴 著 / 湯淺嘉崇 神仏監修</div>
+            <p class="book-blurb">七福神・十二神将・本地仏など、あなたを護る神仏を知り、運を味方につける一冊。</p>
+            <span class="book-cta">Amazonで見る →</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
 </div>
 <!-- /Compatibility App -->
 
@@ -2857,7 +3004,7 @@ html, body {
     <h1 class="hero-title">月のルネーション</h1>
     <p class="hero-sub">
       占星術やウェルネスの分野で古くから使われてきた「月の満ち欠け」を、<br>
-      旧暦・宿曜占星術と重ね合わせた竹本先生独自のメソッドです。
+      旧暦・宿曜占星術と重ね合わせた独自のメソッドです。
     </p>
   </div>
 
