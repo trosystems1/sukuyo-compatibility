@@ -267,6 +267,50 @@ html, body {
 .gtag-btn { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 20px; padding: 4px 12px; font-size: 13px; cursor: pointer; font-family: inherit; transition: all var(--transition); }
 .gtag-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
 .gtag-badge { display: inline-block; font-size: 11px; border: 1px solid var(--border); border-radius: 10px; padding: 1px 7px; color: var(--muted); margin-left: 4px; }
+.mypage-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  margin: 4px 0 22px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+.mypage-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 12px 10px;
+  font-family: 'Shippori Mincho', serif;
+  font-size: 15.5px;
+  letter-spacing: .08em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.mypage-tab + .mypage-tab { border-left: 1px solid var(--border); }
+.mypage-tab:hover { color: var(--ink); background: rgba(184,149,58,.06); }
+.mypage-tab.active {
+  color: var(--moon);
+  background: var(--deep);
+}
+.mypage-tab-count {
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 11.5px;
+  letter-spacing: .02em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 1px 7px;
+  opacity: .85;
+  white-space: nowrap;
+}
+.mypage-panel { display: none; }
+.mypage-panel.active { display: block; }
 .mypage-me { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--r); background: linear-gradient(135deg, var(--deep) 0%, var(--deep2) 100%); }
 .mypage-me-kanji { font-family: 'Shippori Mincho', serif; font-size: 35px; color: var(--gold-l); line-height: 1.1; white-space: nowrap; }
 .mypage-me-info { min-width: 0; }
@@ -288,17 +332,50 @@ html, body {
 .gchip.selected { border-color: var(--gold-l); color: var(--gold-l); box-shadow: 0 0 8px var(--gold-dim); }
 .book-hint { font-size: 12.5px; color: var(--muted); margin-bottom: 20px; line-height: 1.7; }
 .book-list { border-top: 1px solid var(--border); padding-top: 14px; margin-bottom: 18px; }
+.book-list-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
 .book-list-title { font-size: 14px; color: var(--ink); letter-spacing: .08em; margin-bottom: 8px; font-weight: 600; }
+.book-list-head .book-list-title { margin-bottom: 0; }
+.book-list-meta { font-size: 12.5px; color: var(--muted); }
+.book-search {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14.5px;
+  background: #fff;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+.book-people-scroll {
+  max-height: min(420px, 55vh);
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2px 10px;
+  background: rgba(255,255,255,.55);
+}
 .book-empty { font-size: 13.5px; color: var(--muted); padding: 6px 0; }
 .book-row { display: flex; align-items: center; gap: 8px; padding: 7px 2px; border-bottom: 1px dashed var(--border); font-size: 14px; }
+.book-row:last-child { border-bottom: none; }
 .book-row-name { font-weight: 600; white-space: nowrap; }
-.book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; }
+.book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .book-del { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; font-size: 12px; padding: 3px 9px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .book-del:hover { border-color: #b04040; color: #b04040; }
 .book-add { border-top: 1px solid var(--border); padding-top: 14px; }
 .book-add input[type="text"] { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-family: inherit; font-size: 15px; background: #fff; color: var(--ink); margin-bottom: 10px; }
 .book-add-actions { display: flex; align-items: center; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
 .book-me-check { font-size: 13.5px; color: var(--muted); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+.book-capacity { font-size: 13px; color: var(--muted); margin: 0 0 10px; line-height: 1.6; }
+.book-capacity.full { color: #a04545; }
+#btn-book-add:disabled { opacity: .45; cursor: not-allowed; }
 .save-person { margin-top: 18px; padding: 14px; border: 1px dashed var(--border); border-radius: var(--r); display: none; }
 .save-person.show { display: block; }
 .save-person-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -2881,113 +2958,130 @@ html, body {
   <div class="card" id="book-card">
     <div class="card-title">マイページ</div>
 
-    <!-- わたしのプロフィール -->
-    <div id="mypage-profile"></div>
-
-    <!-- 宿曜こよみ ── 「わたし」の生年月日と自動連携（再入力不要） -->
-    <div class="card moon-rune-intro-card" id="mypage-koyomi-card">
-      <div class="card-title">🌙 宿曜こよみ</div>
-      <div id="mypage-koyomi-empty" class="mypage-empty">
-        「わたし」の生年月日を登録すると、ここにあなた専用のこよみ（毎日の宿と月の満ち欠け）が表示されます。
-      </div>
-      <div id="mypage-koyomi-content">
-        <p class="moon-rune-intro-text" id="koyomi-gate-info"></p>
-        <div class="koyomi-head">
-          <button class="koyomi-nav-btn" id="koyomi-prev" aria-label="前の月">◀</button>
-          <div class="koyomi-month-label" id="koyomi-month-label"></div>
-          <button class="koyomi-nav-btn" id="koyomi-next" aria-label="次の月">▶</button>
-        </div>
-        <div class="koyomi-week-head">
-          <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
-        </div>
-        <div class="koyomi-grid" id="koyomi-grid"></div>
-        <div class="koyomi-legend">
-          <span><span class="koyomi-lg-today"></span>今日</span>
-          <span><span class="koyomi-lg-gate"></span>あなたのゲート日</span>
-          <span>朔＝旧暦一日（新月・宿の調整日）</span>
-        </div>
-        <div class="koyomi-detail" id="koyomi-detail"></div>
-      </div>
+    <div class="mypage-tabs" id="mypage-tabs" role="tablist" aria-label="マイページの切替">
+      <button type="button" class="mypage-tab active" id="mypage-tab-me" data-tab="me" role="tab" aria-selected="true" aria-controls="mypage-panel-me">わたし</button>
+      <button type="button" class="mypage-tab" id="mypage-tab-people" data-tab="people" role="tab" aria-selected="false" aria-controls="mypage-panel-people">
+        対人 <span class="mypage-tab-count" id="mypage-people-count">0/50</span>
+      </button>
     </div>
 
-    <!-- 関係の占星盤：わたし基準で保存人物との縁を線で描画 -->
-    <div class="card moon-rune-intro-card" id="mypage-senseiban-card">
-      <div class="card-title">☽ 関係の占星盤</div>
-      <div id="mypage-senseiban-empty" class="mypage-empty">
-        「わたし」を登録すると、保存した人物との縁をこの盤の上に線で表示します。<br>
-        公開のインタラクティブ盤は <a href="senseiban.html">占星盤ページ</a> でもご覧いただけます。
-      </div>
-      <div id="mypage-senseiban-content">
-        <p class="book-lead" style="margin-bottom:0;">
-          中央の命・業・胎は固定。外周を回して基準人物の宿を命に合わせ、縁の色の線で人物を示します。
-        </p>
-        <div class="mypage-senseiban-wrap">
-          <div id="mypage-senseiban-holder"></div>
-          <div class="mypage-senseiban-base" id="mypage-senseiban-base"></div>
-          <div class="mypage-senseiban-legend" id="mypage-senseiban-legend"></div>
+    <!-- タブ：わたし（プロフィール＋こよみ） -->
+    <div class="mypage-panel active" id="mypage-panel-me" role="tabpanel" aria-labelledby="mypage-tab-me">
+      <div id="mypage-profile"></div>
+
+      <!-- 宿曜こよみ ── 「わたし」の生年月日と自動連携（再入力不要） -->
+      <div class="card moon-rune-intro-card" id="mypage-koyomi-card">
+        <div class="card-title">🌙 宿曜こよみ</div>
+        <div id="mypage-koyomi-empty" class="mypage-empty">
+          「わたし」の生年月日を登録すると、ここにあなた専用のこよみ（毎日の宿と月の満ち欠け）が表示されます。
         </div>
-        <p class="mypage-senseiban-note">
-          ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。こちらはマイページの人物帳と連携したプライベートな関係図です。
-        </p>
+        <div id="mypage-koyomi-content">
+          <p class="moon-rune-intro-text" id="koyomi-gate-info"></p>
+          <div class="koyomi-head">
+            <button class="koyomi-nav-btn" id="koyomi-prev" aria-label="前の月">◀</button>
+            <div class="koyomi-month-label" id="koyomi-month-label"></div>
+            <button class="koyomi-nav-btn" id="koyomi-next" aria-label="次の月">▶</button>
+          </div>
+          <div class="koyomi-week-head">
+            <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+          </div>
+          <div class="koyomi-grid" id="koyomi-grid"></div>
+          <div class="koyomi-legend">
+            <span><span class="koyomi-lg-today"></span>今日</span>
+            <span><span class="koyomi-lg-gate"></span>あなたのゲート日</span>
+            <span>朔＝旧暦一日（新月・宿の調整日）</span>
+          </div>
+          <div class="koyomi-detail" id="koyomi-detail"></div>
+        </div>
       </div>
     </div>
 
-    <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
-    <p class="book-lead">
-      保存した人たちを、宿曜の9グループ（宿番号の数字根1〜9）に配置した盤です。
-      同じマスの人とは命・業・胎の深い縁。グループ番号の差だけで、すべての関係が決まります。
-    </p>
-    <div class="gtag-filter" id="gtag-filter">
-      <button type="button" class="gtag-btn active" data-tag="all">すべて</button>
-      <button type="button" class="gtag-btn" data-tag="family">家族</button>
-      <button type="button" class="gtag-btn" data-tag="work">仕事</button>
-      <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
-    </div>
-    <div class="book-viewpoint" id="book-viewpoint"></div>
-    <div class="gboard" id="gboard"></div>
-    <div class="book-hint">
-      人物を1回タップ＝その人視点の盤に切り替え　／　視点がある状態で別の人物をタップ＝2人の相性を表示　／　視点の人をもう一度タップ＝解除
-    </div>
-    <div class="book-hint" style="margin-top:8px;">
-      <strong>チームビルディングの視点：</strong>命・業・胎の間柄は運勢サイクルがほぼ同じため、良い時は共に上がり、悪い時は一緒に落ちやすい関係です。チームには栄親・危成のサポーターを混ぜるとバランスが取れます。また、同じ宿同士は近すぎて衝突しやすいため、距離を置く・役割を分けるなどの「希釈」が有効です。
-    </div>
+    <!-- タブ：対人（占星盤＋人物帳・最大50名） -->
+    <div class="mypage-panel" id="mypage-panel-people" role="tabpanel" aria-labelledby="mypage-tab-people">
+      <!-- 関係の占星盤：わたし基準で保存人物との縁を線で描画 -->
+      <div class="card moon-rune-intro-card" id="mypage-senseiban-card">
+        <div class="card-title">☽ 関係の占星盤</div>
+        <div id="mypage-senseiban-empty" class="mypage-empty">
+          「わたし」を登録すると、保存した人物との縁をこの盤の上に線で表示します。<br>
+          公開のインタラクティブ盤は <a href="senseiban.html">占星盤ページ</a> でもご覧いただけます。
+        </div>
+        <div id="mypage-senseiban-content">
+          <p class="book-lead" style="margin-bottom:0;">
+            中央の命・業・胎は固定。外周を回して基準人物の宿を命に合わせ、縁の色の線で人物を示します。
+          </p>
+          <div class="mypage-senseiban-wrap">
+            <div id="mypage-senseiban-holder"></div>
+            <div class="mypage-senseiban-base" id="mypage-senseiban-base"></div>
+            <div class="mypage-senseiban-legend" id="mypage-senseiban-legend"></div>
+          </div>
+          <p class="mypage-senseiban-note">
+            ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。こちらはマイページの人物帳と連携したプライベートな関係図です。人数が多いときはタグで絞り込みください。
+          </p>
+        </div>
+      </div>
 
-    <div class="book-list">
-      <div class="book-list-title">保存した人物</div>
-      <div id="book-people"></div>
-    </div>
-
-    <div class="book-add">
-      <div class="book-list-title">人物を追加</div>
-      <input type="text" id="book-add-name" maxlength="20" placeholder="名前（例：A部長）" aria-label="名前">
-      <div class="gtag-pick" id="book-add-tags">
+      <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
+      <p class="book-lead">
+        対人を最大50名まで登録できます。宿曜の9グループ（宿番号の数字根1〜9）に配置した盤で、関係を一覧できます。
+        同じマスの人とは命・業・胎の深い縁。グループ番号の差だけで、すべての関係が決まります。
+      </p>
+      <div class="gtag-filter" id="gtag-filter">
+        <button type="button" class="gtag-btn active" data-tag="all">すべて</button>
         <button type="button" class="gtag-btn" data-tag="family">家族</button>
         <button type="button" class="gtag-btn" data-tag="work">仕事</button>
         <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
       </div>
-      <div class="input-mode-toggle" id="input-mode-toggle-book" style="margin-bottom:10px;">
-        <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
-        <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+      <div class="book-viewpoint" id="book-viewpoint"></div>
+      <div class="gboard" id="gboard"></div>
+      <div class="book-hint">
+        人物を1回タップ＝その人視点の盤に切り替え　／　視点がある状態で別の人物をタップ＝2人の相性を表示　／　視点の人をもう一度タップ＝解除
       </div>
-      <div class="date-select-row" id="date-select-book">
-        <select class="date-select" id="book-date-year" aria-label="年"></select>
-        <span class="date-select-unit">年</span>
-        <select class="date-select" id="book-date-month" aria-label="月"></select>
-        <span class="date-select-unit">月</span>
-        <select class="date-select" id="book-date-day" aria-label="日"></select>
-        <span class="date-select-unit">日</span>
+      <div class="book-hint" style="margin-top:8px;">
+        <strong>チームビルディングの視点：</strong>命・業・胎の間柄は運勢サイクルがほぼ同じため、良い時は共に上がり、悪い時は一緒に落ちやすい関係です。チームには栄親・危成のサポーターを混ぜるとバランスが取れます。また、同じ宿同士は近すぎて衝突しやすいため、距離を置く・役割を分けるなどの「希釈」が有効です。
       </div>
-      <select id="shuku-book-select" class="date-input" style="display:none;">
-        <option value="">宿を選択してください</option>
-      </select>
-      <div class="book-add-actions">
-        <button class="btn-submit" id="btn-book-add" style="flex:1;">
-          <span>☆</span>
-          <span>追加する</span>
-        </button>
-        <label class="book-me-check"><input type="checkbox" id="book-add-isme"> わたしとして登録</label>
+
+      <div class="book-list">
+        <div class="book-list-head">
+          <div class="book-list-title">保存した人物</div>
+          <div class="book-list-meta" id="book-list-meta"></div>
+        </div>
+        <input type="search" class="book-search" id="book-search" placeholder="名前で検索" aria-label="名前で検索" autocomplete="off">
+        <div class="book-people-scroll" id="book-people"></div>
       </div>
-      <div class="error-msg" id="book-error"></div>
+
+      <div class="book-add">
+        <div class="book-list-title">人物を追加</div>
+        <p class="book-capacity" id="book-capacity">あと50名まで登録できます。</p>
+        <input type="text" id="book-add-name" maxlength="20" placeholder="名前（例：A部長）" aria-label="名前">
+        <div class="gtag-pick" id="book-add-tags">
+          <button type="button" class="gtag-btn" data-tag="family">家族</button>
+          <button type="button" class="gtag-btn" data-tag="work">仕事</button>
+          <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
+        </div>
+        <div class="input-mode-toggle" id="input-mode-toggle-book" style="margin-bottom:10px;">
+          <button type="button" class="mode-btn active" data-mode="date">生年月日</button>
+          <button type="button" class="mode-btn" data-mode="shuku">宿で選ぶ</button>
+        </div>
+        <div class="date-select-row" id="date-select-book">
+          <select class="date-select" id="book-date-year" aria-label="年"></select>
+          <span class="date-select-unit">年</span>
+          <select class="date-select" id="book-date-month" aria-label="月"></select>
+          <span class="date-select-unit">月</span>
+          <select class="date-select" id="book-date-day" aria-label="日"></select>
+          <span class="date-select-unit">日</span>
+        </div>
+        <select id="shuku-book-select" class="date-input" style="display:none;">
+          <option value="">宿を選択してください</option>
+        </select>
+        <div class="book-add-actions">
+          <button class="btn-submit" id="btn-book-add" style="flex:1;">
+            <span>☆</span>
+            <span>追加する</span>
+          </button>
+          <label class="book-me-check"><input type="checkbox" id="book-add-isme"> わたしとして登録</label>
+        </div>
+        <div class="error-msg" id="book-error"></div>
+      </div>
     </div>
   </div>
     <div class="retry-wrap" style="margin-top:24px;">
@@ -4404,11 +4498,14 @@ let lastCompatResult = null; // 直前の相性結果（A/B/compat）。視点�
 
 /* ── 人物帳（9グループ盤）用の状態 ─────────────────────── */
 const BOOK_KEY = "sukuyo_people_v1";
+const BOOK_MAX_PEOPLE = 50;    // マイページ「対人」の登録上限（わたし含む）
 let resultSource = "form";     // 直前の結果の出どころ: "self" | "form" | "book"
 let bookPairNames = null;      // 人物帳ペア表示時の名前 { a, b }
 let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m, d }
 let lastCompatB = null;        // 相性占いのB側入力日付 { y, m, d } | null
 let bookViewpointId = null;    // 盤の視点になっている人物ID
+let mypageTab = "me";          // "me" | "people"
+let bookSearchQuery = "";      // 対人リストの名前検索
 let inputMode = { self: "date", a: "date", b: "date", book: "date" }; // "date" | "shuku"
 let saveSelectedTag = null;    // 結果ページ保存UIで選択中のタグ（早期宣言）
 
@@ -6269,7 +6366,24 @@ function initBookViewpoint() {
 }
 
 /* ── マイページの表示／非表示（ヘッダー右上から遷移） ───── */
-function showMypage() {
+function selectMypageTab(tab) {
+  mypageTab = tab === "people" ? "people" : "me";
+  document.querySelectorAll("#mypage-tabs .mypage-tab").forEach(btn => {
+    const on = btn.dataset.tab === mypageTab;
+    btn.classList.toggle("active", on);
+    btn.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.getElementById("mypage-panel-me")?.classList.toggle("active", mypageTab === "me");
+  document.getElementById("mypage-panel-people")?.classList.toggle("active", mypageTab === "people");
+}
+
+document.getElementById("mypage-tabs")?.addEventListener("click", (e) => {
+  const btn = e.target.closest(".mypage-tab");
+  if (!btn) return;
+  selectMypageTab(btn.dataset.tab);
+});
+
+function showMypage(opts) {
   // 他ページ・結果表示を閉じる
   document.getElementById("compat-app").classList.add("hide");
   document.getElementById("moon-rune-page").classList.remove("show");
@@ -6279,6 +6393,9 @@ function showMypage() {
   document.getElementById("nav-element")?.classList.remove("active");
   document.getElementById("nav-moon-rune").classList.remove("active");
   document.getElementById("result").classList.remove("show");
+
+  if (opts && opts.tab) selectMypageTab(opts.tab);
+  else selectMypageTab(mypageTab);
 
   initBookViewpoint();
   renderBook();
@@ -6376,13 +6493,17 @@ function renderMypageSenseiban(list, vp) {
     if (visibleOthers.length === 0) {
       legend.innerHTML = `<span class="mypage-senseiban-chip">まだ他の人物がいないか、タグで隠れています</span>`;
     } else {
-      legend.innerHTML = visibleOthers.map(p => {
+      const LEGEND_MAX = 24;
+      const shown = visibleOthers.slice(0, LEGEND_MAX);
+      legend.innerHTML = shown.map(p => {
         const rel = getRelation(baseIdx, p.shukuIdx);
         return `<span class="mypage-senseiban-chip">
           <span class="mypage-senseiban-dot" style="background:${rel.color}"></span>
           ${escapeHtml(p.name)} · ${SHUKU[p.shukuIdx].kanji.replace("宿","")} · ${rel.key}
         </span>`;
-      }).join("");
+      }).join("") + (visibleOthers.length > LEGEND_MAX
+        ? `<span class="mypage-senseiban-chip">ほか ${visibleOthers.length - LEGEND_MAX} 名（タグ・検索で絞り込み）</span>`
+        : "");
     }
   }
 }
@@ -6625,12 +6746,36 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
 }
 
 /* ── 盤・人物リストの描画 ─────────────────────────────── */
+function updateBookCapacityUI(list) {
+  const n = list.length;
+  const remain = Math.max(0, BOOK_MAX_PEOPLE - n);
+  const full = n >= BOOK_MAX_PEOPLE;
+
+  const countEl = document.getElementById("mypage-people-count");
+  if (countEl) countEl.textContent = `${n}/${BOOK_MAX_PEOPLE}`;
+
+  const metaEl = document.getElementById("book-list-meta");
+  if (metaEl) metaEl.textContent = `${n} / ${BOOK_MAX_PEOPLE} 名`;
+
+  const capEl = document.getElementById("book-capacity");
+  if (capEl) {
+    capEl.classList.toggle("full", full);
+    capEl.textContent = full
+      ? `登録上限（${BOOK_MAX_PEOPLE}名）に達しています。追加するには既存の人物を削除してください。`
+      : `あと${remain}名まで登録できます（最大${BOOK_MAX_PEOPLE}名）。`;
+  }
+
+  const addBtn = document.getElementById("btn-book-add");
+  if (addBtn) addBtn.disabled = full;
+}
+
 function renderBook() {
   const list = loadPeople();
   const vp = list.find(p => p.id === bookViewpointId) || null;
 
   updateMypageKoyomi(); // 宿曜こよみ：「わたし」の生年月日と自動連携
   renderMypageSenseiban(list, vp);
+  updateBookCapacityUI(list);
 
   // わたしのプロフィール
   const me = list.find(p => p.isMe) || null;
@@ -6656,10 +6801,12 @@ function renderBook() {
       <div class="mypage-empty">
         まだ「わたし」が登録されていません。<br>
         <a id="mypage-goto-self">☽ 自分を占う</a> から本命宿を調べて「わたしとして保存」するか、
-        下の追加フォームで「わたしとして登録」にチェックを入れてください。
+        <a id="mypage-goto-people-add">対人タブ</a> の追加フォームで「わたしとして登録」にチェックを入れてください。
       </div>`;
     const link = document.getElementById("mypage-goto-self");
     if (link) link.addEventListener("click", () => { hideMypage(); selectTopMode("self"); });
+    const toPeople = document.getElementById("mypage-goto-people-add");
+    if (toPeople) toPeople.addEventListener("click", () => selectMypageTab("people"));
   }
 
   // 視点表示
@@ -6719,14 +6866,18 @@ function renderBook() {
       </div>`;
   }).join("");
 
-  // 人物リスト（フィルタ適用）
+  // 人物リスト（タグ＋名前検索）
+  const q = bookSearchQuery.trim().toLowerCase();
+  const listed = visible.filter(p => !q || String(p.name || "").toLowerCase().includes(q));
   const peopleEl = document.getElementById("book-people");
   if (list.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">保存された人物はまだいません。</div>`;
   } else if (visible.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">このタグの人物はいません。</div>`;
+  } else if (listed.length === 0) {
+    peopleEl.innerHTML = `<div class="book-empty">「${escapeHtml(bookSearchQuery.trim())}」に一致する人物はいません。</div>`;
   } else {
-    peopleEl.innerHTML = visible.map(p => {
+    peopleEl.innerHTML = listed.map(p => {
       const g = groupOfIdx(p.shukuIdx);
       const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "宿のみ登録";
       const tag = tagLabel(p);
@@ -6739,6 +6890,11 @@ function renderBook() {
     }).join("");
   }
 }
+
+document.getElementById("book-search")?.addEventListener("input", (e) => {
+  bookSearchQuery = e.target.value || "";
+  renderBook();
+});
 
 /* ── 盤の人物タップ（視点切替 → 2人目で相性表示） ─────── */
 document.getElementById("gboard").addEventListener("click", (e) => {
@@ -6813,6 +6969,13 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
     return;
   }
 
+  const list = loadPeople();
+  if (list.length >= BOOK_MAX_PEOPLE) {
+    err.textContent = `登録上限（${BOOK_MAX_PEOPLE}名）に達しています。追加するには既存の人物を削除してください。`;
+    err.classList.add("show");
+    return;
+  }
+
   let shuku, y = null, m = null, d = null;
   if (inputMode.book === "date") {
     if (typeof Solar === "undefined") {
@@ -6840,7 +7003,6 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
   }
   const isMe = document.getElementById("book-add-isme").checked;
 
-  const list = loadPeople();
   if (isMe) list.forEach(p => { p.isMe = false; });
   const person = { id: newPersonId(), name, y, m, d, shukuIdx: shuku.index, isMe, tag: bookAddTag };
   list.push(person);
@@ -6851,6 +7013,7 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
   bookAddTag = null;
   clearTagPick("book-add-tags");
   if (isMe || !bookViewpointId) bookViewpointId = person.id;
+  selectMypageTab("people");
   renderBook();
 });
 
@@ -6905,9 +7068,14 @@ document.getElementById("btn-save-person").addEventListener("click", () => {
   }
   if (!person) return;
 
+  const list = loadPeople();
+  if (list.length >= BOOK_MAX_PEOPLE) {
+    note.textContent = `登録上限（${BOOK_MAX_PEOPLE}名）に達しています。マイページの対人タブで削除してから保存してください。`;
+    return;
+  }
+
   person.tag = resultSource === "self" ? null : saveSelectedTag;
   person.id = newPersonId();
-  const list = loadPeople();
   if (person.isMe) list.forEach(p => { p.isMe = false; });
   list.push(person);
   savePeople(list);
@@ -6919,11 +7087,12 @@ document.getElementById("btn-save-person").addEventListener("click", () => {
     try { renderPalaceWheel(); } catch(e) {}
   }
 
+  const gotoTab = person.isMe ? "me" : "people";
   note.innerHTML =
     `「${escapeHtml(person.name)}」を保存しました。 <a id="save-goto-book">マイページで見る →</a>`;
   document.getElementById("save-goto-book").addEventListener("click", () => {
     document.getElementById("result").classList.remove("show");
-    showMypage();
+    showMypage({ tab: gotoTab });
   });
 });
 
@@ -6932,7 +7101,8 @@ function applyLocationHash() {
   const hash = (location.hash || "").replace(/^#/, "");
   if (hash === "moon-rune") showMoonRunePage();
   else if (hash === "astrology") showAstrologyPage();
-  else if (hash === "mypage") showMypage();
+  else if (hash === "mypage" || hash === "mypage/me") showMypage({ tab: "me" });
+  else if (hash === "mypage/people" || hash === "mypage-people") showMypage({ tab: "people" });
   else if (hash.startsWith("shuku=")) {
     const raw = decodeURIComponent(hash.slice("shuku=".length));
     const kanji = raw.endsWith("宿") ? raw : (raw ? raw + "宿" : "");
