@@ -365,8 +365,46 @@ html, body {
 .book-empty { font-size: 13.5px; color: var(--muted); padding: 6px 0; }
 .book-row { display: flex; align-items: center; gap: 8px; padding: 7px 2px; border-bottom: 1px dashed var(--border); font-size: 14px; }
 .book-row:last-child { border-bottom: none; }
+.book-row.is-mei { background: rgba(184,149,58,.08); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
 .book-row-name { font-weight: 600; white-space: nowrap; }
 .book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.book-mei {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 8px 2px 6px;
+  flex-shrink: 0;
+}
+.book-mei:hover { border-color: var(--gold); color: var(--ink); }
+.book-mei.is-on {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+.book-mei input {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  margin: 0;
+  position: relative;
+  flex-shrink: 0;
+}
+.book-mei input:checked::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  background: currentColor;
+}
 .book-del { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; font-size: 12px; padding: 3px 9px; cursor: pointer; font-family: inherit; white-space: nowrap; }
 .book-del:hover { border-color: #b04040; color: #b04040; }
 .book-add { border-top: 1px solid var(--border); padding-top: 14px; }
@@ -6809,17 +6847,19 @@ function renderBook() {
     if (toPeople) toPeople.addEventListener("click", () => selectMypageTab("people"));
   }
 
-  // 視点表示
+  // 視点表示（命の起点。変更は下の「保存した人物」の「命」から）
+  const meiPerson = vp || me;
   const vpEl = document.getElementById("book-viewpoint");
   if (list.length === 0) {
     vpEl.innerHTML = "まだ誰も保存されていません。下のフォームから追加するか、占い結果の「マイページに保存」から登録できます。";
-  } else if (vp) {
-    const g = groupOfIdx(vp.shukuIdx);
+  } else if (meiPerson) {
+    const g = groupOfIdx(meiPerson.shukuIdx);
     vpEl.innerHTML =
-      `視点：<b>${escapeHtml(vp.name)}</b>（${SHUKU[vp.shukuIdx].kanji}・第${g}グループ）` +
-      `　—　各マスはこの人から見た関係です`;
+      `命の視点：<b>${escapeHtml(meiPerson.name)}</b>（${SHUKU[meiPerson.shukuIdx].kanji}・第${g}グループ）` +
+      `　—　各マス・占星盤はこの人を起点にした関係です。<br>` +
+      `<span style="color:var(--muted);font-size:13px;">起点の変更は下の「保存した人物」で「命」を選んでください。</span>`;
   } else {
-    vpEl.innerHTML = "人物をタップすると、その人から見た関係で盤が色づきます。";
+    vpEl.innerHTML = "下の「保存した人物」で「命」を選ぶと、その人視点で盤が色づきます。";
   }
 
   // タグで絞り込み（視点の人物はフィルタに関わらず常に表示）
@@ -6877,12 +6917,18 @@ function renderBook() {
   } else if (listed.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">「${escapeHtml(bookSearchQuery.trim())}」に一致する人物はいません。</div>`;
   } else {
+    const meiId = meiPerson ? meiPerson.id : null;
     peopleEl.innerHTML = listed.map(p => {
       const g = groupOfIdx(p.shukuIdx);
       const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "宿のみ登録";
       const tag = tagLabel(p);
+      const isMei = p.id === meiId;
       return `
-        <div class="book-row">
+        <div class="book-row${isMei ? " is-mei" : ""}">
+          <label class="book-mei${isMei ? " is-on" : ""}" title="この人を命（12時）の起点にする">
+            <input type="radio" name="book-mei" value="${p.id}" ${isMei ? "checked" : ""} aria-label="${escapeHtml(p.name)}を命にする">
+            命
+          </label>
           <span class="book-row-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}${tag ? `<span class="gtag-badge">${tag}</span>` : ""}</span>
           <span class="book-row-meta">${SHUKU[p.shukuIdx].kanji}・第${g}グループ・${dateStr}</span>
           <button type="button" class="book-del" data-del="${p.id}">削除</button>
@@ -6942,7 +6988,17 @@ function showBookPairResult(pA, pB) {
   });
 }
 
-/* ── 人物の削除 ─────────────────────────────────────────── */
+/* ── 命（視点）の切替／人物の削除 ───────────────────────── */
+document.getElementById("book-people").addEventListener("change", (e) => {
+  const radio = e.target.closest('input[name="book-mei"]');
+  if (!radio) return;
+  const pid = radio.value;
+  const list = loadPeople();
+  if (!list.some(x => x.id === pid)) return;
+  bookViewpointId = pid;
+  renderBook();
+});
+
 document.getElementById("book-people").addEventListener("click", (e) => {
   const btn = e.target.closest(".book-del");
   if (!btn) return;
