@@ -3147,7 +3147,8 @@ html, body {
         </div>
         <div id="mypage-senseiban-content">
           <p class="book-lead" style="margin-bottom:0;">
-            中央の命・業・胎は固定。外周を回して基準人物の宿を命に合わせ、縁の色の線で人物を示します。
+            中央の命・業・胎は固定。基準人物の宿を命に合わせ、縁の色の線で人物を示します。<br>
+            盤上に同時表示できる相手は最大8名です。それ以上はタグや検索で絞り込んでください。
           </p>
           <div class="mypage-senseiban-wrap">
             <div id="mypage-senseiban-holder"></div>
@@ -3155,7 +3156,7 @@ html, body {
             <div class="mypage-senseiban-legend" id="mypage-senseiban-legend"></div>
           </div>
           <p class="mypage-senseiban-note">
-            ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。こちらはマイページの人物帳と連携したプライベートな関係図です。人数が多いときはタグで絞り込みください。
+            ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。こちらはマイページの人物帳と連携したプライベートな関係図です。登録は最大50名、盤の同時表示は相手8名までです。
           </p>
         </div>
       </div>
@@ -4723,7 +4724,8 @@ let lastCompatResult = null; // 直前の相性結果（A/B/compat）。視点�
 
 /* ── 人物帳（9グループ盤）用の状態 ─────────────────────── */
 const BOOK_KEY = "sukuyo_people_v1";
-const BOOK_MAX_PEOPLE = 50;    // マイページ「対人」の登録上限（わたし含む）
+const BOOK_MAX_PEOPLE = 50;          // マイページ「対人」の登録上限（わたし含む）
+const SENSEIBAN_MAX_OTHERS = 8;      // 関係の占星盤に同時表示できる相手の上限（基準以外）
 let resultSource = "form";     // 直前の結果の出どころ: "self" | "form" | "book"
 let bookPairNames = null;      // 人物帳ペア表示時の名前 { a, b }
 let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m, d }
@@ -6853,8 +6855,13 @@ function renderMypageSenseiban(list, vp) {
   const baseIdx = basePerson.shukuIdx;
   const others = list.filter(p => p.id !== basePerson.id);
   // タグフィルタ適用（基準本人は常に含む）
-  const visibleOthers = others.filter(p =>
+  const filteredOthers = others.filter(p =>
     bookTagFilter === "all" || p.tag === bookTagFilter);
+  // 盤の可読性のため、同時表示は相手 SENSEIBAN_MAX_OTHERS 名まで
+  const truncated = filteredOthers.length > SENSEIBAN_MAX_OTHERS;
+  const visibleOthers = truncated
+    ? filteredOthers.slice(0, SENSEIBAN_MAX_OTHERS)
+    : filteredOthers;
 
   holder.innerHTML = buildMypageSenseibanSVG(baseIdx, basePerson, visibleOthers);
 
@@ -6862,25 +6869,28 @@ function renderMypageSenseiban(list, vp) {
   if (baseLabel) {
     const s = SHUKU[baseIdx];
     const role = basePerson.isMe && (!vp || vp.id === basePerson.id) ? "わたし" : "視点";
+    const countNote = truncated
+      ? `　<span style="color:var(--muted);font-weight:400;">表示 ${visibleOthers.length}/${filteredOthers.length}名（上限${SENSEIBAN_MAX_OTHERS}名・タグで絞り込み）</span>`
+      : (filteredOthers.length > 0
+        ? `　<span style="color:var(--muted);font-weight:400;">相手 ${filteredOthers.length}/${SENSEIBAN_MAX_OTHERS}名</span>`
+        : "");
     baseLabel.innerHTML =
-      `${role}（命・12時）：<span>${escapeHtml(basePerson.name)} · ${s.kanji}</span>`;
+      `${role}（命・12時）：<span>${escapeHtml(basePerson.name)} · ${s.kanji}</span>${countNote}`;
   }
 
   const legend = document.getElementById("mypage-senseiban-legend");
   if (legend) {
-    if (visibleOthers.length === 0) {
+    if (filteredOthers.length === 0) {
       legend.innerHTML = `<span class="mypage-senseiban-chip">まだ他の人物がいないか、タグで隠れています</span>`;
     } else {
-      const LEGEND_MAX = 24;
-      const shown = visibleOthers.slice(0, LEGEND_MAX);
-      legend.innerHTML = shown.map(p => {
+      legend.innerHTML = visibleOthers.map(p => {
         const rel = getRelation(baseIdx, p.shukuIdx);
         return `<span class="mypage-senseiban-chip">
           <span class="mypage-senseiban-dot" style="background:${rel.color}"></span>
           ${escapeHtml(p.name)} · ${SHUKU[p.shukuIdx].kanji.replace("宿","")} · ${rel.key}
         </span>`;
-      }).join("") + (visibleOthers.length > LEGEND_MAX
-        ? `<span class="mypage-senseiban-chip">ほか ${visibleOthers.length - LEGEND_MAX} 名（タグ・検索で絞り込み）</span>`
+      }).join("") + (truncated
+        ? `<span class="mypage-senseiban-chip">ほか ${filteredOthers.length - SENSEIBAN_MAX_OTHERS} 名は非表示（同時表示は最大${SENSEIBAN_MAX_OTHERS}名／タグ・検索で絞り込み）</span>`
         : "");
     }
   }
@@ -6896,7 +6906,8 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const R_ELEM = (R0 + R1) / 2;
   const R_SHUKU = (R3 + R4) / 2;
   const R_COMPAT = (R4 + R5) / 2;
-  const R_PEOPLE = (R3 + R2) / 2;
+  // ドット＝宿ラベルと同じ半径（宿の文字の上）。名前は外側へ
+  const R_PEOPLE_LABEL = (R2 + R3) / 2;
   const rot = (baseIdx + 0.5) * (360 / N); // 基準宿の中央を12時（命）へ（-deg座標系は正回転）
 
   function slotDeg(i) { return (i / N) * 360; }
@@ -7041,32 +7052,40 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   const goldPointer = pointerArm(0) + pointerArm(120) + pointerArm(240) +
     `<circle cx="${cx}" cy="${cy}" r="${hubR}" fill="#120c24" stroke="#c9a961" stroke-width="1.6"/>`;
 
-  // 命は12時固定。人物は基準からの相対角で配置（外周回転後の見た目に合わせる）
+  // 人物ドットは外周リング内で宿ラベルと同一の局所角に置く → 回転後も必ず宿の文字の上
+  // 線・名前は画面固定層（命=12時）で、見た目角 = 相対スロット角
   const slotCounts = {};
-  let lines = "", markers = "";
-  const meiAnchor = pt(R_PEOPLE, 0);
+  let lines = "", peopleOnShuku = "", nameLabels = "";
+  const meiAnchor = pt(R_SHUKU, 0);
 
   others.forEach((p) => {
     const rel = getRelation(baseIdx, p.shukuIdx);
     const slot = ((p.shukuIdx - baseIdx) % N + N) % N;
     const n = slotCounts[slot] || 0;
     slotCounts[slot] = n + 1;
-    const deg = slotDeg(slot);
-    const r = R_PEOPLE - n * 10;
-    const pos = pt(r, deg);
-    lines += `<line x1="${meiAnchor.x.toFixed(1)}" y1="${meiAnchor.y.toFixed(1)}" x2="${pos.x.toFixed(1)}" y2="${pos.y.toFixed(1)}" stroke="${rel.color}" stroke-width="1.6" stroke-opacity="0.75"/>`;
+    const localDeg = slotDeg(p.shukuIdx) + degShuku / 2; // 宿ラベルと同じ
+    const visualDeg = slotDeg(slot);
+    const rDot = R_SHUKU - n * 9;
+    const onShuku = pt(rDot, localDeg);
+    const visualDot = pt(rDot, visualDeg);
+    const labelPos = pt(R_PEOPLE_LABEL - n * 9, visualDeg);
+    lines += `<line x1="${meiAnchor.x.toFixed(1)}" y1="${meiAnchor.y.toFixed(1)}" x2="${visualDot.x.toFixed(1)}" y2="${visualDot.y.toFixed(1)}" stroke="${rel.color}" stroke-width="1.6" stroke-opacity="0.75"/>`;
+    peopleOnShuku += `<circle cx="${onShuku.x.toFixed(1)}" cy="${onShuku.y.toFixed(1)}" r="8" fill="${rel.color}" stroke="#fff" stroke-width="1.2"/>`;
     const short = (p.name || "?").slice(0, 4);
-    markers += `<g transform="translate(${pos.x.toFixed(1)},${pos.y.toFixed(1)})">` +
-      `<circle r="9" fill="${rel.color}" stroke="#fff" stroke-width="1.2"/>` +
-      `<text y="18" text-anchor="middle" font-size="9" fill="${gold}.9)" font-family="'Noto Serif JP',serif">${escapeHtml(short)}</text>` +
+    nameLabels += `<g>` +
+      `<line x1="${visualDot.x.toFixed(1)}" y1="${visualDot.y.toFixed(1)}" x2="${labelPos.x.toFixed(1)}" y2="${labelPos.y.toFixed(1)}" stroke="${gold}.35)" stroke-width="0.8"/>` +
+      `<text x="${labelPos.x.toFixed(1)}" y="${labelPos.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml(short)}</text>` +
       `</g>`;
   });
 
-  const mePos = pt(R_PEOPLE, 0);
-  markers += `<g transform="translate(${mePos.x.toFixed(1)},${mePos.y.toFixed(1)})">` +
-    `<circle r="11" fill="#c9a961" stroke="#fff" stroke-width="1.5"/>` +
-    `<text y="20" text-anchor="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml((basePerson.name || "基準").slice(0, 4))}</text>` +
-    `</g>`;
+  // 基準本人も宿ラベルと同じ局所角へ
+  {
+    const localDeg = slotDeg(baseIdx) + degShuku / 2;
+    const onShuku = pt(R_SHUKU, localDeg);
+    peopleOnShuku += `<circle cx="${onShuku.x.toFixed(1)}" cy="${onShuku.y.toFixed(1)}" r="10" fill="#c9a961" stroke="#fff" stroke-width="1.5"/>`;
+    const meLabel = pt(R_PEOPLE_LABEL, 0);
+    nameLabels += `<text x="${meLabel.x.toFixed(1)}" y="${meLabel.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml((basePerson.name || "基準").slice(0, 4))}</text>`;
+  }
 
   let ticks = "";
   for (let i = 0; i < N; i++) {
@@ -7106,6 +7125,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     ${ticks}
     ${shukuLabels}
     ${palaceBoundaries}
+    <g id="mp-people-on-shuku">${peopleOnShuku}</g>
   </g>
 
   <g id="mp-compat-fixed">
@@ -7117,7 +7137,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
   </g>
 
   <g id="mp-rel-lines">${lines}</g>
-  <g id="mp-people">${markers}</g>
+  <g id="mp-people-names">${nameLabels}</g>
 
   <text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-family="'Shippori Mincho',serif" font-size="22" fill="#e0c785" font-weight="700" style="pointer-events:none">${SHUKU[baseIdx].kanji.replace("宿","")}</text>
 </svg>`;
