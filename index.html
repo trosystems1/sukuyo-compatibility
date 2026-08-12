@@ -7097,14 +7097,19 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
 
   function nameBadge(x, y, label, leaderFrom) {
     const short = (label || "?").slice(0, 4);
-    const r = Math.max(11, 6.2 * short.length + 3.5);
+    const fontSize = 10;
+    const padX = 7;
+    const h = 18;
+    const textW = short.length * fontSize * 0.95;
+    const w = Math.max(h, textW + padX * 2);
     const xf = x.toFixed(1), yf = y.toFixed(1);
+    const rx = (h / 2).toFixed(1);
     let out = `<g>`;
     if (leaderFrom) {
       out += `<line x1="${leaderFrom.x.toFixed(1)}" y1="${leaderFrom.y.toFixed(1)}" x2="${xf}" y2="${yf}" stroke="${gold}.4)" stroke-width="0.8"/>`;
     }
-    out += `<circle cx="${xf}" cy="${yf}" r="${r.toFixed(1)}" fill="#fff" stroke="rgba(28,16,8,.28)" stroke-width="1"/>` +
-      `<text x="${xf}" y="${yf}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1a1408" font-family="'Noto Serif JP','Shippori Mincho',serif" font-weight="600">${escapeHtml(short)}</text>` +
+    out += `<rect x="${(x - w / 2).toFixed(1)}" y="${(y - h / 2).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="${rx}" ry="${rx}" fill="#fff" stroke="rgba(28,16,8,.55)" stroke-width="1.1"/>` +
+      `<text x="${xf}" y="${yf}" text-anchor="middle" dominant-baseline="middle" font-size="${fontSize}" fill="#1a1408" font-family="'Noto Serif JP','Shippori Mincho',serif" font-weight="600">${escapeHtml(short)}</text>` +
       `</g>`;
     return out;
   }
