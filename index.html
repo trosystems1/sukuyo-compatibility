@@ -2528,6 +2528,78 @@ html, body {
 .koyomi-cell .koyomi-moon { line-height: 0; }
 .koyomi-shuku { font-size: 12px; color: var(--gold, #b8953a); line-height: 1; }
 
+
+/* ── 公開：今日の宿曜 ─────────────────────────────────── */
+.daily-hero { padding: 46px 24px 38px; min-height: 224px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.daily-hero .hero-eyebrow { margin-bottom: 10px; }
+.daily-hero .hero-title { margin-bottom: 8px; line-height: 1.35; }
+.daily-hero .hero-sub { font-size: 15.5px; line-height: 1.8; color: rgba(232,224,245,.64); }
+#daily-page .main-wrap { padding-top: 24px; padding-bottom: 64px; }
+.daily-page-head { text-align: center; padding: 12px 0 20px; }
+.daily-page-eyebrow { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: .26em; color: var(--gold); margin-bottom: 8px; }
+.daily-page-title { font-family: 'Shippori Mincho', serif; font-size: clamp(25px, 3.4vw, 34px); font-weight: 500; color: var(--ink); letter-spacing: .06em; line-height: 1.35; margin-bottom: 8px; }
+.daily-page-lead { font-size: 15.5px; line-height: 1.75; color: #6f6280; }
+.daily-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.daily-main-card { background: linear-gradient(160deg, var(--deep) 0%, var(--violet) 145%); color: var(--moon); border: 1px solid rgba(201,169,97,.28); border-radius: var(--r); padding: 28px 34px; position: relative; overflow: hidden; box-shadow: 0 12px 28px rgba(26,15,46,.14); }
+.daily-main-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,109,212,.20), transparent 68%); pointer-events: none; }
+.daily-main-card > * { position: relative; }
+.daily-date { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 5px 14px; margin-bottom: 14px; text-align: center; color: rgba(232,224,245,.82); }
+.daily-date-main { font-family: 'Shippori Mincho', serif; font-size: clamp(23px, 3vw, 31px); line-height: 1.25; color: #f5eefc; letter-spacing: .03em; }
+.daily-date-lunar { font-size: clamp(14.5px, 1.7vw, 17px); line-height: 1.5; color: #efd889; letter-spacing: .03em; font-weight: 600; }
+.daily-date-label { display: block; width: 100%; font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: .18em; color: rgba(232,224,245,.62); margin-bottom: 0; }
+.daily-day-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
+.daily-day-link { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; min-height: 40px; padding: 8px 14px; border: 1px solid rgba(201,169,97,.28); border-radius: 8px; color: rgba(245,238,252,.86); text-decoration: none; font-size: 14.5px; background: rgba(255,255,255,.055); transition: background var(--transition), border-color var(--transition), color var(--transition); }
+.daily-day-link:hover, .daily-day-link.active { background: rgba(201,169,97,.16); border-color: var(--gold); color: var(--gold-l); }
+.daily-shuku { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin: 0 0 12px; text-align: center; }
+.daily-shuku-kanji { font-family: 'Shippori Mincho', serif; font-size: clamp(46px, 6.2vw, 64px); line-height: 1.05; color: var(--gold-l); letter-spacing: .04em; }
+.daily-shuku-yomi { font-size: 15.5px; line-height: 1.55; color: rgba(245,238,252,.82); letter-spacing: .08em; }
+.daily-theme { font-size: 17px; line-height: 1.65; color: #f2eaf9; margin: 4px auto 10px; text-align: center; font-weight: 600; }
+.daily-meaning { max-width: 780px; font-size: 15.5px; line-height: 1.8; color: rgba(245,238,252,.84); margin: 0 auto 16px; text-align: center; }
+.daily-keywords { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 16px 0 20px; }
+.daily-keyword { display: inline-flex; align-items: center; min-height: 38px; padding: 7px 13px; border: 1px solid rgba(201,169,97,.30); border-radius: 999px; color: var(--gold-l); background: rgba(255,255,255,.07); font-size: 15px; }
+.daily-note { background: rgba(255,255,255,.075); border: 1px solid rgba(201,169,97,.26); border-radius: 8px; padding: 13px 15px; font-size: 14.5px; line-height: 1.75; color: rgba(245,238,252,.82); margin-top: 16px; }
+.daily-two-col { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.daily-guidance { background: rgba(255,255,255,.08); border: 1px solid rgba(201,169,97,.22); border-radius: 8px; padding: 16px 18px; }
+.daily-guidance-title { font-size: 13px; letter-spacing: .16em; color: var(--gold-l); margin-bottom: 10px; font-family: 'Cinzel', serif; }
+.daily-guidance ul { list-style: none; display: grid; gap: 8px; }
+.daily-guidance li { font-size: 15px; line-height: 1.65; color: rgba(245,238,252,.88); padding-left: 1.15em; position: relative; }
+.daily-guidance li::before { content: '・'; position: absolute; left: 0; color: var(--gold); }
+.daily-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 20px; }
+.daily-link { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 9px 18px; border: 1px solid rgba(201,169,97,.34); border-radius: 8px; color: var(--gold-l); text-decoration: none; font-size: 15px; background: rgba(255,255,255,.055); transition: background var(--transition), border-color var(--transition); }
+.daily-link:hover { background: rgba(201,169,97,.14); border-color: var(--gold); }
+.daily-index-card { background: #fff; border: 1px solid var(--border); border-radius: var(--r); padding: 24px; }
+.daily-index-title { font-family: 'Shippori Mincho', serif; font-size: 19px; letter-spacing: .06em; margin-bottom: 16px; color: var(--ink); }
+.daily-index-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 10px; }
+.daily-index-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 9px 12px; border: 1px solid rgba(201,169,97,.24); border-radius: 8px; color: var(--ink); text-decoration: none; background: var(--paper); font-size: 14px; transition: border-color var(--transition), background var(--transition); }
+.daily-index-link:hover, .daily-index-link.active { border-color: var(--gold); background: var(--gold-dim); }
+.daily-index-link span:first-child { font-family: 'Shippori Mincho', serif; font-size: 18px; color: var(--violet); }
+.daily-index-link span:last-child { color: var(--muted); font-size: 13px; }
+.daily-error { padding: 18px; border: 1px dashed var(--border); border-radius: var(--r); color: var(--muted); line-height: 1.8; background: #fff; font-size: 16px; }
+@media (max-width: 700px) {
+  .daily-hero { padding: 34px 18px 30px; min-height: 188px; }
+  .daily-hero .hero-sub { font-size: 14.5px; line-height: 1.75; }
+  #daily-page .main-wrap { padding: 18px 16px 56px; }
+  .daily-page-head { padding: 8px 0 16px; }
+  .daily-page-title { font-size: 26px; }
+  .daily-page-lead { font-size: 15.5px; text-align: left; }
+  .daily-main-card { padding: 24px 18px; }
+  .daily-date { margin-bottom: 14px; }
+  .daily-day-nav { gap: 6px; margin-bottom: 16px; }
+  .daily-day-link { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 8px 10px; font-size: 14.5px; }
+  .daily-date-main { font-size: clamp(22px, 6.2vw, 28px); }
+  .daily-date-lunar { width: 100%; font-size: 16px; }
+  .daily-shuku-kanji { font-size: clamp(44px, 13vw, 60px); }
+  .daily-theme { font-size: 17px; }
+  .daily-meaning { font-size: 15.5px; text-align: left; }
+  .daily-two-col { grid-template-columns: 1fr; }
+  .daily-guidance { padding: 15px 16px; }
+  .daily-guidance li { font-size: 15.5px; }
+  .daily-actions { justify-content: stretch; }
+  .daily-link { width: 100%; min-height: 48px; }
+  .daily-index-card { padding: 20px 16px; }
+  .daily-index-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* デスクトップ・タブレット幅：マイページ自体の横幅を広げて、
    高精堂の運勢カレンダーに近い見やすさに調整する
    （left/transformでの疑似breakoutは親幅とズレて画面が切れたため撤去し、
@@ -2627,6 +2699,7 @@ html, body {
   <div class="page-name">BIRTH STAR READING</div>
   <nav class="header-nav" id="header-nav">
     <a href="sukuyo-about.html" id="nav-sukuyo-about" class="nav-link">宿曜占星術とは</a>
+    <a href="#daily" id="nav-daily" class="nav-link">今日の宿曜</a>
     <a href="#" id="nav-moon-rune" class="nav-link">月のルネーション</a>
     <a href="senseiban.html" id="nav-senseiban" class="nav-link">占星盤</a>
     <a href="#" id="nav-element" class="nav-link">エレメント</a>
@@ -2987,8 +3060,37 @@ html, body {
     </div>
   </section>
 
+
 </div>
 <!-- /Compatibility App -->
+
+<!-- Public Daily Shuku Page（ログイン不要の今日の宿曜） -->
+<div class="moon-rune-page" id="daily-page">
+  <div class="hero daily-hero">
+    <div class="hero-eyebrow">DAILY SUKUYO · 27 MANSIONS</div>
+    <h1 class="hero-title" id="daily-hero-title">本日の宿曜</h1>
+    <p class="hero-sub" id="daily-hero-sub">
+      今日めぐる宿を、旧暦にもとづく宿曜の流れとして読む公開こよみです。<br>
+      個人の吉凶は本命宿との関係で変わるため、ここでは断定しません。
+    </p>
+  </div>
+  <main class="main-wrap" style="max-width:960px;">
+    <div class="daily-page-head">
+      <div class="daily-page-eyebrow" id="daily-page-mode">TODAY</div>
+      <h2 class="daily-page-title" id="daily-page-title">本日の運勢</h2>
+      <p class="daily-page-lead" id="daily-page-lead">
+        今日めぐる宿をもとに、行動を整えるための目安をまとめます。
+      </p>
+    </div>
+    <div class="daily-layout">
+      <section class="daily-main-card" id="daily-main-card" aria-live="polite"></section>
+      <section class="daily-index-card" aria-labelledby="daily-index-title">
+        <div class="daily-index-title" id="daily-index-title">27宿の公開ページ</div>
+        <div class="daily-index-grid" id="daily-index-grid"></div>
+      </section>
+    </div>
+  </main>
+</div>
 
 <!-- My Page（独立ページ：ヘッダー右上から遷移） -->
 <div class="moon-rune-page" id="mypage-page">
@@ -3661,6 +3763,91 @@ function calcShukuIndex(year, month, day) {
 function getShuku(year, month, day) {
   const idx = calcShukuIndex(year, month, day);
   return { ...SHUKU[idx], index: idx };
+}
+
+function getLunarDateParts(year, month, day) {
+  const lunar = Solar.fromYmd(year, month, day).getLunar();
+  const lunarMonth = lunar.getMonth();
+  return {
+    year: lunar.getYear(),
+    month: Math.abs(lunarMonth),
+    day: lunar.getDay(),
+    isLeapMonth: lunarMonth < 0
+  };
+}
+
+function padDatePart(value) {
+  return String(value).padStart(2, "0");
+}
+
+function formatDateParam(date) {
+  return `${date.getFullYear()}-${padDatePart(date.getMonth() + 1)}-${padDatePart(date.getDate())}`;
+}
+
+function parsePublicDateParam(value) {
+  const match = String(value || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const [, y, m, d] = match.map(Number);
+  const date = new Date(y, m - 1, d);
+  if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return null;
+  return date;
+}
+
+function addDays(date, days) {
+  const next = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function isSamePublicDate(a, b) {
+  return a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+}
+
+/* 公開こよみ用：日々の宿の一般的な読み解き。個人運は本命宿との関係を見て判断する。 */
+const DAILY_SHUKU = {
+  "昴宿": { theme:"信頼を積み上げる日", meaning:"堅実さと安定感を意識したい日。急な飛躍より、約束・品質・信用を丁寧に整える流れに向きます。", actions:["予定や契約内容を確認する", "長く使うものを整える", "信頼を得る小さな行動を重ねる"], cautions:["見栄で判断しない", "安全確認を省かない"] },
+  "畢宿": { theme:"実力を形にする日", meaning:"現実的な作業や手を動かす仕事に集中しやすい日。成果を急がず、積み上げた力を着実に出すことが助けになります。", actions:["手順を決めて実務を進める", "道具や作業環境を整える", "未完了の仕事を仕上げる"], cautions:["頑固になりすぎない", "疲れを無視しない"] },
+  "觜宿": { theme:"観察して見極める日", meaning:"情報を集め、細部から全体を読むことに向く日。発言や判断は、事実確認を重ねるほど安定します。", actions:["資料を読み込む", "数字や条件を照合する", "言葉を選んで伝える"], cautions:["疑いすぎて動けなくならない", "批評だけで終わらせない"] },
+  "参宿": { theme:"新しい動きを起こす日", meaning:"変化や挑戦の気配が出やすい日。停滞を破る一歩には向きますが、勢いだけで進めず方向を確認すると安定します。", actions:["新案を試す", "連絡や発信を始める", "停滞している件に着手する"], cautions:["衝動的な決定を避ける", "周囲への説明を省かない"] },
+  "井宿": { theme:"人と場をつなぐ日", meaning:"人脈や共同作業に意識が向く日。ひとりで抱え込むより、必要な人と情報を結ぶことで流れがよくなります。", actions:["紹介や相談をする", "会議の目的を整える", "チーム内の共有を進める"], cautions:["八方美人にならない", "話を広げすぎない"] },
+  "鬼宿": { theme:"直感を静かに聴く日", meaning:"見えにくい気配や違和感を拾いやすい日。無理に説明しきれない感覚も、メモしておくと後で手がかりになります。", actions:["静かな時間を取る", "感覚や夢を書き留める", "人を助ける小さな行動をする"], cautions:["思い込みで断定しない", "境界線を曖昧にしない"] },
+  "柳宿": { theme:"感情を丁寧に扱う日", meaning:"感受性や表現力が動きやすい日。人の気持ちに寄り添う一方で、自分の感情も落ち着いて整えることが大切です。", actions:["音楽や文章で気持ちを整える", "身近な人にやさしく接する", "美しいものに触れる"], cautions:["感情的な返信を急がない", "依存的になりすぎない"] },
+  "星宿": { theme:"存在感を明るく使う日", meaning:"自分の魅力や個性を表に出しやすい日。人前に立つなら、誇張より誠実な表現を心がけると伝わります。", actions:["発表や発信をする", "創作に時間を使う", "場を明るくする役を担う"], cautions:["自己主張を押しつけない", "評価だけを目的にしない"] },
+  "張宿": { theme:"広げる力を整える日", meaning:"楽観性や拡大の流れが出やすい日。可能性を広げるにはよい一方、広げた後の管理も同時に考えると安定します。", actions:["企画を広げる", "人に声をかける", "将来の選択肢を書き出す"], cautions:["約束を増やしすぎない", "楽観だけで予算を決めない"] },
+  "翼宿": { theme:"自由な視点を取り入れる日", meaning:"移動・学び・創造の風が入りやすい日。いつもの枠から少し出ることで、新しい発想が生まれます。", actions:["場所を変えて考える", "学びや旅の計画を立てる", "異なる意見を聞く"], cautions:["落ち着きなく散らかさない", "責任から逃げない"] },
+  "軫宿": { theme:"仕上げと調和の日", meaning:"物事を整え、完成へ向かわせることに向く日。細やかな配慮が効きますが、完璧を求めすぎないことも大切です。", actions:["最終確認をする", "場を整える", "感謝や調整の連絡を入れる"], cautions:["細部にこだわりすぎない", "遠慮で本音を隠しすぎない"] },
+  "角宿": { theme:"新しい道を切り開く日", meaning:"始まりの勇気を持ちやすい日。小さくても先に進む行動が、次の展開を開きます。", actions:["最初の一歩を決める", "課題を分解する", "新しい人や情報に触れる"], cautions:["独断で進めすぎない", "準備不足のまま大きく賭けない"] },
+  "亢宿": { theme:"秩序とバランスを整える日", meaning:"公平さ、契約、ルールを見直すのに向く日。自分と相手の立場を並べて考えると、判断が澄みます。", actions:["条件を整理する", "約束や規程を見直す", "美しく整える"], cautions:["正しさで相手を追い詰めない", "完璧主義で遅らせない"] },
+  "底宿": { theme:"土台を固める日", meaning:"忍耐と基礎づくりに向く日。目立つ成果より、後で効いてくる支えを作る意識が助けになります。", actions:["基礎作業を進める", "長期計画を見直す", "生活や仕事の土台を整える"], cautions:["我慢しすぎない", "重い話を一人で抱えない"] },
+  "房宿": { theme:"調和と関係を育てる日", meaning:"人との距離感や場の空気を整えやすい日。対立を避けるだけでなく、必要な合意を丁寧に作ることが鍵です。", actions:["対話の場を作る", "住まいや身の回りを整える", "大切な人に配慮を伝える"], cautions:["相手に合わせすぎない", "曖昧な合意で済ませない"] },
+  "心宿": { theme:"本質に向き合う日", meaning:"表面ではなく核心を見つめる流れの日。熱意は力になりますが、強すぎる感情は一度落ち着かせて扱いましょう。", actions:["本音を整理する", "重要なテーマを深掘りする", "集中時間を確保する"], cautions:["疑心暗鬼にならない", "感情で相手を試さない"] },
+  "尾宿": { theme:"続ける力を深める日", meaning:"積み重ねや研究に向く日。すぐに見えない成果でも、続けることで深みが生まれます。", actions:["継続中の学びを進める", "記録を振り返る", "専門性を磨く"], cautions:["執着で視野を狭めない", "休息を後回しにしない"] },
+  "箕宿": { theme:"知恵と資源を蓄える日", meaning:"情報、経験、財などを長期視点で蓄えることに向く日。今あるものを活かす工夫が実りにつながります。", actions:["学びを整理する", "収支や資源を確認する", "知恵を人に分かち合う"], cautions:["ため込むだけで使わない状態を避ける", "大きく見せようとしない"] },
+  "斗宿": { theme:"方針を示す日", meaning:"決断や管理の力を使いやすい日。周囲を導くなら、強さと説明責任をセットにすると信頼されます。", actions:["優先順位を決める", "役割分担を明確にする", "リーダーとして声をかける"], cautions:["支配的にならない", "独りで背負いすぎない"] },
+  "女宿": { theme:"受け止めて整える日", meaning:"包容力や細やかな配慮を発揮しやすい日。人を支えるほど、自分の余白も意識して守りましょう。", actions:["ケアや整理をする", "生活リズムを整える", "相手の話を落ち着いて聞く"], cautions:["自己犠牲を当然にしない", "受け身のまま流されない"] },
+  "虚宿": { theme:"空白に可能性を見る日", meaning:"変化や余白が意味を持つ日。決めきれないことも、可能性を広げるための時間として扱えます。", actions:["余白を作る", "古い前提を見直す", "新しい選択肢を並べる"], cautions:["現実逃避に使わない", "不安だけで判断しない"] },
+  "危宿": { theme:"リスクを見抜く日", meaning:"慎重さと備えが役立つ日。怖がるためではなく、安全に進むために、違和感やリスクを確認しましょう。", actions:["安全確認をする", "バックアップを取る", "計画の弱点を点検する"], cautions:["過度に警戒しすぎない", "新しい可能性を全部止めない"] },
+  "室宿": { theme:"内側を整える日", meaning:"静かな集中や精神的な整理に向く日。外へ急ぐより、守るべき空間や軸を整えると安定します。", actions:["部屋や聖域を整える", "瞑想や内省をする", "大切なものを保護する"], cautions:["閉じこもりすぎない", "理想だけで現実を見失わない"] },
+  "壁宿": { theme:"境界を守る日", meaning:"守護と境界の意識が大切な日。大切なものを守るために、引き受ける範囲を明確にしましょう。", actions:["境界線を決める", "資料やデータを守る", "支援の範囲を言葉にする"], cautions:["頑なになりすぎない", "守るために孤立しない"] },
+  "奎宿": { theme:"知性と文化に触れる日", meaning:"学び、文章、文化的な感性が働きやすい日。知識を美しく整え、人に伝わる形にすることに向きます。", actions:["読書や調査をする", "文章を整える", "文化や芸術に触れる"], cautions:["理屈だけで人を見ない", "考えすぎて動けなくならない"] },
+  "婁宿": { theme:"絆を結び直す日", meaning:"人を集め、協力の輪を作る力が出やすい日。親しさを大切にしつつ、目的を共有するとまとまります。", actions:["仲間に声をかける", "協力体制を作る", "感謝を伝える"], cautions:["内輪だけで固まらない", "相手の都合を忘れない"] },
+  "胃宿": { theme:"受け入れて変換する日", meaning:"入ってきたものを消化し、次の形へ変える力が働く日。情報や感情を一度整理してから使うと安定します。", actions:["未整理のものを分類する", "食事や体調を整える", "経験を次の行動に変える"], cautions:["抱え込みすぎない", "勢いで飲み込みすぎない"] }
+};
+
+function normalizeShukuName(raw) {
+  const value = decodeURIComponent(String(raw || "").trim());
+  if (!value) return "";
+  return value.endsWith("宿") ? value : `${value}宿`;
+}
+
+function getDailyShukuInfo(shukuRef) {
+  const idx = typeof shukuRef === "number"
+    ? ((shukuRef % 27) + 27) % 27
+    : SHUKU.findIndex(s => s.kanji === normalizeShukuName(shukuRef) || s.kanji.replace("宿", "") === String(shukuRef || ""));
+  if (idx < 0) return null;
+  const shuku = SHUKU[idx];
+  const daily = DAILY_SHUKU[shuku.kanji];
+  return daily ? { shuku, shukuIdx: idx, daily } : null;
 }
 
 /**
@@ -5739,7 +5926,8 @@ function showAstrologyPage() {
   document.getElementById("mypage-page").classList.remove("show");
   document.getElementById("moon-rune-page").classList.remove("show");
   document.getElementById("element-page")?.classList.remove("show");
-  ["nav-mypage","nav-moon-rune","nav-astrology","nav-element"].forEach(id => {
+  document.getElementById("daily-page")?.classList.remove("show");
+  ["nav-mypage","nav-moon-rune","nav-astrology","nav-element","nav-daily"].forEach(id => {
     document.getElementById(id)?.classList.remove("active");
   });
   // 先に表示してから描画（描画エラーでも真っ白にしない）
@@ -6257,12 +6445,162 @@ function animWorld(canvas, ctx, W, H) {
   draw();
 }
 
+function formatPublicDate(date) {
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日（${weekdays[date.getDay()]}）`;
+}
+
+function formatPublicLunarDate(date) {
+  const lunar = getLunarDateParts(date.getFullYear(), date.getMonth() + 1, date.getDate());
+  return `旧暦 ${lunar.isLeapMonth ? "閏" : ""}${lunar.month}月${lunar.day}日`;
+}
+
+function dailyDateHref(date) {
+  const path = location.pathname && location.pathname !== "/" ? location.pathname : "/index.html";
+  return `${path}?daily=${formatDateParam(date)}`;
+}
+
+function renderDailyDayNav(activeDate) {
+  const today = new Date();
+  const items = [
+    { label: "昨日", date: addDays(today, -1) },
+    { label: "今日", date: today },
+    { label: "明日", date: addDays(today, 1) }
+  ];
+  return `<div class="daily-day-nav" aria-label="表示する日付を選ぶ">${items.map(item => `
+    <a class="daily-day-link${isSamePublicDate(activeDate, item.date) ? " active" : ""}" href="${dailyDateHref(item.date)}">${item.label}</a>`).join("")}
+  </div>`;
+}
+
+function dailyHref(kanji) {
+  return `#daily=${encodeURIComponent(kanji)}`;
+}
+
+function hidePublicPagesForDaily() {
+  document.getElementById("compat-app").classList.add("hide");
+  ["mypage-page", "moon-rune-page", "astrology-page", "element-page"].forEach(id => {
+    document.getElementById(id)?.classList.remove("show");
+  });
+  ["nav-mypage", "nav-moon-rune", "nav-astrology", "nav-element"].forEach(id => {
+    document.getElementById(id)?.classList.remove("active");
+  });
+}
+
+function renderDailyIndex(activeKanji) {
+  const grid = document.getElementById("daily-index-grid");
+  if (!grid) return;
+  grid.innerHTML = SHUKU.map((s, idx) => `
+    <a class="daily-index-link${s.kanji === activeKanji ? " active" : ""}" href="${dailyHref(s.kanji)}">
+      <span>${s.kanji}</span>
+      <span>${idx + 1}</span>
+    </a>`).join("");
+}
+
+function renderDailyCard(info, opts = {}) {
+  const card = document.getElementById("daily-main-card");
+  if (!card) return;
+  if (!info) {
+    card.innerHTML = `<div class="daily-error">指定された宿が見つかりません。下の27宿一覧から選んでください。</div>`;
+    return;
+  }
+  const { shuku, daily } = info;
+  if (opts.mode === "reference") {
+    card.innerHTML = `
+      <div class="daily-date"><span class="daily-date-label">27 MANSION REFERENCE</span></div>
+      <div class="daily-shuku">
+        <div class="daily-shuku-kanji">${shuku.kanji}</div>
+        <div class="daily-shuku-yomi">${shuku.yomi} · ${shuku.nature}</div>
+      </div>
+      <div class="daily-theme">${shuku.kanji}とは</div>
+      <p class="daily-meaning">${shuku.desc}</p>
+      <div class="daily-keywords">
+        ${shuku.keywords.map(item => `<span class="daily-keyword">${item}</span>`).join("")}
+      </div>
+      <div class="daily-note">
+        このページは27宿の基本性質を確認するためのリファレンスです。日ごとの過ごし方や個人にとっての吉凶は、当日の宿とあなた自身の本命宿との関係で変わります。
+      </div>
+      <div class="daily-actions">
+        <a class="daily-link" href="#daily">本日の運勢を見る</a>
+        <a class="daily-link" href="#shuku=${encodeURIComponent(shuku.kanji)}">${shuku.kanji}を詳しく見る</a>
+      </div>`;
+    return;
+  }
+
+  const dateLine = opts.date
+    ? `<div class="daily-date"><span class="daily-date-label">TODAY</span><span class="daily-date-main">${formatPublicDate(opts.date)}</span><span class="daily-date-lunar">（${formatPublicLunarDate(opts.date)}）</span></div>`
+    : `<div class="daily-date"><span class="daily-date-label">TODAY</span></div>`;
+  const dayNav = opts.date ? renderDailyDayNav(opts.date) : "";
+  card.innerHTML = `
+    ${dateLine}
+    ${dayNav}
+    <div class="daily-shuku">
+      <div class="daily-shuku-kanji">${shuku.kanji}</div>
+      <div class="daily-shuku-yomi">${shuku.yomi} · ${shuku.nature}</div>
+    </div>
+    <div class="daily-theme">過ごし方の目安：${daily.theme}</div>
+    <p class="daily-meaning">${daily.meaning}</p>
+    <div class="daily-two-col">
+      <div class="daily-guidance">
+        <div class="daily-guidance-title">向くこと</div>
+        <ul>${daily.actions.map(item => `<li>${item}</li>`).join("")}</ul>
+      </div>
+      <div class="daily-guidance">
+        <div class="daily-guidance-title">気をつけること</div>
+        <ul>${daily.cautions.map(item => `<li>${item}</li>`).join("")}</ul>
+      </div>
+    </div>
+    <div class="daily-note">
+      ここで示すのは、その日にめぐる宿の一般的な空気です。個人にとっての吉凶や「良い日・注意日」は、あなた自身の本命宿との関係（命・栄親・安壊など）で変わるため、生年月日なしには断定しません。
+    </div>
+    <div class="daily-actions">
+      <a class="daily-link" href="${dailyHref(shuku.kanji)}">${shuku.kanji}とは</a>
+      <a class="daily-link" href="#shuku=${encodeURIComponent(shuku.kanji)}">${shuku.kanji}を詳しく見る</a>
+    </div>`;
+}
+
+function showDailyPage(shukuParam) {
+  hidePublicPagesForDaily();
+  const page = document.getElementById("daily-page");
+  page.classList.add("show");
+  document.getElementById("nav-daily")?.classList.add("active");
+
+  let info, date = null, mode = "daily";
+  const requestedDate = parsePublicDateParam(shukuParam);
+  if (shukuParam && !requestedDate) {
+    mode = "reference";
+    info = getDailyShukuInfo(shukuParam);
+    document.getElementById("daily-hero-title").textContent = "27宿リファレンス";
+    document.getElementById("daily-hero-sub").innerHTML = "27宿それぞれの基本性質を確認する公開ページです。<br>日々の吉凶や個人運を断定するものではありません。";
+    document.getElementById("daily-page-mode").textContent = "REFERENCE";
+    document.getElementById("daily-page-title").textContent = info ? `${info.shuku.kanji}とは` : "27宿のリファレンス";
+    document.getElementById("daily-page-lead").textContent = "宿そのものの性質を確認するための公開リファレンスです。日々の吉凶を断定するページではありません。";
+  } else {
+    date = requestedDate || new Date();
+    info = getDailyShukuInfo(calcShukuIndex(date.getFullYear(), date.getMonth() + 1, date.getDate()));
+    document.getElementById("daily-hero-title").textContent = "本日の宿曜";
+    document.getElementById("daily-hero-sub").innerHTML = "今日めぐる宿を、旧暦にもとづく宿曜の流れとして読む公開こよみです。<br>個人の吉凶は本命宿との関係で変わるため、ここでは断定しません。";
+    document.getElementById("daily-page-mode").textContent = "TODAY";
+    document.getElementById("daily-page-title").textContent = "本日の運勢";
+    document.getElementById("daily-page-lead").textContent = "今日めぐる宿をもとに、行動を整えるための目安をまとめます。";
+  }
+  renderDailyCard(info, { date, mode });
+  renderDailyIndex(info ? info.shuku.kanji : null);
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+document.getElementById("nav-daily")?.addEventListener("click", e => {
+  e.preventDefault();
+  if (location.hash !== "#daily") history.pushState(null, "", "#daily");
+  showDailyPage();
+});
+
 function showElementPage() {
   document.getElementById("compat-app").classList.add("hide");
   document.getElementById("mypage-page").classList.remove("show");
   document.getElementById("moon-rune-page").classList.remove("show");
   document.getElementById("astrology-page").classList.remove("show");
-  ["nav-mypage","nav-moon-rune","nav-astrology","nav-element"].forEach(id => {
+  document.getElementById("daily-page")?.classList.remove("show");
+  ["nav-mypage","nav-moon-rune","nav-astrology","nav-element","nav-daily"].forEach(id => {
     document.getElementById(id)?.classList.remove("active");
   });
   document.getElementById("element-page").classList.add("show");
@@ -6301,11 +6639,13 @@ function goHome() {
   document.getElementById("astrology-page")?.classList.remove("show");
   document.getElementById("element-page")?.classList.remove("show");
   document.getElementById("mypage-page")?.classList.remove("show");
+  document.getElementById("daily-page")?.classList.remove("show");
   document.getElementById("compat-app").classList.remove("hide");
   document.getElementById("nav-moon-rune").classList.remove("active");
   document.getElementById("nav-astrology")?.classList.remove("active");
   document.getElementById("nav-element")?.classList.remove("active");
   document.getElementById("nav-mypage")?.classList.remove("active");
+  document.getElementById("nav-daily")?.classList.remove("active");
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 
   // 結果表示・フォームを初期状態（自分を占うモード）に戻す
@@ -7155,7 +7495,9 @@ document.getElementById("btn-save-person").addEventListener("click", () => {
 /* ── ディープリンク（#moon-rune 等）／宿曜とはからの遷移 ── */
 function applyLocationHash() {
   const hash = (location.hash || "").replace(/^#/, "");
-  if (hash === "moon-rune") showMoonRunePage();
+  if (hash === "daily") showDailyPage();
+  else if (hash.startsWith("daily=")) showDailyPage(decodeURIComponent(hash.slice("daily=".length)));
+  else if (hash === "moon-rune") showMoonRunePage();
   else if (hash === "astrology") showAstrologyPage();
   else if (hash === "mypage" || hash === "mypage/me") showMypage({ tab: "me" });
   else if (hash === "mypage/people" || hash === "mypage-people") showMypage({ tab: "people" });
@@ -7170,8 +7512,9 @@ function applyLocationHash() {
       document.getElementById("astrology-page")?.classList.remove("show");
       document.getElementById("element-page")?.classList.remove("show");
       document.getElementById("mypage-page")?.classList.remove("show");
+      document.getElementById("daily-page")?.classList.remove("show");
       document.getElementById("compat-app")?.classList.remove("hide");
-      ["nav-mypage","nav-moon-rune","nav-astrology","nav-element"].forEach(id => {
+      ["nav-mypage","nav-moon-rune","nav-astrology","nav-element","nav-daily"].forEach(id => {
         document.getElementById(id)?.classList.remove("active");
       });
       openShukuPanel(SHUKU[idx].kanji, "命 · PURPOSE", idx);
@@ -7180,8 +7523,16 @@ function applyLocationHash() {
     else document.addEventListener("DOMContentLoaded", open, { once: true });
   }
 }
+function applyLocationQueryRoute() {
+  const params = new URLSearchParams(location.search || "");
+  if (!params.has("daily")) return false;
+  const value = params.get("daily");
+  showDailyPage(value && value !== "today" ? value : null);
+  return true;
+}
+
 window.addEventListener("hashchange", applyLocationHash);
-if (location.hash) applyLocationHash();
+if (!applyLocationQueryRoute() && location.hash) applyLocationHash();
 
 </script>
 <!-- ── 宿詳細スライドインパネル ────────────────────────── -->

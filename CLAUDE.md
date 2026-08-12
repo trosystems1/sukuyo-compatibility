@@ -2,7 +2,8 @@
 
 ## このプロジェクトについて
 竹本光晴堂（kosei-do.co.jp）向け、宿曜占星術の本命宿計算・月のルネーション・相性診断ツール。
-単一HTMLファイル構成（ビルドステップなし）で、Vercelに直接デプロイする運用。
+`index.html`を中心に、`senseiban.html`と`sukuyo-about.html`を補助ページとして持つ静的HTML/JSアプリ。
+ビルドステップなしで、Vercelに静的サイトとして直接デプロイする運用。
 
 ## Session Start
 - シンプルなタスク（文言修正、CSS微調整など）の場合、プロジェクトの全ドキュメントを読む必要はない。
@@ -21,10 +22,11 @@
 ## 絶対に守ること
 - 宿曜計算ロジック（`calcShukuIndex`, `SHUKU`配列, `getShuku`）を変更した場合、
   README記載の検証済みテストケース（1962/3/22→底宿、1975/8/11→亢宿、1973/1/1→箕宿）で必ず再検証する。
-- `middleware.js`のBasic認証デフォルト値（kosei-do / sukuyo2026）を本番運用の前提にしない。
+- `middleware.js`のBasic認証フォールバック値を本番運用の前提にしない。
   本番はVercel環境変数（`BASIC_AUTH_USER` / `BASIC_AUTH_PASS`）で上書きされている前提で扱う。
 - ビルドステップを発生させる変更（npm依存の追加など）は、No-build運用の方針と衝突するため、
   追加前に方針を確認する。
+- iOS/Capacitorへ反映する場合は、ルートのHTML/アセットを更新してから`npm run sync:www`で`www/`へ同期する。
 
 ## 関連ファイル
 - `index.json` — ファイル/関数の地図

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "test": "node tests/shuku-regression.test.cjs && node tests/middleware-public-daily.test.mjs",
     "sync:www": "mkdir -p www && cp index.html sukuyo-about.html senseiban.html www/ && cp -r assets www/",
     "ios": "npm run sync:www && npx cap sync ios && npx cap run ios --target-name \"iPhone 17 Pro\""
   },
@@ -14,6 +15,12 @@
     "@capacitor/splash-screen": "^8.0.1"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5"
+    "@capacitor/assets": "^3.0.5",
+    "lunar-javascript": "1.7.4"
+  },
+  "overrides": {
+    "replace": {
+      "minimatch": "3.1.4"
+    }
   }
 }
