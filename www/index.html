@@ -2540,16 +2540,18 @@ html, body {
 .daily-page-title { font-family: 'Shippori Mincho', serif; font-size: clamp(25px, 3.4vw, 34px); font-weight: 500; color: var(--ink); letter-spacing: .06em; line-height: 1.35; margin-bottom: 8px; }
 .daily-page-lead { font-size: 15.5px; line-height: 1.75; color: #6f6280; }
 .daily-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
-.daily-main-card { background: linear-gradient(160deg, var(--deep) 0%, var(--violet) 145%); color: var(--moon); border: 1px solid rgba(201,169,97,.28); border-radius: var(--r); padding: 28px 34px; position: relative; overflow: hidden; box-shadow: 0 12px 28px rgba(26,15,46,.14); }
+.daily-main-card { background: linear-gradient(160deg, var(--deep) 0%, var(--violet) 145%); color: var(--moon); border: 1px solid rgba(201,169,97,.28); border-radius: var(--r); padding: 72px 34px 28px; position: relative; overflow: hidden; box-shadow: 0 12px 28px rgba(26,15,46,.14); }
 .daily-main-card::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 80% at 50% 0%, rgba(139,109,212,.20), transparent 68%); pointer-events: none; }
 .daily-main-card > * { position: relative; }
 .daily-date { display: flex; align-items: baseline; justify-content: center; flex-wrap: wrap; gap: 5px 14px; margin-bottom: 14px; text-align: center; color: rgba(232,224,245,.82); }
 .daily-date-main { font-family: 'Shippori Mincho', serif; font-size: clamp(23px, 3vw, 31px); line-height: 1.25; color: #f5eefc; letter-spacing: .03em; }
 .daily-date-lunar { font-size: clamp(14.5px, 1.7vw, 17px); line-height: 1.5; color: #efd889; letter-spacing: .03em; font-weight: 600; }
 .daily-date-label { display: block; width: 100%; font-family: 'Cinzel', serif; font-size: 13px; letter-spacing: .18em; color: rgba(232,224,245,.62); margin-bottom: 0; }
-.daily-day-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin: 0 0 18px; }
-.daily-day-link { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; min-height: 40px; padding: 8px 14px; border: 1px solid rgba(201,169,97,.28); border-radius: 8px; color: rgba(245,238,252,.86); text-decoration: none; font-size: 14.5px; background: rgba(255,255,255,.055); transition: background var(--transition), border-color var(--transition), color var(--transition); }
-.daily-day-link:hover, .daily-day-link.active { background: rgba(201,169,97,.16); border-color: var(--gold); color: var(--gold-l); }
+.daily-day-nav { position: absolute; top: 18px; left: 18px; right: 18px; z-index: 2; display: flex; justify-content: space-between; gap: 12px; pointer-events: none; }
+.daily-day-link { pointer-events: auto; display: inline-flex; align-items: center; justify-content: center; min-width: 142px; min-height: 42px; padding: 7px 13px; border: 1px solid rgba(201,169,97,.28); border-radius: 8px; color: rgba(245,238,252,.88); text-decoration: none; font-size: 14px; line-height: 1.35; background: rgba(255,255,255,.055); transition: background var(--transition), border-color var(--transition), color var(--transition); }
+.daily-day-link.next { margin-left: auto; }
+.daily-day-link:hover { background: rgba(201,169,97,.16); border-color: var(--gold); color: var(--gold-l); }
+.daily-day-label { color: var(--gold-l); font-weight: 600; }
 .daily-shuku { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; margin: 0 0 12px; text-align: center; }
 .daily-shuku-kanji { font-family: 'Shippori Mincho', serif; font-size: clamp(46px, 6.2vw, 64px); line-height: 1.05; color: var(--gold-l); letter-spacing: .04em; }
 .daily-shuku-yomi { font-size: 15.5px; line-height: 1.55; color: rgba(245,238,252,.82); letter-spacing: .08em; }
@@ -2582,10 +2584,10 @@ html, body {
   .daily-page-head { padding: 8px 0 16px; }
   .daily-page-title { font-size: 26px; }
   .daily-page-lead { font-size: 15.5px; text-align: left; }
-  .daily-main-card { padding: 24px 18px; }
+  .daily-main-card { padding: 82px 18px 24px; }
   .daily-date { margin-bottom: 14px; }
-  .daily-day-nav { gap: 6px; margin-bottom: 16px; }
-  .daily-day-link { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 8px 10px; font-size: 14.5px; }
+  .daily-day-nav { top: 14px; left: 14px; right: 14px; gap: 8px; }
+  .daily-day-link { min-width: 0; flex: 1 1 0; min-height: 46px; padding: 7px 9px; font-size: 13.5px; }
   .daily-date-main { font-size: clamp(22px, 6.2vw, 28px); }
   .daily-date-lunar { width: 100%; font-size: 16px; }
   .daily-shuku-kanji { font-size: clamp(44px, 13vw, 60px); }
@@ -6483,15 +6485,17 @@ function dailyDateHref(date) {
 }
 
 function renderDailyDayNav(activeDate) {
-  const today = new Date();
   const items = [
-    { label: "昨日", date: addDays(today, -1) },
-    { label: "今日", date: today },
-    { label: "明日", date: addDays(today, 1) }
+    { label: "昨日", direction: "prev", arrow: "←", date: addDays(activeDate, -1) },
+    { label: "明日", direction: "next", arrow: "→", date: addDays(activeDate, 1) }
   ];
-  return `<div class="daily-day-nav" aria-label="表示する日付を選ぶ">${items.map(item => `
-    <a class="daily-day-link${isSamePublicDate(activeDate, item.date) ? " active" : ""}" href="${dailyDateHref(item.date)}">${item.label}</a>`).join("")}
-  </div>`;
+  return `<div class="daily-day-nav" aria-label="前後の日の宿を見る">${items.map(item => {
+    const neighbor = getDailyShukuInfo(calcShukuIndex(item.date.getFullYear(), item.date.getMonth() + 1, item.date.getDate()));
+    const text = item.direction === "prev"
+      ? `${item.arrow} <span class="daily-day-label">${item.label}</span> ${neighbor.shuku.kanji}`
+      : `<span class="daily-day-label">${item.label}</span> ${neighbor.shuku.kanji} ${item.arrow}`;
+    return `<a class="daily-day-link ${item.direction}" href="${dailyDateHref(item.date)}">${text}</a>`;
+  }).join("")}</div>`;
 }
 
 function dailyHref(kanji) {
@@ -7086,9 +7090,24 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     `<circle cx="${cx}" cy="${cy}" r="${hubR}" fill="#120c24" stroke="#c9a961" stroke-width="1.6"/>`;
 
   // 人物ドットは外周リング内で宿ラベルと同一局所角 → 回転後も宿の文字の上
+  // 名前は白丸バッジ（黒文字）で盤上の可読性を確保
   const slotCounts = {};
   let lines = "", peopleOnShuku = "", nameLabels = "";
   const meiAnchor = pt(R_SHUKU, 0);
+
+  function nameBadge(x, y, label, leaderFrom) {
+    const short = (label || "?").slice(0, 4);
+    const r = Math.max(11, 6.2 * short.length + 3.5);
+    const xf = x.toFixed(1), yf = y.toFixed(1);
+    let out = `<g>`;
+    if (leaderFrom) {
+      out += `<line x1="${leaderFrom.x.toFixed(1)}" y1="${leaderFrom.y.toFixed(1)}" x2="${xf}" y2="${yf}" stroke="${gold}.4)" stroke-width="0.8"/>`;
+    }
+    out += `<circle cx="${xf}" cy="${yf}" r="${r.toFixed(1)}" fill="#fff" stroke="rgba(28,16,8,.28)" stroke-width="1"/>` +
+      `<text x="${xf}" y="${yf}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#1a1408" font-family="'Noto Serif JP','Shippori Mincho',serif" font-weight="600">${escapeHtml(short)}</text>` +
+      `</g>`;
+    return out;
+  }
 
   others.forEach((p) => {
     const rel = getRelation(baseIdx, p.shukuIdx);
@@ -7103,11 +7122,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const labelPos = pt(R_PEOPLE_LABEL - n * 9, visualDeg);
     lines += `<line x1="${meiAnchor.x.toFixed(1)}" y1="${meiAnchor.y.toFixed(1)}" x2="${visualDot.x.toFixed(1)}" y2="${visualDot.y.toFixed(1)}" stroke="${rel.color}" stroke-width="1.6" stroke-opacity="0.75"/>`;
     peopleOnShuku += `<circle cx="${onShuku.x.toFixed(1)}" cy="${onShuku.y.toFixed(1)}" r="8" fill="${rel.color}" stroke="#fff" stroke-width="1.2"/>`;
-    const short = (p.name || "?").slice(0, 4);
-    nameLabels += `<g>` +
-      `<line x1="${visualDot.x.toFixed(1)}" y1="${visualDot.y.toFixed(1)}" x2="${labelPos.x.toFixed(1)}" y2="${labelPos.y.toFixed(1)}" stroke="${gold}.35)" stroke-width="0.8"/>` +
-      `<text x="${labelPos.x.toFixed(1)}" y="${labelPos.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml(short)}</text>` +
-      `</g>`;
+    nameLabels += nameBadge(labelPos.x, labelPos.y, p.name, visualDot);
   });
 
   {
@@ -7115,7 +7130,7 @@ function buildMypageSenseibanSVG(baseIdx, basePerson, others) {
     const onShuku = pt(R_SHUKU, localDeg);
     peopleOnShuku += `<circle cx="${onShuku.x.toFixed(1)}" cy="${onShuku.y.toFixed(1)}" r="10" fill="#c9a961" stroke="#fff" stroke-width="1.5"/>`;
     const meLabel = pt(R_PEOPLE_LABEL, 0);
-    nameLabels += `<text x="${meLabel.x.toFixed(1)}" y="${meLabel.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="9" fill="${gold}.95)" font-family="'Noto Serif JP',serif">${escapeHtml((basePerson.name || "基準").slice(0, 4))}</text>`;
+    nameLabels += nameBadge(meLabel.x, meLabel.y, basePerson.name || "基準", null);
   }
 
   const centerKanji = SHUKU[baseIdx].kanji.replace("宿", "");
