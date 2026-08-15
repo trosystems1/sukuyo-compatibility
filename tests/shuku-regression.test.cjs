@@ -26,15 +26,29 @@ const calcBlock = sliceBetween(
   '/**\n * 月のルネーション（月相）計算ロジック'
 );
 
-const context = { Solar };
+const context = { console };
 vm.createContext(context);
 vm.runInContext(
-  `${shukuBlock}\n${calcBlock}\nglobalThis.__shukuExports = { SHUKU, LUNAR_MONTH_START, DAILY_SHUKU, calcShukuIndex, getShuku, getLunarDateParts, normalizeShukuName, getDailyShukuInfo, parsePublicDateParam, formatDateParam, addDays };`,
+  `${shukuBlock}\n${calcBlock}\nglobalThis.__shukuExports = { SHUKU, LUNAR_MONTH_START, DAILY_SHUKU, KYUREKI_SAKU, kyurekiLookup, calcShukuIndex, getShuku, getLunarDateParts, normalizeShukuName, getDailyShukuInfo, parsePublicDateParam, formatDateParam, addDays };`,
   context,
   { filename: 'index.html#shuku-regression' }
 );
 
-const { SHUKU, LUNAR_MONTH_START, DAILY_SHUKU, calcShukuIndex, getShuku, getLunarDateParts, normalizeShukuName, getDailyShukuInfo, parsePublicDateParam, formatDateParam, addDays } = context.__shukuExports;
+const {
+  SHUKU,
+  LUNAR_MONTH_START,
+  DAILY_SHUKU,
+  KYUREKI_SAKU,
+  kyurekiLookup,
+  calcShukuIndex,
+  getShuku,
+  getLunarDateParts,
+  normalizeShukuName,
+  getDailyShukuInfo,
+  parsePublicDateParam,
+  formatDateParam,
+  addDays,
+} = context.__shukuExports;
 
 function test(name, fn) {
   try {
@@ -56,6 +70,14 @@ test('lunar month start table covers all 12 months and points to known mansions'
   for (const startName of Object.values(LUNAR_MONTH_START)) {
     assert.ok(SHUKU.some((s) => s.kanji === `${startName}宿`), `Unknown month start mansion: ${startName}`);
   }
+});
+
+test('embedded JST kyureki saku table is present and covers lookup range', () => {
+  assert.equal(typeof KYUREKI_SAKU, 'string');
+  assert.ok(KYUREKI_SAKU.length > 1000, 'Expected multi-century saku table');
+  assert.ok(kyurekiLookup(1899, 1, 12), 'Epoch date should resolve');
+  assert.ok(kyurekiLookup(2100, 1, 1), 'Late-range date should resolve');
+  assert.equal(kyurekiLookup(1800, 1, 1), null);
 });
 
 test('public daily shuku data covers all 27 mansions with required guidance', () => {
@@ -85,12 +107,21 @@ test('daily shuku lookup accepts stable public route names', () => {
   assert.equal(getDailyShukuInfo('存在しない宿'), null);
 });
 
-test('public date helper exposes the lunar date used by daily shuku logic', () => {
+test('public date helper exposes the Japanese lunar date used by daily shuku logic', () => {
   const lunar = getLunarDateParts(2026, 8, 12);
-  assert.equal(lunar.year, 2026);
   assert.equal(lunar.month, 6);
   assert.equal(lunar.day, 30);
   assert.equal(lunar.isLeapMonth, false);
+  assert.equal(lunar.dayCount, 30);
+});
+
+test('Japanese kyureki differs from Chinese lunar on known boundary date', () => {
+  const jp = getLunarDateParts(1976, 12, 8);
+  assert.equal(jp.month, 10);
+  assert.equal(jp.day, 17);
+  const cn = Solar.fromYmd(1976, 12, 8).getLunar();
+  assert.equal(Math.abs(cn.getMonth()), 10);
+  assert.equal(cn.getDay(), 18);
 });
 
 test('public daily date route helpers accept yesterday and tomorrow dates', () => {
@@ -108,6 +139,7 @@ const documentedCases = [
   ['1962-03-22', '底宿'],
   ['1975-08-11', '亢宿'],
   ['1973-01-01', '箕宿'],
+  ['1976-12-08', '井宿'],
 ];
 
 for (const [date, expected] of documentedCases) {

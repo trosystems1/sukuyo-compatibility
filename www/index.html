@@ -9,7 +9,6 @@
 <meta property="og:description" content="生年月日から本命宿を算出し、自分自身の鑑定も、上司・部下・法人との相性も占える宿曜占いツールです。">
 <meta property="og:type" content="website">
 <link rel="stylesheet" href="assets/fonts/fonts.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lunar-javascript/1.7.4/lunar.min.js"></script>
 <style>
 /* ── Reset & Tokens ───────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -3756,7 +3755,12 @@ const SHUKU_ORACLE = {
  *   1973/1/1 (新暦) → 箕宿  ✓
  *
  * 【ロジック】
- *   1. 新暦の生年月日 → 旧暦（太陰太陽暦）に変換 (lunar-javascript使用)
+ *   1. 新暦の生年月日 → 旧暦（太陰太陽暦）に変換
+ *      ※2026/8修正: lunar-javascriptは中国暦(UTC+8)であり日本の旧暦(UTC+9)と
+ *        朔がJST 0時台に入る月で1日ずれる(41年間で3.1%の日付が不一致)ことが判明。
+ *        天文計算(astronomy-engine)でJST基準の朔・中気から自前構築した
+ *        朔テーブル(1899-2100年)に差し替え。旧正月・中秋の名月 各7年分の
+ *        公表暦日および確定3例(1962/3/22=底,1973/1/1=箕,1975/8/11=亢)で検証済み。
  *   2. 旧暦の各月「1日」の宿は固定（年に関わらず）:
  *        1月=室 2月=奎 3月=胃 4月=畢 5月=参 6月=鬼
  *        7月=張 8月=角 9月=底 10月=心 11月=斗 12月=虚
@@ -3771,16 +3775,39 @@ const LUNAR_MONTH_START = {
   7: "張", 8: "角", 9: "底", 10: "心", 11: "斗", 12: "虚"
 };
 
-function calcShukuIndex(year, month, day) {
-  // 新暦 → 旧暦変換 (lunar-javascript、CDN経由でグローバルにSolar/Lunarが展開される)
-  const solar = Solar.fromYmd(year, month, day);
-  const lunar = solar.getLunar();
-  const lunarMonth = Math.abs(lunar.getMonth()); // 閏月は負数で返るためabs
-  const lunarDay = lunar.getDay();
+/* ---- 日本の旧暦テーブル（JST基準・1899〜2100年） ----
+ * 朔(旧暦1日)ごとに1文字: 英数1字 = (月初の宿index)*2 + (月の日数-29)
+ * 宿indexはSHUKU配列(昴=0)準拠。月初の宿から旧暦月が一意に定まる。 */
+const KYUREKI_ALPH = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const KYUREKI_EPOCH = Date.UTC(1899, 0, 12);   // 表の最初の朔（JST暦日）
+const KYUREKI_SAKU = 'ejmr27AHNQVafinq27AHNMRVafinq27AHMRVbejmr26BGNQVbfinq366BGNQVbejnq36AHMRUbejnr27AGNQVafinr236BGNQVafinq37AHMRUbejmr27AHMRVafinmq36BHMRVafinq27AHMRVbejmr26BAGNRVafjmr26BGMRVafjnq36AHMQVafjnq376AHMRUafjmr36BGNQVafinq36BHMRUbejmmr27BGNRUbejmq36BGNRVafinq27AHGNRUbfinq27AGNRUbfjmr26BGMRUbfjmr366BGMRUbfinr27AHMRUafjmr27BGNQVaejmr327AHNQVafimr27AHNQVbejmq36BGNRUbfinmq36AHNQVbfinq27AGNQVbfinr26BAGNQVbejnr26BGMRUbejnr27AHMQVafinr277AHMRUafinq37AHNQVafimr27AHNQVbejmqr27AHMRVbejmq36AHMRVbejnq27AGHMRVafjnq27AGNQVafjnq36BGMRUbejnq37ABGMRUbejmr36BHMRUafinq36BHMRVafimr236BGNRUbfimr26BGNRVafjmq36AHMRVafjnmq36AHMRUbfjmr27AGNQVafjnq36BGGNQVafjmr36BGMRUbejmr36BGNQVafinq367BGNQVafinq27BGNRUbfimr26BGNRUbfjmqr26BGNQVbfinq36AHMRUbfjmr27AGNMRUbfinr27AGNQVafinr27AHMRUbejmr27BAHMRUbejmr27AHNQVafinq27AHNQVbejmr227AHMRVbejmr26BGNQVbfinq36AHMQVbfinrq36AHMQVbejnq37AGNQVafinr27AHGNQVafinq36BHMRUbejmq37AHMRVafinq276BGNRVafinq27AHMRVbejmr26BGMRVbejnq326BGMRVafjnq36AHMQVafjnq36BGNMRUafjmr36BGNQVaejnq36BHMRUbejmq36BBGNRUbejmq36BGNRUbfinq27AGNRUbfjmr227AGNRUbfjmr26BGMRUbfjmr36AHMQVUbfinr27AHMQVafinr27BGNQVaejmr36BAHNQVafimr27AHNQVbejmq36BGNRUbfinq276AHNQVbfinq27AGNQVbfinr26BGMRUbfinrq36BGMRUbejnr27AHMQVafinr27BGNMRUafinq37AHMRVafimr27AHNQVbejmq366BHMRVbejmq36AHMRVbejnq27AGNQVbejnr227AGNQVafjnq36BGMRUbejnq37AHMQVafinmr36BGNQVafinq36BHMRVaejmr27AHGNRUbfimr26BGNRVafjmq36AHMRVafjnq276AHMRUbfjmr27AGNQVafjmr36BGMRUbejmrr36BGMRUbejmr36BGNQVafinq36BGNRQVafinq27AHNRUbejmr26BGNRUbfinq366BGNQVbfinq36AHMRUbfjmr27AGNQVafjmr327AGNQVafinr27AHMRUbejmr27BGNQVafinmr27AHNQVafinq27AHNQVbejmr26BAHMRVbejmr26BGNQVbfinq36AHMQVbfinr276AHMQVbejnq37AGNQUbfinq37AHMRUbejmrq36BHMRUbejmq36BHMRVafinq27AHMRVbafinq27AHMRVbejmr26BGMRVafjnq36ABGMRVafjnq36AHMQVafjnq36BGNQUbejnq376BGNQVaejmr36BHMRUbejmq36BHMRVafinmq36BGNRUbfinq27AGNRUbfjmr26BGGNQVbfjmr26BGMRUbfjmr36AHMQVafjmr367AHMQVafinr27BGNQVaejmr27BGNRUbejmqr27AHNQVbejmq36BGNQVbfinq27AGNNQVbfinq27AGNQVbfinr26BGMRUbfinr27ABGMRUbejnr27AHMQVafinr27AHNQUbejmr237AHMRVaejmr27AHNQVbejmq36AHNQVbfinqq36AHMRVbejnq27AGNQVbejnq36BGGNQVafjnq36BGMRUbejnq37AHMQVafinq376BGNQVafinq36BHMRUbejmr27AHMRVafjmq326BGNRVafjmq36AHMRVafjnq27AGNMRUbfjmr27AGNQVafjmr36BGMRUbejmr36BAHMRUbejmr27BGNQVafinq36BGNRUbejmr227AHNRUbejmr26BGNRUbfinq36AHMRUbfjmrq36AHMRUbfjmr27AGNQUbfinr36BGGNQVafinr27AHMRUbejmr27BGNQVafinq277AHNQVafinq27AHNQVbejmr26BGNQVbfinq326BGMRVbfinq36AHMQVbejnr27AGNMQVbejnq36BGNQUbfinq37AHMRUbejmr27ABHMRUbejmq36BHMRVafinq27AHMRVbejmr227AHMRVbejmr26BGMRVafjnq36AHMQVbejnrq36AHMQVafjnq36BGNQUbe';
+const KYUREKI_MONTH_OF = {22:1, 24:2, 26:3, 1:4, 3:5, 5:6, 8:7, 11:8, 13:9, 15:10, 18:11, 20:12};
 
-  const monthStartName = LUNAR_MONTH_START[lunarMonth];
-  const startIdx = SHUKU.findIndex(s => s.kanji === monthStartName + "宿");
-  return (startIdx + lunarDay - 1 + 27) % 27;
+/* 新暦(y,m,d) → { shukuIdx, month, day, isLeapMonth, dayCount } / 範囲外は null */
+function kyurekiLookup(year, month, day) {
+  const off = Math.round((Date.UTC(year, month - 1, day) - KYUREKI_EPOCH) / 86400000);
+  if (off < 0) return null;
+  let acc = 0, prevBase = -1;
+  for (let k = 0; k < KYUREKI_SAKU.length; k++) {
+    const v = KYUREKI_ALPH.indexOf(KYUREKI_SAKU[k]);
+    const len = 29 + (v % 2), base = v >> 1;
+    if (acc + len > off) {
+      return {
+        shukuIdx: (base + off - acc) % 27,
+        month: KYUREKI_MONTH_OF[base],
+        day: off - acc + 1,
+        isLeapMonth: base === prevBase,   // 月初の宿が前月と同じ=閏月（前月と同じ宿から再スタート）
+        dayCount: len
+      };
+    }
+    acc += len; prevBase = base;
+  }
+  return null;
+}
+
+function calcShukuIndex(year, month, day) {
+  const r = kyurekiLookup(year, month, day);
+  return r ? r.shukuIdx : 0;
 }
 
 function getShuku(year, month, day) {
@@ -3789,14 +3816,8 @@ function getShuku(year, month, day) {
 }
 
 function getLunarDateParts(year, month, day) {
-  const lunar = Solar.fromYmd(year, month, day).getLunar();
-  const lunarMonth = lunar.getMonth();
-  return {
-    year: lunar.getYear(),
-    month: Math.abs(lunarMonth),
-    day: lunar.getDay(),
-    isLeapMonth: lunarMonth < 0
-  };
+  const r = kyurekiLookup(year, month, day);
+  return r || { month: 0, day: 0, isLeapMonth: false };
 }
 
 function padDatePart(value) {
@@ -3895,13 +3916,10 @@ const MOON_PHASES = [
 ];
 
 function calcMoonPhase(year, month, day) {
-  const solar = Solar.fromYmd(year, month, day);
-  const lunar = solar.getLunar();
-  const lunarMonth = Math.abs(lunar.getMonth());
-  const lunarDay = lunar.getDay();
-  const lm = LunarMonth.fromYm(lunar.getYear(), lunar.getMonth());
-  const dayCount = lm.getDayCount();
+  const r = kyurekiLookup(year, month, day);
+  if (!r) return { ...MOON_PHASES[0], index: 0, lunarDay: 1, dayCount: 30, ratio: 0 };
 
+  const lunarDay = r.day, dayCount = r.dayCount;
   const ratio = (lunarDay - 1) / dayCount; // 0以上1未満
   const phaseIdx = Math.min(7, Math.floor(ratio * 8)); // 0-7
   return { ...MOON_PHASES[phaseIdx], index: phaseIdx, lunarDay, dayCount, ratio };
@@ -4895,12 +4913,6 @@ document.getElementById("btn-self-calc").addEventListener("click", calculateSelf
 function calculateSelf() {
   const errEl = document.getElementById("self-error-msg");
 
-  if (typeof Solar === "undefined") {
-    errEl.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
-    errEl.classList.add("show");
-    return;
-  }
-
   let shukuA, yA, mA, dA;
 
   if (inputMode.self === "date") {
@@ -4934,13 +4946,6 @@ document.getElementById("btn-calc").addEventListener("click", calculate);
 
 function calculate() {
   const errEl = document.getElementById("error-msg");
-
-  // 旧暦変換ライブラリの読み込み確認
-  if (typeof Solar === "undefined") {
-    errEl.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
-    errEl.classList.add("show");
-    return;
-  }
 
   // A側（自分）の入力を取得（生年月日 or 宿選択）
   let shukuA;
@@ -7436,11 +7441,6 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
 
   let shuku, y = null, m = null, d = null;
   if (inputMode.book === "date") {
-    if (typeof Solar === "undefined") {
-      err.textContent = "計算ライブラリの読み込みに失敗しました。ページを再読み込みしてお試しください。";
-      err.classList.add("show");
-      return;
-    }
     const val = getDateSelectValue("book");
     if (!val) {
       err.textContent = "生年月日を入力してください";

@@ -1,16 +1,18 @@
 {
   "project": "sukuyo-compatibility",
   "description": "竹本光晴堂（kosei-do.co.jp）向け、宿曜占星術の本命宿計算・月のルネーション・対人/対法人相性診断ツール",
-  "lastUpdated": "2026-08-12",
+  "lastUpdated": "2026-08-15",
   "files": {
     "index.html": {
-      "role": "ツール本体。HTML/CSS/JSをすべて含む単一ファイル（約7200行）",
+      "role": "ツール本体。HTML/CSS/JSをすべて含む単一ファイル（約7600行）",
       "sections": [
         { "lines": "1-3300", "what": "head, CSS, HTML本体（ナビ、入力フォーム、結果、月のルネーション、マイページ、占星術/エレメント解説）" },
-        { "lines": "3307-7199", "what": "<script>本体。宿曜計算、相性判定、占星盤SVG、マイページ人物帳、ページ切替制御" }
+        { "lines": "3307-7600", "what": "<script>本体。宿曜計算、相性判定、占星盤SVG、マイページ人物帳、ページ切替制御" }
       ],
       "keyFunctions": {
-        "calcShukuIndex(year, month, day)": "新暦→旧暦変換後、旧暦月初の宿テーブル(SHUKU)を起点に該当日の宿インデックスを算出",
+        "kyurekiLookup(year, month, day)": "JST基準朔テーブルから旧暦日・宿index・閏月・月日数を返す",
+        "getLunarDateParts(year, month, day)": "kyurekiLookupのラッパー。公開こよみの旧暦表示などに利用",
+        "calcShukuIndex(year, month, day)": "kyurekiLookupの宿indexを返す（範囲外は0）",
         "getShuku(year, month, day)": "calcShukuIndexのラッパー。宿オブジェクトを返す",
         "calcMoonPhase(year, month, day)": "月のルネーション（旧暦日からのフェーズ）算出",
         "moonPhaseSVG(phaseIdx, size)": "月相アイコンSVG生成",
@@ -27,7 +29,9 @@
         "selectTopMode(mode) / selectInputMode(side, mode) / selectRel(rel)": "UIタブ・入力モード切り替え系"
       },
       "dataStructures": {
-        "SHUKU": "27宿の名称・属性を保持する配列。月初の宿が固定で割り当てられている前提（calcShukuIndex内で参照）",
+        "SHUKU": "27宿の名称・属性を保持する配列。月初の宿が固定で割り当てられている前提",
+        "KYUREKI_SAKU": "JST基準の朔テーブル（1899–2100）。各文字が月初宿indexと月日数を符号化",
+        "LUNAR_MONTH_START": "旧暦月初(1日)の宿名テーブル（説明・検証用）",
         "COMPAT_TABLE": "宿同士の関係性11分類を定義するテーブル"
       }
     },
@@ -38,7 +42,7 @@
       "role": "宿曜占星術の説明ページ。27宿、11種類の縁、命・業・胎グループなどの解説を表示する"
     },
     "www/": {
-      "role": "Capacitor/iOS用の同期先。`npm run sync:www`でルートのHTMLとassetsをコピーする"
+      "role": "Capacitor/iOS用の同期先。`npm run sync:www`でルートのHTML・assetsをコピーする"
     },
     "middleware.js": {
       "role": "VercelのRouting MiddlewareによるBasic認証。全パス(/:path*)に適用",
@@ -46,7 +50,7 @@
       "note": "コード内にローカル用フォールバック値があるが、本番ではVercel環境変数で必ず上書きする運用"
     },
     "package.json": {
-      "role": "Capacitor同期・iOS起動用スクリプトとCapacitor依存を管理。lunar-javascriptはCDN経由"
+      "role": "Capacitor同期・iOS起動用スクリプトとCapacitor依存を管理。旧暦計算はindex.html内完結"
     },
     "vercel.json": {
       "role": "Vercel設定。検索エンジンへの非表示設定など"
@@ -58,7 +62,8 @@
   "verifiedTestCases": [
     { "date": "1962-03-22", "expected": "底宿" },
     { "date": "1975-08-11", "expected": "亢宿" },
-    { "date": "1973-01-01", "expected": "箕宿" }
+    { "date": "1973-01-01", "expected": "箕宿" },
+    { "date": "1976-12-08", "expected": "井宿" }
   ],
   "deployment": {
     "host": "Vercel",
