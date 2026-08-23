@@ -1,13 +1,13 @@
 {
   "project": "sukuyo-compatibility",
   "description": "竹本光晴堂（kosei-do.co.jp）向け、宿曜占星術の本命宿計算・月のルネーション・対人/対法人相性診断ツール",
-  "lastUpdated": "2026-08-15",
+  "lastUpdated": "2026-08-23",
   "files": {
     "index.html": {
-      "role": "ツール本体。HTML/CSS/JSをすべて含む単一ファイル（約7600行）",
+      "role": "ツール本体。HTML/CSS/JSをすべて含む単一ファイル（約7955行）",
       "sections": [
-        { "lines": "1-3300", "what": "head, CSS, HTML本体（ナビ、入力フォーム、結果、月のルネーション、マイページ、占星術/エレメント解説）" },
-        { "lines": "3307-7600", "what": "<script>本体。宿曜計算、相性判定、占星盤SVG、マイページ人物帳、ページ切替制御" }
+        { "lines": "1-3470", "what": "head, CSS, HTML本体（ナビ、トップ今日の宿、入力フォーム、結果、月のルネーション、マイページこよみ併記、占星術/エレメント解説）" },
+        { "lines": "3471-7955", "what": "<script>本体。宿曜計算、日運・月運、相性判定、占星盤SVG、マイページ人物帳、ページ切替制御" }
       ],
       "keyFunctions": {
         "kyurekiLookup(year, month, day)": "JST基準朔テーブルから旧暦日・宿index・閏月・月日数を返す",
@@ -17,6 +17,9 @@
         "calcMoonPhase(year, month, day)": "月のルネーション（旧暦日からのフェーズ）算出",
         "moonPhaseSVG(phaseIdx, size)": "月相アイコンSVG生成",
         "getRelation(idxA, idxB)": "27宿同士の関係性（11分類）を判定",
+        "dayFortune(myIdx, dayIdx)": "本命宿と日宿の関係を◎○△×の日運に変換（暫定）",
+        "getLunarMonthInfo(y, m, d)": "旧暦ひと月の朔・月宿・12宮テーマを返す",
+        "renderTodayCard()": "トップの「今日の宿」セクション描画（前後日ナビ・月テーマ・個人運）",
         "calcCompatScore(idxA, idxB)": "相性スコア算出",
         "getRelAdvice(rel, relKey, shukuA, shukuB)": "関係性×宿の組み合わせに応じたアドバイス文生成",
         "calculateSelf()": "「本命宿を調べる」モードのエントリポイント",
@@ -32,7 +35,9 @@
         "SHUKU": "27宿の名称・属性を保持する配列。月初の宿が固定で割り当てられている前提",
         "KYUREKI_SAKU": "JST基準の朔テーブル（1899–2100）。各文字が月初宿indexと月日数を符号化",
         "LUNAR_MONTH_START": "旧暦月初(1日)の宿名テーブル（説明・検証用）",
-        "COMPAT_TABLE": "宿同士の関係性11分類を定義するテーブル"
+        "COMPAT_TABLE": "宿同士の関係性11分類を定義するテーブル",
+        "DAY_FORTUNE": "11分類→◎○△×の日運対応（暫定。先生確認後に確定）",
+        "PALACE_MONTH_THEME": "12宮ごとの旧暦月テーマ"
       }
     },
     "senseiban.html": {

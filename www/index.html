@@ -2527,6 +2527,68 @@ html, body {
 .koyomi-cell .koyomi-moon { line-height: 0; }
 .koyomi-shuku { font-size: 12px; color: var(--gold, #b8953a); line-height: 1; }
 
+/* ── 暦：相性併記（自分／相手）───────────────────────── */
+.koyomi-cell { min-height: 74px; }
+.koyomi-marks { display: flex; flex-direction: column; align-items: center; gap: 0px; line-height: 1.05; margin-top: 1px; }
+.koyomi-mark { font-size: 11.5px; font-weight: 700; letter-spacing: 0; }
+.koyomi-mark.tier-best { color: #2e7d32; }
+.koyomi-mark.tier-good { color: #6b8f3a; }
+.koyomi-mark.tier-care { color: #c08a2e; }
+.koyomi-mark.tier-bad  { color: #b04040; }
+.koyomi-cell.dual-good { background: rgba(46,125,50,.13); }
+.koyomi-cell.dual-bad  { background: rgba(176,64,64,.10); }
+.koyomi-partner-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 2px 0 12px; font-size: 14px; color: var(--muted); }
+.koyomi-partner-row select { font-family: inherit; font-size: 14px; padding: 7px 10px; min-height: 40px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--ink); }
+.koyomi-mark-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+.koyomi-detail-rel { display: flex; flex-wrap: wrap; gap: 8px 16px; margin: 8px 0 2px; }
+.koyomi-detail-rel b { font-weight: 700; }
+
+/* ── トップ：今日の宿（紙面に溶かす軽量セクション）─────── */
+.today-sec { margin: 4px 0 26px; padding: 22px 4px 20px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.today-eyebrow { font-family: 'Cinzel', serif; font-size: 10.5px; letter-spacing: .24em; color: var(--gold); text-align: center; margin-bottom: 7px; }
+.today-date { text-align: center; font-size: 13.5px; color: var(--muted); line-height: 1.6; margin-bottom: 12px; }
+.today-date .today-lunar { color: #9a7c33; font-weight: 600; }
+
+/* 前後日ナビ：中央が今日、左右が昨日・明日 */
+.today-nav { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; max-width: 560px; margin: 0 auto; }
+.today-step { display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 44px; justify-content: center; padding: 7px 8px; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); font-family: inherit; cursor: pointer; transition: border-color var(--transition), background var(--transition); }
+.today-step:hover { border-color: var(--gold); background: var(--gold-dim); }
+.today-step .step-label { font-size: 11px; letter-spacing: .08em; }
+.today-step .step-shuku { font-family: 'Shippori Mincho', serif; font-size: 15px; color: #8a6f2e; letter-spacing: .04em; }
+.today-now { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.today-main { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.today-moon { line-height: 0; opacity: .8; }
+.today-kanji { font-family: 'Shippori Mincho', serif; font-size: clamp(26px, 4.4vw, 34px); line-height: 1.1; color: var(--ink); letter-spacing: .05em; }
+.today-yomi { font-size: 12.5px; color: var(--muted); letter-spacing: .06em; }
+
+.today-back { text-align: center; margin-top: 9px; }
+.today-back button { background: none; border: none; font-family: inherit; font-size: 12.5px; color: var(--teal); cursor: pointer; padding: 6px 10px; min-height: 34px; text-decoration: underline; text-underline-offset: 3px; }
+
+.today-theme { text-align: center; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.6; margin: 15px 0 6px; }
+.today-meaning { font-size: 14px; line-height: 1.85; color: #5c5170; text-align: center; margin: 0 auto 15px; max-width: 620px; }
+.today-guide { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; max-width: 660px; margin: 0 auto; }
+.today-guide-box { background: rgba(255,255,255,.55); border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px; }
+.today-guide-title { font-size: 11.5px; letter-spacing: .10em; color: #8a6f2e; margin-bottom: 6px; }
+.today-guide-box ul { list-style: none; display: grid; gap: 4px; }
+.today-guide-box li { font-size: 13px; line-height: 1.6; color: #5c5170; padding-left: 1em; position: relative; }
+.today-guide-box li::before { content: '・'; position: absolute; left: 0; color: var(--gold); }
+
+.today-month { max-width: 660px; margin: 14px auto 0; text-align: center; font-size: 13.5px; line-height: 1.8; color: #5c5170; }
+.today-month .today-month-head { font-size: 11px; letter-spacing: .14em; color: #8a6f2e; margin-bottom: 3px; }
+.today-month b { color: var(--ink); font-weight: 600; }
+.today-me { margin-top: 13px; text-align: center; font-size: 13.5px; line-height: 1.9; color: #5c5170; }
+.today-me .rel-chip { display: inline-block; padding: 1px 9px; margin: 0 1px; border-radius: 999px; font-weight: 600; background: var(--gold-dim); border: 1px solid var(--border); color: #7d6423; }
+.today-me-cta { margin-top: 13px; text-align: center; font-size: 12.5px; line-height: 1.75; color: var(--muted); }
+.today-foot { margin-top: 11px; text-align: center; }
+.today-foot a { color: var(--teal); text-decoration: none; font-size: 13.5px; border-bottom: 1px solid rgba(107,75,168,.30); padding-bottom: 1px; }
+@media (max-width: 560px) {
+  .today-sec { padding: 18px 0 16px; }
+  .today-guide { grid-template-columns: minmax(0,1fr); }
+  .today-nav { gap: 6px; }
+  .today-step .step-label { font-size: 10px; }
+  .today-step .step-shuku { font-size: 13.5px; }
+}
+
 
 /* ── 公開：今日の宿曜 ─────────────────────────────────── */
 .daily-hero { padding: 46px 24px 38px; min-height: 224px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -2777,6 +2839,9 @@ html, body {
 
 <!-- Main -->
 <main class="main-wrap">
+
+  <!-- ══ 今日の宿（竹本式：まず「天下に何宿のエネルギーが降り注ぐ日か」を見る）══ -->
+  <section class="today-sec" id="today-card" aria-live="polite"></section>
 
   <!-- Top mode selector -->
   <div class="top-mode-tabs" role="radiogroup" aria-label="占いの種類" id="top-mode-tabs">
@@ -3138,6 +3203,10 @@ html, body {
         </div>
         <div id="mypage-koyomi-content">
           <p class="moon-rune-intro-text" id="koyomi-gate-info"></p>
+          <div class="koyomi-partner-row">
+            <label for="koyomi-partner">相手と併記：</label>
+            <select id="koyomi-partner"><option value="">（自分のみ）</option></select>
+          </div>
           <div class="koyomi-head">
             <button class="koyomi-nav-btn" id="koyomi-prev" aria-label="前の月">◀</button>
             <div class="koyomi-month-label" id="koyomi-month-label"></div>
@@ -3152,6 +3221,7 @@ html, body {
             <span><span class="koyomi-lg-gate"></span>あなたのゲート日</span>
             <span>朔＝旧暦一日（新月・宿の調整日）</span>
           </div>
+          <div class="koyomi-mark-legend" id="koyomi-mark-legend"></div>
           <div class="koyomi-detail" id="koyomi-detail"></div>
         </div>
       </div>
@@ -4018,6 +4088,200 @@ const COMPAT_TABLE = [
  * A→Bの関係（方向性あり）
  * 宿曜では「自分から見た相手」と「相手から見た自分」が異なる
  */
+/* ══════════════════════════════════════════════════════════
+   日運・月運（2026/8 竹本先生 授業より）
+
+   【月宿の求め方】
+     旧暦1日＝新月。その新月の日の宿が、その旧暦ひと月の「月宿」。
+     例）2026/8/13 新月＝張宿 → 8/13〜9/10 は「張宿月」＝獅子宮のテーマ。
+     全人類がその宮のテーマに準じると流れに乗る、という読み。
+
+   【日宿の見方】
+     自分の運気より先に「今日は何宿の日か」を見る。
+     今日1日は天下にその宿のエネルギーが降り注いでいる、と捉え、
+     その宿に寄り添う行動＝ラッキーアクション（開運アクション）とする。
+
+   ※ ◎○△× の対応は暫定。竹本先生の確認を取ってから確定させること。
+   ══════════════════════════════════════════════════════════ */
+const DAY_FORTUNE = {
+  "命": { mark:"◎", tier:"best", label:"大吉" },
+  "栄": { mark:"◎", tier:"best", label:"大吉" },
+  "親": { mark:"◎", tier:"best", label:"大吉" },
+  "友": { mark:"○", tier:"good", label:"吉"   },
+  "安": { mark:"○", tier:"good", label:"吉"   },
+  "成": { mark:"○", tier:"good", label:"吉"   },
+  "胎": { mark:"○", tier:"good", label:"吉"   },
+  "衰": { mark:"△", tier:"care", label:"注意" },
+  "危": { mark:"△", tier:"care", label:"注意" },
+  "業": { mark:"△", tier:"care", label:"注意" },
+  "壊": { mark:"×", tier:"bad",  label:"要警戒" },
+};
+function dayFortune(myIdx, dayIdx) {
+  const rel = getRelation(myIdx, dayIdx);
+  const f = DAY_FORTUNE[rel.key] || DAY_FORTUNE["安"];
+  return { ...f, key: rel.key, name: rel.name, text: rel.text };
+}
+
+// 12宮ごとの「その月のテーマ」（授業の語彙ベース／要・先生確認）
+const PALACE_MONTH_THEME = {
+  "羊宮":   "口火を切る・自己を打ち出す・突破する",
+  "牛宮":   "積む・味わう・確かなものを手元に置く",
+  "夫妻宮": "情報を交わす・動き回る・学ぶ",
+  "蟹宮":   "守る・育てる・帰る場所を整える",
+  "獅子宮": "創る・表現する・遊ぶ（レジャーとエンタメ）",
+  "女宮":   "分析する・整える・つまびらかにする",
+  "秤宮":   "調整する・提案する・美と豊かさを釣り合わせる",
+  "蠍宮":   "深く追求する・受け継ぐ・命と向き合う",
+  "弓宮":   "拡大する・発展させる・遠くへ出る",
+  "磨宮":   "社会と時間を使う・仕組みを作る・継承する",
+  "瓶宮":   "未来を知る・研究し発明する・仲間と組む",
+  "魚宮":   "感じる・委ねる・目に見えないものに触れる",
+};
+
+// その日が属する旧暦ひと月の情報（朔＝月宿の起点）を返す
+function getLunarMonthInfo(y, m, d) {
+  const r = kyurekiLookup(y, m, d);
+  if (!r) return null;
+  const start = addDays(new Date(y, m - 1, d), -(r.day - 1));
+  const end   = addDays(start, r.dayCount - 1);
+  const monthShukuIdx = calcShukuIndex(start.getFullYear(), start.getMonth() + 1, start.getDate());
+  const palaceIdx = SHUKU_TO_PALACE[monthShukuIdx];
+  const palace = (palaceIdx != null) ? PALACE_DATA[palaceIdx] : null;
+  return {
+    lunarMonth: r.month, isLeapMonth: r.isLeapMonth, lunarDay: r.day, dayCount: r.dayCount,
+    start, end, monthShukuIdx, monthShuku: SHUKU[monthShukuIdx], palace,
+    theme: palace ? (PALACE_MONTH_THEME[palace.name] || "") : ""
+  };
+}
+
+// localStorage 人物帳から「わたし」を取得（未登録なら null）
+function getMeIndex() {
+  try {
+    const me = (loadPeople() || []).find(p => p.isMe);
+    if (!me || !me.y || !me.m || !me.d) return null;
+    return { idx: calcShukuIndex(me.y, me.m, me.d), name: me.name || "あなた" };
+  } catch (e) { return null; }
+}
+
+const WEEK_JP = ["日", "月", "火", "水", "木", "金", "土"];
+
+// トップの「今日の宿」表示日オフセット（0=今日 / -1=昨日 / +1=明日 …）
+let todayCardOffset = 0;
+
+function renderTodayCard() {
+  const el = document.getElementById("today-card");
+  if (!el) return;
+
+  const base = new Date();
+  const cur  = addDays(new Date(base.getFullYear(), base.getMonth(), base.getDate()), todayCardOffset);
+  const y = cur.getFullYear(), m = cur.getMonth() + 1, d = cur.getDate();
+
+  const idx   = calcShukuIndex(y, m, d);
+  const shuku = SHUKU[idx];
+  const daily = DAILY_SHUKU[shuku.kanji] || null;
+  const moon  = calcMoonPhase(y, m, d);
+  const lm    = getLunarMonthInfo(y, m, d);
+
+  // 前後日（左右に宿名を出す）
+  const prev = addDays(cur, -1), next = addDays(cur, 1);
+  const prevShuku = SHUKU[calcShukuIndex(prev.getFullYear(), prev.getMonth() + 1, prev.getDate())];
+  const nextShuku = SHUKU[calcShukuIndex(next.getFullYear(), next.getMonth() + 1, next.getDate())];
+  const stepLabel = (off) => {
+    if (off === -1) return "昨日";
+    if (off === 0)  return "今日";
+    if (off === 1)  return "明日";
+    return `${Math.abs(off)}日${off < 0 ? "前" : "後"}`;
+  };
+
+  const isToday = todayCardOffset === 0;
+  const eyebrow = isToday ? "TODAY'S LODGE · 今日の宿" : "THIS DAY'S LODGE · この日の宿";
+
+  const actions  = daily ? daily.actions.map(t => `<li>${escapeHtml(t)}</li>`).join("") : "";
+  const cautions = daily ? daily.cautions.map(t => `<li>${escapeHtml(t)}</li>`).join("") : "";
+
+  // 今月のテーマ（新月の日の宿＝その旧暦ひと月の月宿）
+  let monthHtml = "";
+  if (lm) {
+    const range = `${lm.start.getMonth() + 1}/${lm.start.getDate()}〜${lm.end.getMonth() + 1}/${lm.end.getDate()}`;
+    monthHtml = `
+      <div class="today-month">
+        <div class="today-month-head">${isToday ? "今月のテーマ" : "この月のテーマ"}</div>
+        旧暦${lm.isLeapMonth ? "閏" : ""}${lm.lunarMonth}月（${range}）は <b>${lm.monthShuku.kanji}月</b>${lm.palace ? ` ── <b>${lm.palace.name}</b>` : ""}。
+        ${escapeHtml(lm.theme)}。
+      </div>`;
+  }
+
+  // 「わたし」登録済みなら、全体を見たあとに個人運を添える
+  const me = getMeIndex();
+  let meHtml = "";
+  if (me) {
+    const fd = dayFortune(me.idx, idx);
+    const fm = lm ? dayFortune(me.idx, lm.monthShukuIdx) : null;
+    meHtml = `
+      <div class="today-me">
+        ${escapeHtml(me.name)}さん（${SHUKU[me.idx].kanji}）にとって、
+        ${isToday ? "今日" : "この日"}は <span class="rel-chip">${fd.key}の日</span>${fm ? `／${isToday ? "今月" : "この月"}は <span class="rel-chip">${fm.key}の月</span>` : ""}
+      </div>`;
+  } else {
+    meHtml = `
+      <div class="today-me-cta">
+        マイページで「わたし」の生年月日を登録すると、あなたにとって何の日かも表示されます。
+      </div>`;
+  }
+
+  el.innerHTML = `
+    <div class="today-eyebrow">${eyebrow}</div>
+    <div class="today-date">
+      ${y}年${m}月${d}日（${WEEK_JP[cur.getDay()]}）
+      ${lm ? `・<span class="today-lunar">旧暦${lm.isLeapMonth ? "閏" : ""}${lm.lunarMonth}月${lm.lunarDay}日${lm.lunarDay === 1 ? "・朔" : ""}</span>` : ""}
+    </div>
+
+    <div class="today-nav">
+      <button type="button" class="today-step" id="today-prev" aria-label="前の日">
+        <span class="step-label">◀ ${stepLabel(todayCardOffset - 1)}</span>
+        <span class="step-shuku">${prevShuku.kanji}</span>
+      </button>
+      <div class="today-now">
+        <div class="today-main">
+          <span class="today-moon">${moonPhaseSVG(moon.index, 26)}</span>
+          <span class="today-kanji">${shuku.kanji}</span>
+        </div>
+        <div class="today-yomi">${shuku.yomi}　／　${moon.name}</div>
+      </div>
+      <button type="button" class="today-step" id="today-next" aria-label="次の日">
+        <span class="step-label">${stepLabel(todayCardOffset + 1)} ▶</span>
+        <span class="step-shuku">${nextShuku.kanji}</span>
+      </button>
+    </div>
+    ${isToday ? "" : `<div class="today-back"><button type="button" id="today-reset">今日に戻る</button></div>`}
+
+    ${daily ? `<div class="today-theme">${escapeHtml(daily.theme)}</div>
+    <div class="today-meaning">${escapeHtml(daily.meaning)}</div>
+    <div class="today-guide">
+      <div class="today-guide-box">
+        <div class="today-guide-title">☽ 寄り添う（開運アクション）</div>
+        <ul>${actions}</ul>
+      </div>
+      <div class="today-guide-box">
+        <div class="today-guide-title">⚠ 控える</div>
+        <ul>${cautions}</ul>
+      </div>
+    </div>` : ""}
+    ${monthHtml}
+    ${meHtml}
+    <div class="today-foot"><a href="${dailyHref(shuku.kanji)}">${shuku.kanji}の日をもっと詳しく →</a></div>`;
+
+  // 前後日の切り替え（±60日まで）
+  const step = (delta) => {
+    todayCardOffset = Math.max(-60, Math.min(60, todayCardOffset + delta));
+    renderTodayCard();
+  };
+  el.querySelector("#today-prev").addEventListener("click", () => step(-1));
+  el.querySelector("#today-next").addEventListener("click", () => step(1));
+  const reset = el.querySelector("#today-reset");
+  if (reset) reset.addEventListener("click", () => { todayCardOffset = 0; renderTodayCard(); });
+}
+
 function getRelation(idxA, idxB) {
   // 【2026/6 再修正】kosei-do.co.jp(Takemoto-sensei公式サイト)の占星盤解説ページ
   // (https://kosei-do.co.jp/details/senseiban.html) の実例データと27件全件照合した結果、
@@ -4831,6 +5095,7 @@ function daysInMonth(year, month) {
   function doRender() {
     try { renderPalaceWheel(); } catch(e) { console.warn("palace wheel:", e); }
     try { renderHeroStarfield(); } catch(e) { console.warn("starfield:", e); }
+    try { renderTodayCard(); } catch(e) { console.warn("today card:", e); }
   }
   // DOMContentLoadedが既に済んでいる場合はrequestAnimationFrame、そうでなければ待つ
   if (document.readyState === "loading") {
@@ -5375,6 +5640,8 @@ const koyomiState = {
   year: new Date().getFullYear(),
   month: new Date().getMonth() + 1,   // 1-12
   birthPhaseIdx: null,                // ゲート日判定用（誕生ルネーション）
+  meIdx: null,                        // 「わたし」の本命宿インデックス
+  partnerId: null,                    // 併記する相手（人物帳のid）
   rendered: false
 };
 
@@ -5393,15 +5660,44 @@ function updateMypageKoyomi() {
   card.classList.remove("empty");
   const moon = calcMoonPhase(me.y, me.m, me.d);
   koyomiState.birthPhaseIdx = moon.index;
+  koyomiState.meIdx = calcShukuIndex(me.y, me.m, me.d);
   document.getElementById("koyomi-gate-info").textContent =
-    `☆ ${me.name}さん（${me.y}年${me.m}月${me.d}日生まれ）は「${moon.name}」生まれ。同じ月相の日にゲート印がつきます。`;
+    `☆ ${me.name}さん（${me.y}年${me.m}月${me.d}日生まれ・${SHUKU[koyomiState.meIdx].kanji}）は「${moon.name}」生まれ。同じ月相の日にゲート印がつきます。`;
+  buildKoyomiPartnerSelect(list, me);
   renderKoyomi();
+}
+
+// 併記する相手のプルダウンを人物帳から構築する
+function buildKoyomiPartnerSelect(list, me) {
+  const sel = document.getElementById("koyomi-partner");
+  if (!sel) return;
+  const others = (list || []).filter(p => !p.isMe && p.y && p.m && p.d);
+  if (koyomiState.partnerId && !others.some(p => p.id === koyomiState.partnerId)) {
+    koyomiState.partnerId = null;
+  }
+  sel.innerHTML = `<option value="">（自分のみ）</option>` + others.map(p => {
+    const idx = calcShukuIndex(p.y, p.m, p.d);
+    const tag = tagLabel(p) ? `［${tagLabel(p)}］` : "";
+    return `<option value="${escapeHtml(p.id)}"${p.id === koyomiState.partnerId ? " selected" : ""}>${escapeHtml(p.name)}${tag}・${SHUKU[idx].kanji}</option>`;
+  }).join("");
+  sel.disabled = others.length === 0;
+  if (others.length === 0) {
+    sel.innerHTML = `<option value="">（人物帳に相手を登録すると併記できます）</option>`;
+  }
 }
 
 function koyomiDayInfo(y, m, d) {
   const idx = calcShukuIndex(y, m, d);
   const moon = calcMoonPhase(y, m, d);
   return { shuku: SHUKU[idx], shukuIdx: idx, moon };
+}
+
+// 併記対象の相手を人物帳から解決する
+function koyomiPartner() {
+  if (!koyomiState.partnerId) return null;
+  const p = (loadPeople() || []).find(x => x.id === koyomiState.partnerId);
+  if (!p || !p.y || !p.m || !p.d) return null;
+  return { name: p.name || "相手", idx: calcShukuIndex(p.y, p.m, p.d) };
 }
 
 function renderKoyomi() {
@@ -5412,6 +5708,8 @@ function renderKoyomi() {
   const daysInMonth = new Date(year, month, 0).getDate();
   const today = new Date();
   const isThisMonth = today.getFullYear() === year && (today.getMonth() + 1) === month;
+  const partner = koyomiPartner();
+  const meIdx = koyomiState.meIdx;
 
   let html = "";
   for (let i = 0; i < first.getDay(); i++) html += `<div class="koyomi-cell empty"></div>`;
@@ -5421,13 +5719,30 @@ function renderKoyomi() {
     const classes = ["koyomi-cell"];
     if (isThisMonth && today.getDate() === d) classes.push("today");
     if (koyomiState.birthPhaseIdx !== null && info.moon.index === koyomiState.birthPhaseIdx) classes.push("gate");
+
+    // 自分／相手の日運マークを2段で併記する
+    let marks = "";
+    if (meIdx !== null) {
+      const fMe = dayFortune(meIdx, info.shukuIdx);
+      marks += `<span class="koyomi-mark tier-${fMe.tier}" title="あなた：${fMe.key}の日">${fMe.mark}</span>`;
+      if (partner) {
+        const fP = dayFortune(partner.idx, info.shukuIdx);
+        marks += `<span class="koyomi-mark tier-${fP.tier}" title="${escapeHtml(partner.name)}：${fP.key}の日">${fP.mark}</span>`;
+        // 双方が良い／どちらかが悪い日を面で示す（候補日を選びやすくするため）
+        const good = ["best", "good"];
+        if (good.includes(fMe.tier) && good.includes(fP.tier)) classes.push("dual-good");
+        else if (fMe.tier === "bad" || fP.tier === "bad") classes.push("dual-bad");
+      }
+    }
+
     const saku = info.moon.lunarDay === 1 ? `<span class="koyomi-saku">朔</span>` : "";
     html += `
       <div class="${classes.join(" ")}" data-day="${d}">
         ${saku}
         <div class="koyomi-day-num">${d}</div>
-        <div class="koyomi-moon">${moonPhaseSVG(info.moon.index, 24)}</div>
+        <div class="koyomi-moon">${moonPhaseSVG(info.moon.index, 20)}</div>
         <div class="koyomi-shuku">${info.shuku.kanji.charAt(0)}</div>
+        ${marks ? `<div class="koyomi-marks">${marks}</div>` : ""}
       </div>`;
   }
   document.getElementById("koyomi-grid").innerHTML = html;
@@ -5439,6 +5754,14 @@ function renderKoyomi() {
   const detail = document.getElementById("koyomi-detail");
   detail.classList.remove("show");
   detail.innerHTML = "";
+
+  // マーク凡例（相手を選んでいるときだけ「上＝自分／下＝相手」を明示）
+  const lg = document.getElementById("koyomi-mark-legend");
+  if (lg) {
+    lg.innerHTML = (koyomiState.meIdx === null) ? "" :
+      `<span>◎ 栄・親・命</span><span>○ 友・安・成・胎</span><span>△ 衰・危・業</span><span>× 壊</span>`
+      + (partner ? `<span style="width:100%">上段＝あなた／下段＝${escapeHtml(partner.name)}さん　緑地＝双方○以上　赤地＝どちらかが×</span>` : "");
+  }
   koyomiState.rendered = true;
 }
 
@@ -5449,13 +5772,33 @@ function showKoyomiDetail(d, cell) {
   const info = koyomiDayInfo(year, month, d);
   const isGate = koyomiState.birthPhaseIdx !== null && info.moon.index === koyomiState.birthPhaseIdx;
   const detail = document.getElementById("koyomi-detail");
+
+  // 自分／相手それぞれから見た、その日の関係
+  const partner = koyomiPartner();
+  let relHtml = "";
+  if (koyomiState.meIdx !== null) {
+    const fMe = dayFortune(koyomiState.meIdx, info.shukuIdx);
+    relHtml += `<span><b>あなた</b>：${fMe.mark} ${fMe.name}（${fMe.label}）</span>`;
+    if (partner) {
+      const fP = dayFortune(partner.idx, info.shukuIdx);
+      relHtml += `<span><b>${escapeHtml(partner.name)}さん</b>：${fP.mark} ${fP.name}（${fP.label}）</span>`;
+    }
+    relHtml = `<div class="koyomi-detail-rel">${relHtml}</div>`;
+  }
+
   detail.innerHTML = `
     <div class="koyomi-detail-date">${year}年${month}月${d}日（旧暦 ${info.moon.lunarDay}日）${info.moon.lunarDay === 1 ? "・朔（新月）── 宿の足踏み／スキップが起こる調整日" : ""}</div>
     この日の宿：<strong>${info.shuku.kanji}（${info.shuku.yomi}）</strong><br>
     月のルネーション：<strong>${info.moon.name}</strong>（${info.moon.stage}期・8フェーズ中${info.moon.no}番目）<br>
+    ${relHtml}
     ${isGate ? "☽ <strong>あなたのゲート日です。</strong>生まれた時と同じ形の月を眺めて、メディテーション（エネルギー調整）を。" : info.moon.desc}`;
   detail.classList.add("show");
 }
+
+document.getElementById("koyomi-partner").addEventListener("change", (e) => {
+  koyomiState.partnerId = e.target.value || null;
+  renderKoyomi();
+});
 
 document.getElementById("koyomi-prev").addEventListener("click", () => {
   koyomiState.month--;
