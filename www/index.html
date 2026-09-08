@@ -398,6 +398,35 @@ html, body {
 .book-row.is-mei { background: rgba(184,149,58,.08); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
 .book-row-name { font-weight: 600; white-space: nowrap; }
 .book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard { display: flex; align-items: center; gap: 12px; padding: 11px 10px; min-height: 62px; border-bottom: 1px solid var(--border); border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pcard:last-child { border-bottom: none; }
+.pcard:active { background: rgba(184,149,58,.10); }
+.pcard.is-picked { background: rgba(184,149,58,.16); box-shadow: inset 0 0 0 1px var(--gold-dim); }
+.pcard-av { width: 38px; height: 38px; border-radius: 50%; background: var(--deep); color: var(--moon); display: flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
+.pcard.is-picked .pcard-av { background: var(--gold); color: #fff; }
+.pcard-body { flex: 1; min-width: 0; }
+.pcard-name { display: block; font-size: 18px; font-weight: 600; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-meta { display: block; font-size: 14px; color: var(--muted); line-height: 1.5; }
+.pcard-tag { font-size: 12px; border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px; color: var(--muted); flex: none; white-space: nowrap; }
+.pcard-state { font-size: 13px; color: var(--gold); flex: none; white-space: nowrap; }
+.pickbar { position: sticky; bottom: 0; z-index: 5; display: none; align-items: center; gap: 10px; margin-top: 10px; padding: 12px 14px; border: 1px solid var(--gold-dim); border-radius: 12px; background: #fff; box-shadow: 0 -2px 14px rgba(0,0,0,.10); }
+.pickbar.show { display: flex; }
+.pickbar-av { width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; flex: none; }
+.pickbar-body { flex: 1; min-width: 0; }
+.pickbar-name { display: block; font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pickbar-hint { display: block; font-size: 13px; color: var(--muted); }
+.pickbar-clear { flex: none; font-size: 14px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--muted); font-family: inherit; cursor: pointer; }
+.book-list-tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0 6px; }
+.book-edit-toggle { font-size: 14px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px; background: #fff; color: var(--muted); font-family: inherit; cursor: pointer; }
+.book-edit-toggle.on { border-color: var(--gold); color: var(--gold); }
+.book-recent { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+.book-recent-label { width: 100%; font-size: 13px; color: var(--muted); }
+.book-recent-chip { font-size: 15px; padding: 9px 14px; border: 1px solid var(--border); border-radius: 20px; background: #fff; color: var(--ink); font-family: inherit; cursor: pointer; }
+.gboard-fold { margin: 10px 0 4px; }
+.gboard-fold > summary { cursor: pointer; font-size: 15px; color: var(--gold); padding: 10px 2px; list-style: none; }
+.gboard-fold > summary::-webkit-details-marker { display: none; }
+.gboard-fold > summary::before { content: "▸ "; }
+.gboard-fold[open] > summary::before { content: "▾ "; }
 .book-mei {
   display: inline-flex;
   align-items: center;
@@ -444,6 +473,11 @@ html, body {
 .book-capacity { font-size: 13px; color: var(--muted); margin: 0 0 10px; line-height: 1.6; }
 .book-capacity.full { color: #a04545; }
 #btn-book-add:disabled { opacity: .45; cursor: not-allowed; }
+.book-backup { border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 12px; }
+.book-backup-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.book-backup-msg { font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 8px; }
+.book-backup-msg.ok { color: #2f7d5a; }
+.book-backup-msg.ng { color: #a04545; }
 .save-person { margin-top: 18px; padding: 14px; border: 1px dashed var(--border); border-radius: var(--r); display: none; }
 .save-person.show { display: block; }
 .save-person-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -3279,22 +3313,17 @@ html, body {
             <div class="mypage-senseiban-legend" id="mypage-senseiban-legend"></div>
           </div>
           <p class="mypage-senseiban-note">
-            ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。登録は最大50名、盤の同時表示は相手8名までです。
+            ※公開用の占星盤（ログイン不要）はナビの「占星盤」から。登録は最大300名、盤の同時表示は相手8名までです。
           </p>
         </div>
       </div>
 
-      <div class="book-list-title" style="margin-top:20px;">人物帳（9グループ盤）</div>
-      <p class="book-lead">
-        対人を最大50名まで登録できます。宿曜の9グループ（宿番号の数字根1〜9）に配置した盤で、関係を一覧できます。
-        同じマスの人とは命・業・胎の深い縁。グループ番号の差だけで、すべての関係が決まります。
-      </p>
-      <div class="gtag-filter" id="gtag-filter">
-        <button type="button" class="gtag-btn active" data-tag="all">すべて</button>
-        <button type="button" class="gtag-btn" data-tag="family">家族</button>
-        <button type="button" class="gtag-btn" data-tag="work">仕事</button>
-        <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
-      </div>
+      <details class="gboard-fold" id="gboard-fold">
+        <summary>人物帳（9グループ盤）をひらく</summary>
+        <p class="book-lead">
+          対人を最大300名まで登録できます。宿曜の9グループ（宿番号の数字根1〜9）に配置した盤で、関係を一覧できます。
+          同じマスの人とは命・業・胎の深い縁。グループ番号の差だけで、すべての関係が決まります。
+        </p>
       <div class="book-viewpoint" id="book-viewpoint"></div>
       <div class="gboard" id="gboard"></div>
       <div class="book-hint">
@@ -3303,6 +3332,14 @@ html, body {
       <div class="book-hint" style="margin-top:8px;">
         <strong>チームビルディングの視点：</strong>命・業・胎の間柄は運勢サイクルがほぼ同じため、良い時は共に上がり、悪い時は一緒に落ちやすい関係です。チームには栄親・危成のサポーターを混ぜるとバランスが取れます。また、同じ宿同士は近すぎて衝突しやすいため、距離を置く・役割を分けるなどの「希釈」が有効です。
       </div>
+      </details>
+
+      <div class="gtag-filter" id="gtag-filter">
+        <button type="button" class="gtag-btn active" data-tag="all">すべて</button>
+        <button type="button" class="gtag-btn" data-tag="family">家族</button>
+        <button type="button" class="gtag-btn" data-tag="work">仕事</button>
+        <button type="button" class="gtag-btn" data-tag="private">プライベート</button>
+      </div>
 
       <div class="book-list">
         <div class="book-list-head">
@@ -3310,7 +3347,29 @@ html, body {
           <div class="book-list-meta" id="book-list-meta"></div>
         </div>
         <input type="search" class="book-search" id="book-search" placeholder="名前で検索" aria-label="名前で検索" autocomplete="off">
+        <div class="book-recent" id="book-recent"></div>
+        <div class="book-list-tools">
+          <span class="book-lead" style="margin:0;font-size:13.5px;">人物をタップすると選べます</span>
+          <button type="button" class="book-edit-toggle" id="btn-book-edit">編集</button>
+        </div>
         <div class="book-people-scroll" id="book-people"></div>
+        <div class="pickbar" id="book-pickbar">
+          <span class="pickbar-av" id="pickbar-av"></span>
+          <span class="pickbar-body">
+            <span class="pickbar-name" id="pickbar-name"></span>
+            <span class="pickbar-hint">もう一人タップすると相性が出ます</span>
+          </span>
+          <button type="button" class="pickbar-clear" id="pickbar-clear">解除</button>
+        </div>
+
+        <div class="book-backup">
+          <div class="book-backup-row">
+            <button type="button" class="gtag-btn" id="btn-book-export">⬇ バックアップを書き出す</button>
+            <button type="button" class="gtag-btn" id="btn-book-import">⬆ バックアップを読み込む</button>
+            <input type="file" id="book-import-file" accept="application/json,.json" style="display:none;" aria-label="バックアップファイル">
+          </div>
+          <div class="book-backup-msg" id="book-backup-msg">保存した人物は、この端末のブラウザ内にのみ記録されています。機種変更や別のPCで使う前に書き出しておくと安心です。</div>
+        </div>
       </div>
 
       <div class="book-add">
@@ -5060,13 +5119,14 @@ let lastCompatResult = null; // 直前の相性結果（A/B/compat）。視点�
 
 /* ── 人物帳（9グループ盤）用の状態 ─────────────────────── */
 const BOOK_KEY = "sukuyo_people_v1";
-const BOOK_MAX_PEOPLE = 50;          // マイページ「対人」の登録上限（わたし含む）
+const BOOK_MAX_PEOPLE = 300;          // マイページ「対人」の登録上限（わたし含む）
 const SENSEIBAN_MAX_OTHERS = 8;      // 関係の占星盤に同時表示できる相手の上限（基準以外）
 let resultSource = "form";     // 直前の結果の出どころ: "self" | "form" | "book"
 let bookPairNames = null;      // 人物帳ペア表示時の名前 { a, b }
 let lastSelfResult = null;     // 自分を占うの直前結果 { shukuA, y, m, d }
 let lastCompatB = null;        // 相性占いのB側入力日付 { y, m, d } | null
 let bookViewpointId = null;    // 盤の視点になっている人物ID
+let bookEditMode = false;      // 対人リストの編集（削除）モード
 let mypageTab = "me";          // "me" | "people"
 let bookSearchQuery = "";      // 対人リストの名前検索
 let inputMode = { self: "date", a: "date", b: "date", book: "date" }; // "date" | "shuku"
@@ -7699,24 +7759,82 @@ function renderBook() {
   } else if (listed.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">「${escapeHtml(bookSearchQuery.trim())}」に一致する人物はいません。</div>`;
   } else {
-    const meiId = meiPerson ? meiPerson.id : null;
     peopleEl.innerHTML = listed.map(p => {
       const g = groupOfIdx(p.shukuIdx);
-      const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "宿のみ登録";
       const tag = tagLabel(p);
-      const isMei = p.id === meiId;
+      const picked = p.id === bookViewpointId;
       return `
-        <div class="book-row${isMei ? " is-mei" : ""}">
-          <label class="book-mei${isMei ? " is-on" : ""}" title="この人を命（12時）の起点にする">
-            <input type="radio" name="book-mei" value="${p.id}" ${isMei ? "checked" : ""} aria-label="${escapeHtml(p.name)}を命にする">
-            命
-          </label>
-          <span class="book-row-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}${tag ? `<span class="gtag-badge">${tag}</span>` : ""}</span>
-          <span class="book-row-meta">${SHUKU[p.shukuIdx].kanji}・第${g}グループ・${dateStr}</span>
-          <button type="button" class="book-del" data-del="${p.id}">削除</button>
+        <div class="pcard${picked ? " is-picked" : ""}" data-pid="${p.id}" role="button" tabindex="0"
+             aria-label="${escapeHtml(p.name)}を選ぶ">
+          <span class="pcard-av">${escapeHtml(String(p.name || "?").trim().charAt(0))}</span>
+          <span class="pcard-body">
+            <span class="pcard-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>
+            <span class="pcard-meta">${SHUKU[p.shukuIdx].kanji}・第${g}グループ</span>
+          </span>
+          ${picked ? `<span class="pcard-state">選択中</span>` : (tag ? `<span class="pcard-tag">${tag}</span>` : "")}
+          ${bookEditMode ? `<button type="button" class="book-del" data-del="${p.id}">削除</button>` : ""}
         </div>`;
     }).join("");
   }
+
+  renderBookRecent(list);
+  renderPickBar(list);
+}
+
+/* ── 最近見た人 ─────────────────────────────────────────── */
+const BOOK_RECENT_KEY = "sukuyo_recent_v1";
+const BOOK_RECENT_MAX = 6;
+
+function loadRecentIds() {
+  try { const v = JSON.parse(localStorage.getItem(BOOK_RECENT_KEY)); return Array.isArray(v) ? v : []; }
+  catch (e) { return []; }
+}
+function pushRecentId(pid) {
+  const ids = loadRecentIds().filter(x => x !== pid);
+  ids.unshift(pid);
+  try { localStorage.setItem(BOOK_RECENT_KEY, JSON.stringify(ids.slice(0, BOOK_RECENT_MAX))); } catch (e) {}
+}
+function renderBookRecent(list) {
+  const el = document.getElementById("book-recent");
+  if (!el) return;
+  const q = bookSearchQuery.trim();
+  const ids = loadRecentIds();
+  const people = ids.map(id => list.find(p => p.id === id)).filter(Boolean);
+  if (q || people.length === 0 || list.length < 8) { el.innerHTML = ""; return; }
+  el.innerHTML = `<span class="book-recent-label">最近見た人</span>` +
+    people.map(p => `<button type="button" class="book-recent-chip" data-pid="${p.id}">${escapeHtml(p.name)}</button>`).join("");
+}
+
+/* ── 選択バー ───────────────────────────────────────────── */
+function renderPickBar(list) {
+  const bar = document.getElementById("book-pickbar");
+  if (!bar) return;
+  const p = list.find(x => x.id === bookViewpointId);
+  if (!p) { bar.classList.remove("show"); return; }
+  bar.classList.add("show");
+  document.getElementById("pickbar-av").textContent = String(p.name || "?").trim().charAt(0);
+  document.getElementById("pickbar-name").textContent = (p.isMe ? "☆" : "") + p.name;
+}
+
+/* ── 人物のタップ＝選択／2人目で相性 ─────────────────── */
+function pickPerson(pid) {
+  const list = loadPeople();
+  const p = list.find(x => x.id === pid);
+  if (!p) return;
+  if (!bookViewpointId || !list.some(x => x.id === bookViewpointId)) {
+    bookViewpointId = pid;
+    pushRecentId(pid);
+    renderBook();
+    return;
+  }
+  if (bookViewpointId === pid) {
+    bookViewpointId = null;
+    renderBook();
+    return;
+  }
+  const vp = list.find(x => x.id === bookViewpointId);
+  pushRecentId(pid);
+  showBookPairResult(vp, p);
 }
 
 document.getElementById("book-search")?.addEventListener("input", (e) => {
@@ -7771,13 +7889,38 @@ function showBookPairResult(pA, pB) {
 }
 
 /* ── 命（視点）の切替／人物の削除 ───────────────────────── */
-document.getElementById("book-people").addEventListener("change", (e) => {
-  const radio = e.target.closest('input[name="book-mei"]');
-  if (!radio) return;
-  const pid = radio.value;
-  const list = loadPeople();
-  if (!list.some(x => x.id === pid)) return;
-  bookViewpointId = pid;
+document.getElementById("book-people").addEventListener("click", (e) => {
+  if (e.target.closest(".book-del")) return;
+  const card = e.target.closest(".pcard");
+  if (!card) return;
+  if (bookEditMode) return;
+  pickPerson(card.dataset.pid);
+});
+
+document.getElementById("book-people").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target.closest(".pcard");
+  if (!card || bookEditMode) return;
+  e.preventDefault();
+  pickPerson(card.dataset.pid);
+});
+
+document.getElementById("book-recent")?.addEventListener("click", (e) => {
+  const chip = e.target.closest(".book-recent-chip");
+  if (!chip) return;
+  pickPerson(chip.dataset.pid);
+});
+
+document.getElementById("btn-book-edit")?.addEventListener("click", () => {
+  bookEditMode = !bookEditMode;
+  const btn = document.getElementById("btn-book-edit");
+  btn.classList.toggle("on", bookEditMode);
+  btn.textContent = bookEditMode ? "完了" : "編集";
+  renderBook();
+});
+
+document.getElementById("pickbar-clear")?.addEventListener("click", () => {
+  bookViewpointId = null;
   renderBook();
 });
 
@@ -7848,6 +7991,145 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
   if (isMe || !bookViewpointId) bookViewpointId = person.id;
   selectMypageTab("people");
   renderBook();
+});
+
+/* ── バックアップ（書き出し／読み込み） ─────────────────── */
+const BOOK_BACKUP_VERSION = 1;
+const BOOK_TAGS = ["family", "work", "private"];
+
+function bookBackupMsg(text, state) {
+  const el = document.getElementById("book-backup-msg");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove("ok", "ng");
+  if (state === "ok") el.classList.add("ok");
+  if (state === "ng") el.classList.add("ng");
+}
+
+function exportPeople() {
+  const list = loadPeople();
+  if (!list.length) {
+    bookBackupMsg("書き出せる人物がまだ登録されていません。", "ng");
+    return;
+  }
+  const payload = {
+    app: "sukuyo-compatibility",
+    version: BOOK_BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    count: list.length,
+    people: list
+  };
+  const now = new Date();
+  const stamp = now.getFullYear()
+    + String(now.getMonth() + 1).padStart(2, "0")
+    + String(now.getDate()).padStart(2, "0");
+  try {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sukuyo-people-" + stamp + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    bookBackupMsg(list.length + "名を書き出しました。ダウンロードフォルダのファイルを保管してください。", "ok");
+  } catch (e) {
+    bookBackupMsg("書き出しに失敗しました。時間をおいて試してみてください。", "ng");
+  }
+}
+
+function normalizeImportedPerson(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const name = typeof raw.name === "string" ? raw.name.trim().slice(0, 20) : "";
+  if (!name) return null;
+
+  const num = v => (v === null || v === undefined || v === "" ? null : Number(v));
+  let y = num(raw.y), m = num(raw.m), d = num(raw.d);
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) { y = m = d = null; }
+
+  let shukuIdx = Number(raw.shukuIdx);
+  if (!Number.isInteger(shukuIdx) || shukuIdx < 0 || shukuIdx > 26) {
+    if (y && m && d) {
+      try { shukuIdx = getShuku(y, m, d).index; } catch (e) { return null; }
+    } else {
+      return null;
+    }
+  }
+  if (!Number.isInteger(shukuIdx) || shukuIdx < 0 || shukuIdx > 26) return null;
+
+  return {
+    id: newPersonId(),
+    name,
+    y, m, d,
+    shukuIdx,
+    isMe: raw.isMe === true,
+    tag: BOOK_TAGS.indexOf(raw.tag) >= 0 ? raw.tag : null
+  };
+}
+
+function importPeopleFromText(text) {
+  let data;
+  try { data = JSON.parse(text); }
+  catch (e) {
+    bookBackupMsg("ファイルを読み取れませんでした。書き出したJSONファイルを選んでください。", "ng");
+    return;
+  }
+
+  const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.people) ? data.people : null);
+  if (!incoming) {
+    bookBackupMsg("このアプリで書き出したバックアップファイルではないようです。", "ng");
+    return;
+  }
+
+  const list = loadPeople();
+  const seen = {};
+  list.forEach(p => { seen[p.name + "|" + p.shukuIdx] = true; });
+  let hasMe = list.some(p => p.isMe);
+
+  let added = 0, skipped = 0, invalid = 0, overflow = 0;
+  incoming.forEach(raw => {
+    const person = normalizeImportedPerson(raw);
+    if (!person) { invalid++; return; }
+    const key = person.name + "|" + person.shukuIdx;
+    if (seen[key]) { skipped++; return; }
+    if (list.length >= BOOK_MAX_PEOPLE) { overflow++; return; }
+    if (person.isMe) {
+      if (hasMe) person.isMe = false;
+      else hasMe = true;
+    }
+    list.push(person);
+    seen[key] = true;
+    added++;
+  });
+
+  if (added > 0) {
+    savePeople(list);
+    initBookViewpoint();
+    renderBook();
+  }
+
+  const parts = [added + "名を読み込みました"];
+  if (skipped) parts.push("登録済み " + skipped + "名はそのまま");
+  if (overflow) parts.push("上限" + BOOK_MAX_PEOPLE + "名を超える " + overflow + "名は未登録");
+  if (invalid) parts.push("読み取れないデータ " + invalid + "件");
+  bookBackupMsg(parts.join(" ／ ") + "。", added > 0 ? "ok" : "ng");
+}
+
+document.getElementById("btn-book-export")?.addEventListener("click", exportPeople);
+
+document.getElementById("btn-book-import")?.addEventListener("click", () => {
+  document.getElementById("book-import-file")?.click();
+});
+
+document.getElementById("book-import-file")?.addEventListener("change", ev => {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => importPeopleFromText(String(reader.result || ""));
+  reader.onerror = () => bookBackupMsg("ファイルの読み込みに失敗しました。", "ng");
+  reader.readAsText(file);
+  ev.target.value = "";
 });
 
 /* ── 結果ページの保存UI ─────────────────────────────────── */
