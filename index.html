@@ -444,6 +444,11 @@ html, body {
 .book-capacity { font-size: 13px; color: var(--muted); margin: 0 0 10px; line-height: 1.6; }
 .book-capacity.full { color: #a04545; }
 #btn-book-add:disabled { opacity: .45; cursor: not-allowed; }
+.book-backup { border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 12px; }
+.book-backup-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.book-backup-msg { font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 8px; }
+.book-backup-msg.ok { color: #2f7d5a; }
+.book-backup-msg.ng { color: #a04545; }
 .save-person { margin-top: 18px; padding: 14px; border: 1px dashed var(--border); border-radius: var(--r); display: none; }
 .save-person.show { display: block; }
 .save-person-row { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -3311,6 +3316,15 @@ html, body {
         </div>
         <input type="search" class="book-search" id="book-search" placeholder="名前で検索" aria-label="名前で検索" autocomplete="off">
         <div class="book-people-scroll" id="book-people"></div>
+
+        <div class="book-backup">
+          <div class="book-backup-row">
+            <button type="button" class="gtag-btn" id="btn-book-export">⬇ バックアップを書き出す</button>
+            <button type="button" class="gtag-btn" id="btn-book-import">⬆ バックアップを読み込む</button>
+            <input type="file" id="book-import-file" accept="application/json,.json" style="display:none;" aria-label="バックアップファイル">
+          </div>
+          <div class="book-backup-msg" id="book-backup-msg">保存した人物は、この端末のブラウザ内にのみ記録されています。機種変更や別のPCで使う前に書き出しておくと安心です。</div>
+        </div>
       </div>
 
       <div class="book-add">
@@ -7848,6 +7862,145 @@ document.getElementById("btn-book-add").addEventListener("click", () => {
   if (isMe || !bookViewpointId) bookViewpointId = person.id;
   selectMypageTab("people");
   renderBook();
+});
+
+/* ── バックアップ（書き出し／読み込み） ─────────────────── */
+const BOOK_BACKUP_VERSION = 1;
+const BOOK_TAGS = ["family", "work", "private"];
+
+function bookBackupMsg(text, state) {
+  const el = document.getElementById("book-backup-msg");
+  if (!el) return;
+  el.textContent = text;
+  el.classList.remove("ok", "ng");
+  if (state === "ok") el.classList.add("ok");
+  if (state === "ng") el.classList.add("ng");
+}
+
+function exportPeople() {
+  const list = loadPeople();
+  if (!list.length) {
+    bookBackupMsg("書き出せる人物がまだ登録されていません。", "ng");
+    return;
+  }
+  const payload = {
+    app: "sukuyo-compatibility",
+    version: BOOK_BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    count: list.length,
+    people: list
+  };
+  const now = new Date();
+  const stamp = now.getFullYear()
+    + String(now.getMonth() + 1).padStart(2, "0")
+    + String(now.getDate()).padStart(2, "0");
+  try {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sukuyo-people-" + stamp + ".json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    bookBackupMsg(list.length + "名を書き出しました。ダウンロードフォルダのファイルを保管してください。", "ok");
+  } catch (e) {
+    bookBackupMsg("書き出しに失敗しました。時間をおいて試してみてください。", "ng");
+  }
+}
+
+function normalizeImportedPerson(raw) {
+  if (!raw || typeof raw !== "object") return null;
+  const name = typeof raw.name === "string" ? raw.name.trim().slice(0, 20) : "";
+  if (!name) return null;
+
+  const num = v => (v === null || v === undefined || v === "" ? null : Number(v));
+  let y = num(raw.y), m = num(raw.m), d = num(raw.d);
+  if (!Number.isInteger(y) || !Number.isInteger(m) || !Number.isInteger(d)) { y = m = d = null; }
+
+  let shukuIdx = Number(raw.shukuIdx);
+  if (!Number.isInteger(shukuIdx) || shukuIdx < 0 || shukuIdx > 26) {
+    if (y && m && d) {
+      try { shukuIdx = getShuku(y, m, d).index; } catch (e) { return null; }
+    } else {
+      return null;
+    }
+  }
+  if (!Number.isInteger(shukuIdx) || shukuIdx < 0 || shukuIdx > 26) return null;
+
+  return {
+    id: newPersonId(),
+    name,
+    y, m, d,
+    shukuIdx,
+    isMe: raw.isMe === true,
+    tag: BOOK_TAGS.indexOf(raw.tag) >= 0 ? raw.tag : null
+  };
+}
+
+function importPeopleFromText(text) {
+  let data;
+  try { data = JSON.parse(text); }
+  catch (e) {
+    bookBackupMsg("ファイルを読み取れませんでした。書き出したJSONファイルを選んでください。", "ng");
+    return;
+  }
+
+  const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.people) ? data.people : null);
+  if (!incoming) {
+    bookBackupMsg("このアプリで書き出したバックアップファイルではないようです。", "ng");
+    return;
+  }
+
+  const list = loadPeople();
+  const seen = {};
+  list.forEach(p => { seen[p.name + "|" + p.shukuIdx] = true; });
+  let hasMe = list.some(p => p.isMe);
+
+  let added = 0, skipped = 0, invalid = 0, overflow = 0;
+  incoming.forEach(raw => {
+    const person = normalizeImportedPerson(raw);
+    if (!person) { invalid++; return; }
+    const key = person.name + "|" + person.shukuIdx;
+    if (seen[key]) { skipped++; return; }
+    if (list.length >= BOOK_MAX_PEOPLE) { overflow++; return; }
+    if (person.isMe) {
+      if (hasMe) person.isMe = false;
+      else hasMe = true;
+    }
+    list.push(person);
+    seen[key] = true;
+    added++;
+  });
+
+  if (added > 0) {
+    savePeople(list);
+    initBookViewpoint();
+    renderBook();
+  }
+
+  const parts = [added + "名を読み込みました"];
+  if (skipped) parts.push("登録済み " + skipped + "名はそのまま");
+  if (overflow) parts.push("上限" + BOOK_MAX_PEOPLE + "名を超える " + overflow + "名は未登録");
+  if (invalid) parts.push("読み取れないデータ " + invalid + "件");
+  bookBackupMsg(parts.join(" ／ ") + "。", added > 0 ? "ok" : "ng");
+}
+
+document.getElementById("btn-book-export")?.addEventListener("click", exportPeople);
+
+document.getElementById("btn-book-import")?.addEventListener("click", () => {
+  document.getElementById("book-import-file")?.click();
+});
+
+document.getElementById("book-import-file")?.addEventListener("change", ev => {
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => importPeopleFromText(String(reader.result || ""));
+  reader.onerror = () => bookBackupMsg("ファイルの読み込みに失敗しました。", "ng");
+  reader.readAsText(file);
+  ev.target.value = "";
 });
 
 /* ── 結果ページの保存UI ─────────────────────────────────── */
