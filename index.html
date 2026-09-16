@@ -398,31 +398,50 @@ html, body {
 .book-row.is-mei { background: rgba(184,149,58,.08); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
 .book-row-name { font-weight: 600; white-space: nowrap; }
 .book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pcard { display: flex; align-items: center; gap: 10px; padding: 10px 6px; min-height: 60px; border-bottom: 1px solid var(--border); border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; background: transparent; }
-.pcard:last-child { border-bottom: none; }
-.book-people-base { font-size: 12.5px; color: var(--muted); padding: 8px 4px 2px; }
-.psec { padding-top: 2px; }
-.psec + .psec { margin-top: 6px; border-top: 1.5px solid rgba(201,169,97,.45); }
-.psec-head { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 4px 4px; }
-.psec-title { font-size: 15px; font-weight: 600; color: var(--violet); letter-spacing: .06em; }
-.psec-count { font-size: 12.5px; color: var(--muted); }
-.psec-empty { font-size: 13px; color: var(--muted); padding: 2px 4px 10px; }
-.pcard-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
-.pcard-top .pcard-tag { margin-left: auto; }
-.pcard-meta > span { white-space: nowrap; margin-right: 1em; }
-.pcard-meta > span:last-child { margin-right: 0; }
+/* 対人リスト：1人1行の表。列幅はリスト全体でそろえる（subgrid） */
+.plist { display: grid; grid-template-columns: auto minmax(0,max-content) auto auto auto 1fr; column-gap: 14px; }
+.plist.is-editing { grid-template-columns: auto minmax(0,max-content) auto auto auto 1fr auto auto; }
+.pcard-name { padding-right: 18px; }
+.plist > *, .psec > * { grid-column: 1 / -1; }
+.psec, .pcard, .plist-head { display: grid; grid-template-columns: subgrid; align-items: center; }
+.book-people-base { font-size: 12.5px; color: var(--muted); padding: 8px 6px 0; }
+.plist-head { position: sticky; top: 0; z-index: 3; background: #fff; font-size: 11px; color: var(--muted); letter-spacing: .04em; padding: 6px 6px 5px; border-bottom: 1px solid var(--border); }
+.plist-head > span:nth-child(2) { grid-column: 2; }
+.psec + .psec { border-top: 1.5px solid rgba(201,169,97,.45); }
+.psec-head { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 6px 3px; }
+.psec-title { font-size: 14px; font-weight: 600; color: var(--violet); letter-spacing: .06em; }
+.psec-count { font-size: 12px; color: var(--muted); }
+.psec-empty { font-size: 12.5px; color: var(--muted); padding: 0 6px 8px; }
+.pcard { min-height: 40px; padding: 6px 6px; border-bottom: 1px solid rgba(0,0,0,.05); cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.psec > .pcard:last-child { border-bottom: none; }
+.pcard:active { background: rgba(184,149,58,.10); }
+.pcard.is-picked { background: rgba(184,149,58,.16); border-radius: 6px; }
+.pcard-rel { font-size: 12.5px; font-weight: 600; color: var(--gold); text-align: center; min-width: 1em; }
+.pcard-name { min-width: 0; font-size: 15.5px; font-weight: 600; line-height: 1.35; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-date, .pcard-shuku, .pcard-grp { font-size: 12.5px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pcard-shuku { color: var(--ink); }
+.pcard-grp { text-align: center; }
+.pcard-tag { font-size: 11px; color: var(--muted); white-space: nowrap; }
+.pcard-tag[data-tag] { border: 1px solid var(--border); border-radius: 20px; padding: 1px 7px; justify-self: start; }
 .book-people-scroll.is-editing { user-select: none; -webkit-user-select: none; }
-.pcard-rel { display: inline-block; min-width: 1.4em; font-size: 13px; font-weight: 600; color: var(--gold); flex: none; }
-.pcard-drag { flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pcard .book-del { padding: 2px 8px; }
+.pcard-drag { width: 34px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--muted); border: 1px solid var(--border); border-radius: 7px; background: #fff; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
 .pcard.is-dragging { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.14); position: relative; z-index: 2; }
 .pcard.is-dragging .pcard-drag { cursor: grabbing; color: var(--gold); border-color: var(--gold); }
-.pcard:active { background: rgba(184,149,58,.10); }
-.pcard.is-picked { background: rgba(184,149,58,.16); box-shadow: inset 0 0 0 1px var(--gold-dim); }
-.pcard-body { flex: 1; min-width: 0; }
-.pcard-name { display: block; min-width: 0; font-size: 17px; font-weight: 600; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pcard-meta { display: flex; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); line-height: 1.5; font-variant-numeric: tabular-nums; }
-.pcard-tag { font-size: 12px; border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px; color: var(--muted); flex: none; white-space: nowrap; }
-.pcard-state { font-size: 13px; color: var(--gold); flex: none; white-space: nowrap; }
+@media (max-width: 640px) {
+  #book-card { padding-left: 14px; padding-right: 14px; }
+  .book-people-scroll { padding-left: 0; padding-right: 0; }
+  .plist { grid-template-columns: auto minmax(0,1fr) auto auto auto auto; column-gap: 7px; }
+  .plist-head { display: none; }
+  .pcard-name { padding-right: 0; }
+  .pcard-tag[data-tag] { border: none; padding: 0; font-size: 11px; }
+  .pcard-name { font-size: 15px; }
+  .pcard-date, .pcard-shuku, .pcard-grp { font-size: 12px; }
+  /* 編集中は並び替えに必要な列だけ残す */
+  .plist.is-editing { grid-template-columns: auto minmax(0,1fr) auto auto auto; }
+  .plist.is-editing .pcard-date, .plist.is-editing .pcard-grp, .plist.is-editing .pcard-tag,
+  .plist.is-editing .plist-head .h-date, .plist.is-editing .plist-head .h-grp, .plist.is-editing .plist-head .h-tag { display: none; }
+}
 .pickbar { position: sticky; bottom: 0; z-index: 5; display: none; align-items: center; gap: 10px; margin-top: 10px; padding: 12px 14px; border: 1px solid var(--gold-dim); border-radius: 12px; background: #fff; box-shadow: 0 -2px 14px rgba(0,0,0,.10); }
 .pickbar.show { display: flex; }
 .pickbar-body { flex: 1; min-width: 0; }
@@ -7791,7 +7810,9 @@ function renderBook() {
     });
     const searching = !!q;
     peopleEl.innerHTML =
+      `<div class="plist${bookEditMode ? " is-editing" : ""}">` +
       `<div class="book-people-base">${escapeHtml(base.name)}（${SHUKU[base.shukuIdx].kanji}）から見た関係</div>` +
+      `<div class="plist-head"><span></span><span>名前</span><span class="h-date">生年月日</span><span>宿</span><span class="h-grp">グループ</span><span class="h-tag">属性</span>${bookEditMode ? "<span></span><span></span>" : ""}</div>` +
       sections.filter(sec => !searching || sec.people.length).map(sec => `
         <div class="psec" data-sec="${sec.id}">
           <div class="psec-head">
@@ -7802,24 +7823,23 @@ function renderBook() {
             const g = groupOfIdx(p.shukuIdx);
             const tag = tagLabel(p);
             const picked = p.id === bookViewpointId;
-            const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "生年月日なし";
+            const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "—";
             const relStr = p.id === base.id ? "命" : key;
             return `
             <div class="pcard${picked ? " is-picked" : ""}" data-pid="${p.id}" role="button" tabindex="0"
                  aria-label="${escapeHtml(p.name)}を選ぶ">
-              <span class="pcard-body">
-                <span class="pcard-top">
-                  <span class="pcard-rel">${relStr}</span>
-                  <span class="pcard-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>
-                  ${tag ? `<span class="pcard-tag">${tag}</span>` : ""}
-                </span>
-                <span class="pcard-meta"><span>${dateStr}</span><span>${SHUKU[p.shukuIdx].kanji}</span><span>第${g}グループ</span></span>
-              </span>
+              <span class="pcard-rel">${relStr}</span>
+              <span class="pcard-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>
+              <span class="pcard-date">${dateStr}</span>
+              <span class="pcard-shuku">${SHUKU[p.shukuIdx].kanji}</span>
+              <span class="pcard-grp">第${g}</span>
+              <span class="pcard-tag"${tag ? ` data-tag="${p.tag}"` : ""}>${tag || ""}</span>
               ${bookEditMode ? `<button type="button" class="book-del" data-del="${p.id}">削除</button>
               <span class="pcard-drag" data-drag="${p.id}" role="button" aria-label="${escapeHtml(p.name)}を並び替え">≡</span>` : ""}
             </div>`;
           }).join("") : `<div class="psec-empty">まだいません</div>`}
-        </div>`).join("");
+        </div>`).join("") +
+      `</div>`;
   }
 
   renderBookRecent(list);
