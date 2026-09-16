@@ -398,20 +398,33 @@ html, body {
 .book-row.is-mei { background: rgba(184,149,58,.08); margin: 0 -8px; padding-left: 8px; padding-right: 8px; border-radius: 8px; }
 .book-row-name { font-weight: 600; white-space: nowrap; }
 .book-row-meta { color: var(--muted); font-size: 13px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pcard { display: flex; align-items: center; gap: 12px; padding: 11px 10px; min-height: 62px; border-bottom: 1px solid var(--border); border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.pcard { display: flex; align-items: center; gap: 10px; padding: 10px 6px; min-height: 60px; border-bottom: 1px solid var(--border); border-radius: 10px; cursor: pointer; -webkit-tap-highlight-color: transparent; background: transparent; }
 .pcard:last-child { border-bottom: none; }
+.book-people-base { font-size: 12.5px; color: var(--muted); padding: 8px 4px 2px; }
+.psec { padding-top: 2px; }
+.psec + .psec { margin-top: 6px; border-top: 1.5px solid rgba(201,169,97,.45); }
+.psec-head { display: flex; align-items: baseline; justify-content: space-between; padding: 10px 4px 4px; }
+.psec-title { font-size: 15px; font-weight: 600; color: var(--violet); letter-spacing: .06em; }
+.psec-count { font-size: 12.5px; color: var(--muted); }
+.psec-empty { font-size: 13px; color: var(--muted); padding: 2px 4px 10px; }
+.pcard-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.pcard-top .pcard-tag { margin-left: auto; }
+.pcard-meta > span { white-space: nowrap; margin-right: 1em; }
+.pcard-meta > span:last-child { margin-right: 0; }
+.book-people-scroll.is-editing { user-select: none; -webkit-user-select: none; }
+.pcard-rel { display: inline-block; min-width: 1.4em; font-size: 13px; font-weight: 600; color: var(--gold); flex: none; }
+.pcard-drag { flex: none; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; background: #fff; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pcard.is-dragging { background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.14); position: relative; z-index: 2; }
+.pcard.is-dragging .pcard-drag { cursor: grabbing; color: var(--gold); border-color: var(--gold); }
 .pcard:active { background: rgba(184,149,58,.10); }
 .pcard.is-picked { background: rgba(184,149,58,.16); box-shadow: inset 0 0 0 1px var(--gold-dim); }
-.pcard-av { width: 38px; height: 38px; border-radius: 50%; background: var(--deep); color: var(--moon); display: flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
-.pcard.is-picked .pcard-av { background: var(--gold); color: #fff; }
 .pcard-body { flex: 1; min-width: 0; }
-.pcard-name { display: block; font-size: 18px; font-weight: 600; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pcard-meta { display: block; font-size: 14px; color: var(--muted); line-height: 1.5; }
+.pcard-name { display: block; min-width: 0; font-size: 17px; font-weight: 600; line-height: 1.45; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard-meta { display: flex; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); line-height: 1.5; font-variant-numeric: tabular-nums; }
 .pcard-tag { font-size: 12px; border: 1px solid var(--border); border-radius: 20px; padding: 3px 9px; color: var(--muted); flex: none; white-space: nowrap; }
 .pcard-state { font-size: 13px; color: var(--gold); flex: none; white-space: nowrap; }
 .pickbar { position: sticky; bottom: 0; z-index: 5; display: none; align-items: center; gap: 10px; margin-top: 10px; padding: 12px 14px; border: 1px solid var(--gold-dim); border-radius: 12px; background: #fff; box-shadow: 0 -2px 14px rgba(0,0,0,.10); }
 .pickbar.show { display: flex; }
-.pickbar-av { width: 34px; height: 34px; border-radius: 50%; background: var(--gold); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; flex: none; }
 .pickbar-body { flex: 1; min-width: 0; }
 .pickbar-name { display: block; font-size: 16px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pickbar-hint { display: block; font-size: 13px; color: var(--muted); }
@@ -3349,12 +3362,11 @@ html, body {
         <input type="search" class="book-search" id="book-search" placeholder="名前で検索" aria-label="名前で検索" autocomplete="off">
         <div class="book-recent" id="book-recent"></div>
         <div class="book-list-tools">
-          <span class="book-lead" style="margin:0;font-size:13.5px;">人物をタップすると選べます</span>
+          <span class="book-lead" id="book-list-lead" style="margin:0;font-size:13.5px;">人物をタップすると選べます</span>
           <button type="button" class="book-edit-toggle" id="btn-book-edit">編集</button>
         </div>
         <div class="book-people-scroll" id="book-people"></div>
         <div class="pickbar" id="book-pickbar">
-          <span class="pickbar-av" id="pickbar-av"></span>
           <span class="pickbar-body">
             <span class="pickbar-name" id="pickbar-name"></span>
             <span class="pickbar-hint">もう一人タップすると相性が出ます</span>
@@ -7272,6 +7284,15 @@ let bookAddTag = null;       // 追加フォームで選択中のタグ
 
 function tagLabel(p) { return PERSON_TAGS[p.tag] || null; }
 
+// 対人リストの区切り（上から順に表示）
+const PEOPLE_SECTIONS = [
+  { id: "meigyotai", label: "命・業・胎", keys: ["命", "業", "胎"] },
+  { id: "eishin",    label: "栄・親",     keys: ["栄", "親"] },
+  { id: "yusui",     label: "友・衰",     keys: ["友", "衰"] },
+  { id: "ankai",     label: "安・壊",     keys: ["安", "壊"] },
+  { id: "kisei",     label: "危・成",     keys: ["危", "成"] },
+];
+
 // フィルタ切替
 document.getElementById("gtag-filter").addEventListener("click", (e) => {
   const btn = e.target.closest(".gtag-btn");
@@ -7752,6 +7773,7 @@ function renderBook() {
   const q = bookSearchQuery.trim().toLowerCase();
   const listed = visible.filter(p => !q || String(p.name || "").toLowerCase().includes(q));
   const peopleEl = document.getElementById("book-people");
+  peopleEl.classList.toggle("is-editing", bookEditMode);
   if (list.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">保存された人物はまだいません。</div>`;
   } else if (visible.length === 0) {
@@ -7759,22 +7781,45 @@ function renderBook() {
   } else if (listed.length === 0) {
     peopleEl.innerHTML = `<div class="book-empty">「${escapeHtml(bookSearchQuery.trim())}」に一致する人物はいません。</div>`;
   } else {
-    peopleEl.innerHTML = listed.map(p => {
-      const g = groupOfIdx(p.shukuIdx);
-      const tag = tagLabel(p);
-      const picked = p.id === bookViewpointId;
-      return `
-        <div class="pcard${picked ? " is-picked" : ""}" data-pid="${p.id}" role="button" tabindex="0"
-             aria-label="${escapeHtml(p.name)}を選ぶ">
-          <span class="pcard-av">${escapeHtml(String(p.name || "?").trim().charAt(0))}</span>
-          <span class="pcard-body">
-            <span class="pcard-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>
-            <span class="pcard-meta">${SHUKU[p.shukuIdx].kanji}・第${g}グループ</span>
-          </span>
-          ${picked ? `<span class="pcard-state">選択中</span>` : (tag ? `<span class="pcard-tag">${tag}</span>` : "")}
-          ${bookEditMode ? `<button type="button" class="book-del" data-del="${p.id}">削除</button>` : ""}
-        </div>`;
-    }).join("");
+    // 並びの基準：わたし（未登録なら最初に登録した人）から見た関係
+    const base = me || list[0];
+    const sections = PEOPLE_SECTIONS.map(sec => ({ ...sec, people: [] }));
+    listed.forEach(p => {
+      const key = getRelation(base.shukuIdx, p.shukuIdx).key;
+      const sec = sections.find(x => x.keys.includes(key));
+      if (sec) sec.people.push({ p, key });
+    });
+    const searching = !!q;
+    peopleEl.innerHTML =
+      `<div class="book-people-base">${escapeHtml(base.name)}（${SHUKU[base.shukuIdx].kanji}）から見た関係</div>` +
+      sections.filter(sec => !searching || sec.people.length).map(sec => `
+        <div class="psec" data-sec="${sec.id}">
+          <div class="psec-head">
+            <span class="psec-title">${sec.label}</span>
+            <span class="psec-count">${sec.people.length}名</span>
+          </div>
+          ${sec.people.length ? sec.people.map(({ p, key }) => {
+            const g = groupOfIdx(p.shukuIdx);
+            const tag = tagLabel(p);
+            const picked = p.id === bookViewpointId;
+            const dateStr = p.y ? `${p.y}/${p.m}/${p.d}` : "生年月日なし";
+            const relStr = p.id === base.id ? "命" : key;
+            return `
+            <div class="pcard${picked ? " is-picked" : ""}" data-pid="${p.id}" role="button" tabindex="0"
+                 aria-label="${escapeHtml(p.name)}を選ぶ">
+              <span class="pcard-body">
+                <span class="pcard-top">
+                  <span class="pcard-rel">${relStr}</span>
+                  <span class="pcard-name">${p.isMe ? "☆" : ""}${escapeHtml(p.name)}</span>
+                  ${tag ? `<span class="pcard-tag">${tag}</span>` : ""}
+                </span>
+                <span class="pcard-meta"><span>${dateStr}</span><span>${SHUKU[p.shukuIdx].kanji}</span><span>第${g}グループ</span></span>
+              </span>
+              ${bookEditMode ? `<button type="button" class="book-del" data-del="${p.id}">削除</button>
+              <span class="pcard-drag" data-drag="${p.id}" role="button" aria-label="${escapeHtml(p.name)}を並び替え">≡</span>` : ""}
+            </div>`;
+          }).join("") : `<div class="psec-empty">まだいません</div>`}
+        </div>`).join("");
   }
 
   renderBookRecent(list);
@@ -7812,7 +7857,6 @@ function renderPickBar(list) {
   const p = list.find(x => x.id === bookViewpointId);
   if (!p) { bar.classList.remove("show"); return; }
   bar.classList.add("show");
-  document.getElementById("pickbar-av").textContent = String(p.name || "?").trim().charAt(0);
   document.getElementById("pickbar-name").textContent = (p.isMe ? "☆" : "") + p.name;
 }
 
@@ -7916,8 +7960,78 @@ document.getElementById("btn-book-edit")?.addEventListener("click", () => {
   const btn = document.getElementById("btn-book-edit");
   btn.classList.toggle("on", bookEditMode);
   btn.textContent = bookEditMode ? "完了" : "編集";
+  const lead = document.getElementById("book-list-lead");
+  if (lead) lead.textContent = bookEditMode ? "≡ をドラッグして並び替えできます" : "人物をタップすると選べます";
   renderBook();
 });
+
+/* ── 編集モード：≡ をドラッグして並び替え ─────────────── */
+(function initBookDragSort() {
+  const root = document.getElementById("book-people");
+  if (!root) return;
+  let drag = null; // { row, sec, pointerId }
+
+  function rowsOf(sec) { return Array.from(sec.querySelectorAll(":scope > .pcard")); }
+
+  root.addEventListener("pointerdown", (e) => {
+    const handle = e.target.closest(".pcard-drag");
+    if (!handle || !bookEditMode) return;
+    e.preventDefault();
+    const row = handle.closest(".pcard");
+    const sec = row.closest(".psec");
+    if (!row || !sec) return;
+    drag = { row, sec, pointerId: e.pointerId };
+    if (window.getSelection) window.getSelection().removeAllRanges();
+    row.classList.add("is-dragging");
+  });
+
+  window.addEventListener("pointermove", (e) => {
+    if (!drag || e.pointerId !== drag.pointerId) return;
+    e.preventDefault();
+    const y = e.clientY;
+    // リスト枠の上下端に近づいたら自動スクロール
+    const box = root.getBoundingClientRect();
+    if (y < box.top + 36) root.scrollTop -= 12;
+    else if (y > box.bottom - 36) root.scrollTop += 12;
+    // ドラッグ中の行は動かさず、周りの行を入れ替える
+    for (let guard = 0; guard < 300; guard++) {
+      const rows = rowsOf(drag.sec);
+      const idx = rows.indexOf(drag.row);
+      const prev = rows[idx - 1];
+      const next = rows[idx + 1];
+      if (prev) {
+        const r = prev.getBoundingClientRect();
+        if (y < r.top + r.height / 2) { drag.sec.insertBefore(prev, drag.row.nextSibling); continue; }
+      }
+      if (next) {
+        const r = next.getBoundingClientRect();
+        if (y > r.top + r.height / 2) { drag.sec.insertBefore(next, drag.row); continue; }
+      }
+      break;
+    }
+  }, { passive: false });
+
+  function endDrag(e) {
+    if (!drag || (e && e.pointerId !== drag.pointerId)) return;
+    const ids = rowsOf(drag.sec).map(r => r.dataset.pid);
+    drag.row.classList.remove("is-dragging");
+    drag = null;
+    // 同じ区切りの人たちが占めていた位置に、新しい順で入れ直す（他の人の順番は変えない）
+    const list = loadPeople();
+    const slots = ids.map(id => list.findIndex(p => p.id === id)).filter(i => i >= 0).sort((a, b) => a - b);
+    const byId = Object.fromEntries(list.map(p => [p.id, p]));
+    const moved = ids.map(id => byId[id]).filter(Boolean);
+    if (slots.length !== moved.length) { renderBook(); return; }
+    const changed = slots.some((pos, k) => list[pos].id !== moved[k].id);
+    if (changed) {
+      slots.forEach((pos, k) => { list[pos] = moved[k]; });
+      savePeople(list);
+    }
+    renderBook();
+  }
+  window.addEventListener("pointerup", endDrag);
+  window.addEventListener("pointercancel", endDrag);
+})();
 
 document.getElementById("pickbar-clear")?.addEventListener("click", () => {
   bookViewpointId = null;
